@@ -1,17 +1,26 @@
+import { Metadata } from 'next'
+import HeroSection from '@/components/home/HeroSection'
+import HomeProductGrid from '@/components/home/HomeProductGrid'
+import BrandStory from '@/components/home/BrandStory'
+import SocialProof from '@/components/home/SocialProof'
+
+export const metadata: Metadata = {
+  title: 'Jamaica House Brand - Original Jerk Sauce | 30 Years of Flavor',
+  description: 'Authentic Jamaican jerk sauce crafted from Chef Anthony\'s 30-year family recipe. Shop our collection of all-natural, zero-calorie sauces.',
+  openGraph: {
+    title: 'Jamaica House Brand - Original Jerk Sauce',
+    description: 'Authentic Jamaican jerk sauce crafted from Chef Anthony\'s 30-year family recipe.',
+    type: 'website',
+  },
+}
+
 export default function Home() {
   return (
-    <main className="min-h-screen pt-16 flex items-center justify-center">
-      <div className="text-center px-4">
-        <h1 className="text-5xl md:text-6xl font-bold text-brand-gold mb-6">
-          Jamaica House Brand
-        </h1>
-        <p className="text-xl md:text-2xl text-white mb-4">
-          30 Years of Flavor. One Legendary Sauce.
-        </p>
-        <p className="text-brand-gold/80 text-sm uppercase tracking-wide">
-          From Our Family to Yours
-        </p>
-      </div>
-    </main>
-  );
+    <>
+      <HeroSection />
+      <HomeProductGrid />
+      <BrandStory />
+      <SocialProof />
+    </>
+  )
 }
