@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { plusJakarta } from "@/lib/fonts";
 import Navigation from "@/components/navigation/Navigation";
+import Footer from "@/components/layout/Footer";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,8 +17,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${plusJakarta.variable} dark`}>
       <body className="bg-brand-dark text-white antialiased">
-        <Navigation />
-        {children}
+        <div className="flex flex-col min-h-screen">
+          <Navigation />
+          <main className="flex-1">
+            {children}
+          </main>
+          <Footer />
+        </div>
       </body>
     </html>
   );
