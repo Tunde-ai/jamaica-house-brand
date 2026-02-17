@@ -4,6 +4,7 @@ import { getProductBySlug, products } from '@/data/products'
 import ImageGallery from '@/components/product/ImageGallery'
 import ProductInfo from '@/components/product/ProductInfo'
 import ProductCallouts from '@/components/product/ProductCallouts'
+import QuantitySelector from '@/components/product/QuantitySelector'
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -55,7 +56,17 @@ export default async function ProductDetailPage({ params }: Props) {
           <div>
             <ProductInfo product={product} />
             <ProductCallouts callouts={product.callouts} />
-            {/* QuantitySelector + Add to Cart from Task 3 */}
+
+            {/* Quantity Selector and Add to Cart */}
+            <div className="mt-8 space-y-4">
+              <QuantitySelector />
+              <button
+                type="button"
+                className="w-full bg-brand-gold text-brand-dark font-bold text-lg py-4 rounded-lg hover:bg-brand-gold-light transition-colors"
+              >
+                Add to Cart
+              </button>
+            </div>
           </div>
         </div>
       </div>
