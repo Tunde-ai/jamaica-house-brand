@@ -17,9 +17,9 @@ export default function SocialProof() {
               key={testimonial.id}
               className="bg-white/5 border border-brand-gold/10 rounded-lg p-6"
             >
-              <StarRating rating={testimonial.rating} />
+              <StarRating rating={testimonial.rating} showValue={false} />
               <blockquote className="text-gray-300 italic mt-4 leading-relaxed">
-                "{testimonial.quote}"
+                &ldquo;{testimonial.quote}&rdquo;
               </blockquote>
               <div className="mt-4">
                 <p className="text-white font-semibold">{testimonial.name}</p>

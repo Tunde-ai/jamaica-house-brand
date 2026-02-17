@@ -30,13 +30,13 @@ export default function BrandStory() {
             </h2>
             <div className="text-gray-300 leading-relaxed space-y-4">
               <p>
-                What started as Chef Anthony's secret recipe at his first South Florida restaurant quickly became legendary.
+                What started as Chef Anthony&apos;s secret recipe at his first South Florida restaurant quickly became legendary.
               </p>
               <p>
                 When 92% of customers started asking to buy the sauce by the bottle, we knew we had something special.
               </p>
               <p>
-                Three restaurants and 30 years later, we're bringing that same authentic Jamaican flavor directly to your table.
+                Three restaurants and 30 years later, we&apos;re bringing that same authentic Jamaican flavor directly to your table.
               </p>
             </div>
             <Link

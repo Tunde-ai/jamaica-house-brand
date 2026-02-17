@@ -16,7 +16,7 @@ export default function HeroSection() {
       <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
         {/* Eyebrow text */}
         <p className="text-brand-gold/60 uppercase tracking-[0.3em] text-sm mb-4">
-          Est. 1994
+          Since 1994
         </p>
 
         {/* Main headline */}
@@ -26,7 +26,7 @@ export default function HeroSection() {
 
         {/* Subheadline */}
         <p className="text-lg md:text-xl text-gray-300 mt-6 max-w-2xl mx-auto">
-          Authentic Jamaican Jerk Sauce, Crafted from Chef Anthony's Family Recipe
+          Authentic Jamaican Jerk Sauce, Crafted from Chef Anthony&apos;s Family Recipe
         </p>
 
         {/* CTA button */}
