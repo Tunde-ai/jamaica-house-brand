@@ -8,6 +8,9 @@ export interface Product {
   slug: string
   category: 'sauce' | 'pikliz'
   inStock: boolean
+  rating: number // star rating (e.g., 4.8)
+  callouts: string[] // product highlights (e.g., ["Zero Calories", "All Natural"])
+  images: string[] // array of image paths for gallery (first image is primary)
   stripeProductId?: string // Optional - will be set in Phase 3 (Stripe integration)
   stripePriceId?: string
 }

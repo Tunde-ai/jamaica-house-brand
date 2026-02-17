@@ -11,6 +11,13 @@ export const products: Product[] = [
     slug: 'jerk-sauce-2oz',
     category: 'sauce',
     inStock: true,
+    rating: 4.8,
+    callouts: ['Zero Calories', 'All Natural', '30-Year Recipe'],
+    images: [
+      '/images/products/jerk-sauce-2oz.jpg',
+      '/images/products/jerk-sauce-2oz-2.jpg',
+      '/images/products/jerk-sauce-2oz-3.jpg',
+    ],
   },
   {
     id: 'jerk-sauce-5oz',
@@ -22,6 +29,13 @@ export const products: Product[] = [
     slug: 'jerk-sauce-5oz',
     category: 'sauce',
     inStock: true,
+    rating: 4.9,
+    callouts: ['Zero Calories', 'All Natural', '30-Year Recipe'],
+    images: [
+      '/images/products/jerk-sauce-5oz.jpg',
+      '/images/products/jerk-sauce-5oz-2.jpg',
+      '/images/products/jerk-sauce-5oz-3.jpg',
+    ],
   },
   {
     id: 'jerk-sauce-10oz',
@@ -33,6 +47,13 @@ export const products: Product[] = [
     slug: 'jerk-sauce-10oz',
     category: 'sauce',
     inStock: true,
+    rating: 4.7,
+    callouts: ['Zero Calories', 'All Natural', '30-Year Recipe'],
+    images: [
+      '/images/products/jerk-sauce-10oz.jpg',
+      '/images/products/jerk-sauce-10oz-2.jpg',
+      '/images/products/jerk-sauce-10oz-3.jpg',
+    ],
   },
   {
     id: 'escovitch-pikliz-12oz',
@@ -44,6 +65,13 @@ export const products: Product[] = [
     slug: 'escovitch-pikliz-12oz',
     category: 'pikliz',
     inStock: true,
+    rating: 4.6,
+    callouts: ['All Natural', 'Handcrafted', 'Authentic Recipe'],
+    images: [
+      '/images/products/pikliz-12oz.jpg',
+      '/images/products/pikliz-12oz-2.jpg',
+      '/images/products/pikliz-12oz-3.jpg',
+    ],
   },
 ]
 
