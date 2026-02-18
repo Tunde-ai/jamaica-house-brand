@@ -1,6 +1,6 @@
 'use client'
 
-import { Fragment, useEffect } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from '@headlessui/react'
 import { useCartStore } from '@/lib/cart-store'
@@ -9,6 +9,7 @@ import CartItem from './CartItem'
 
 export default function CartDrawer() {
   const { items, isOpen, closeCart } = useCartStore()
+  const [isCheckingOut, setIsCheckingOut] = useState(false)
 
   // Rehydrate from localStorage after SSR
   useEffect(() => {
@@ -16,6 +17,27 @@ export default function CartDrawer() {
   }, [])
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+
+  async function handleCheckout() {
+    setIsCheckingOut(true)
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items }),
+      })
+      const data = await response.json()
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        console.error('No checkout URL returned')
+        setIsCheckingOut(false)
+      }
+    } catch (error) {
+      console.error('Checkout error:', error)
+      setIsCheckingOut(false)
+    }
+  }
 
   return (
     <Transition show={isOpen} as={Fragment}>
@@ -110,11 +132,11 @@ export default function CartDrawer() {
                         </div>
                         <button
                           type="button"
-                          onClick={() => console.log('checkout')}
-                          disabled={items.length === 0}
+                          onClick={handleCheckout}
+                          disabled={isCheckingOut || items.length === 0}
                           className="w-full bg-brand-gold text-brand-dark font-bold py-4 rounded-lg hover:bg-brand-gold-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          Checkout
+                          {isCheckingOut ? 'Redirecting...' : 'Checkout'}
                         </button>
                       </div>
                     )}
