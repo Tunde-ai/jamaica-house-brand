@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { stripe } from '@/lib/stripe'
+import { getStripe } from '@/lib/stripe'
 import { formatPrice } from '@/lib/utils'
 import ClearCartOnSuccess from '@/components/ClearCartOnSuccess'
 import TrackPurchase from '@/components/analytics/TrackPurchase'
@@ -43,7 +43,7 @@ export default async function SuccessPage({
   // Retrieve Stripe session
   let session
   try {
-    session = await stripe.checkout.sessions.retrieve(sessionId, {
+    session = await getStripe().checkout.sessions.retrieve(sessionId, {
       expand: ['line_items'],
     })
   } catch (error) {
