@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { plusJakarta } from "@/lib/fonts";
 import Navigation from "@/components/navigation/Navigation";
 import Footer from "@/components/layout/Footer";
 import CartDrawer from "@/components/CartDrawer";
+import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
+import MetaPixel from "@/components/analytics/MetaPixel";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -50,7 +53,11 @@ export default function RootLayout({
           <Footer />
         </div>
         <CartDrawer />
+        <Suspense fallback={null}>
+          <MetaPixel />
+        </Suspense>
       </body>
+      <GoogleAnalytics />
     </html>
   );
 }

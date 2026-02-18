@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { stripe } from '@/lib/stripe'
 import { formatPrice } from '@/lib/utils'
 import ClearCartOnSuccess from '@/components/ClearCartOnSuccess'
+import TrackPurchase from '@/components/analytics/TrackPurchase'
 
 export const metadata: Metadata = {
   title: 'Order Confirmed',
@@ -94,6 +95,7 @@ export default async function SuccessPage({
   return (
     <>
       <ClearCartOnSuccess />
+      <TrackPurchase value={session.amount_total ?? 0} orderId={session.id} />
       <div className="min-h-screen flex items-center justify-center px-4 py-12">
         <div className="max-w-lg w-full space-y-8">
           {/* Success checkmark */}
