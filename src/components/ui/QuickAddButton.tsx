@@ -1,16 +1,35 @@
 'use client'
 
+import { useCartStore } from '@/lib/cart-store'
+
 interface QuickAddButtonProps {
   productId: string
   productName: string
+  productPrice: number
+  productImage: string
+  productSize: string
 }
 
-export default function QuickAddButton({ productId, productName }: QuickAddButtonProps) {
+export default function QuickAddButton({
+  productId,
+  productName,
+  productPrice,
+  productImage,
+  productSize,
+}: QuickAddButtonProps) {
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     e.stopPropagation()
-    console.log('Add to cart:', productName)
-    // Phase 3 will wire this to actual cart state management
+
+    // Add to cart and open drawer
+    useCartStore.getState().addItem({
+      id: productId,
+      name: productName,
+      price: productPrice,
+      image: productImage,
+      size: productSize,
+    })
+    useCartStore.getState().openCart()
   }
 
   return (

@@ -41,7 +41,13 @@ export default function ProductCard({ product }: ProductCardProps) {
           </span>
         </div>
 
-        <QuickAddButton productId={product.id} productName={product.name} />
+        <QuickAddButton
+          productId={product.id}
+          productName={product.name}
+          productPrice={product.price}
+          productImage={product.image}
+          productSize={product.size}
+        />
       </div>
     </Link>
   )

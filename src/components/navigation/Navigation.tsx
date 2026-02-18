@@ -3,17 +3,19 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useCartStore } from '@/lib/cart-store'
 
 const navItems = [
   { name: 'Shop', href: '/shop' },
   { name: 'Our Story', href: '/our-story' },
   { name: 'Recipes', href: '/recipes' },
   { name: 'Subscribe', href: '/subscribe', comingSoon: true },
-  { name: 'Cart', href: '/cart' },
 ]
 
 export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { items, openCart } = useCartStore()
+  const cartCount = items.reduce((sum, item) => sum + item.quantity, 0)
 
   return (
     <nav className="bg-brand-dark border-b border-brand-gold/20">
@@ -34,7 +36,7 @@ export default function Navigation() {
           </Link>
 
           {/* Desktop navigation */}
-          <div className="hidden md:flex space-x-8">
+          <div className="hidden md:flex space-x-8 items-center">
             {navItems.map((item) => (
               <Link
                 key={item.name}
@@ -49,6 +51,19 @@ export default function Navigation() {
                 )}
               </Link>
             ))}
+            <button
+              type="button"
+              onClick={openCart}
+              className="text-white hover:text-brand-gold transition-colors text-sm font-medium flex items-center gap-1 h-11"
+              aria-label={`Shopping cart with ${cartCount} items`}
+            >
+              <span>Cart</span>
+              {cartCount > 0 && (
+                <span className="w-5 h-5 bg-brand-gold text-brand-dark text-xs font-bold rounded-full flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </button>
           </div>
 
           {/* Mobile menu button - MUST be 44x44px minimum */}
@@ -105,6 +120,21 @@ export default function Navigation() {
                 )}
               </Link>
             ))}
+            <button
+              type="button"
+              onClick={() => {
+                setMobileMenuOpen(false)
+                openCart()
+              }}
+              className="block py-3 text-white hover:text-brand-gold transition-colors text-base w-full text-left"
+            >
+              Cart
+              {cartCount > 0 && (
+                <span className="ml-2 w-5 h-5 bg-brand-gold text-brand-dark text-xs font-bold rounded-full inline-flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </button>
           </div>
         )}
       </div>

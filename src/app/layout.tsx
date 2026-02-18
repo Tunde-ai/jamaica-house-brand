@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { plusJakarta } from "@/lib/fonts";
 import Navigation from "@/components/navigation/Navigation";
 import Footer from "@/components/layout/Footer";
+import CartDrawer from "@/components/CartDrawer";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -24,6 +25,7 @@ export default function RootLayout({
           </main>
           <Footer />
         </div>
+        <CartDrawer />
       </body>
     </html>
   );
