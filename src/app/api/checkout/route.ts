@@ -10,16 +10,11 @@ interface CheckoutItem {
   size: string
 }
 
-interface CheckoutRequest {
-  items: CheckoutItem[]
-}
-
 export async function POST(request: NextRequest) {
   try {
-    const body: CheckoutRequest = await request.json()
-    const { items } = body
+    const { items }: { items: CheckoutItem[] } = await request.json()
 
-    // Validate that items array is non-empty
+    // Validate items array is non-empty
     if (!items || items.length === 0) {
       return NextResponse.json(
         { error: 'Cart is empty' },
