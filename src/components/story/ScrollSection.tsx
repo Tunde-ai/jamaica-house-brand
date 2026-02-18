@@ -1,7 +1,7 @@
 'use client'
 
-import Image from 'next/image'
 import { useInView } from 'react-intersection-observer'
+import Image from 'next/image'
 
 interface ScrollSectionProps {
   title: string
@@ -16,67 +16,74 @@ export default function ScrollSection({
   content,
   image,
   imageAlt,
-  layout,
+  layout
 }: ScrollSectionProps) {
   const { ref, inView } = useInView({
     threshold: 0.3,
     triggerOnce: true,
   })
 
+  if (layout === 'centered') {
+    return (
+      <section
+        ref={ref}
+        className={`min-h-[80vh] py-24 px-4 md:px-8 flex items-center transition-all duration-1000 ease-out ${
+          inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}
+      >
+        <div className="max-w-6xl mx-auto text-center">
+          <h2 className="text-4xl md:text-5xl font-bold text-brand-gold mb-6">
+            {title}
+          </h2>
+          <p className="text-lg md:text-xl text-gray-300 leading-relaxed mb-12">
+            {content}
+          </p>
+          <div className="relative w-full aspect-video max-w-4xl mx-auto">
+            <Image
+              src={image}
+              alt={imageAlt}
+              fill
+              className="object-cover rounded-lg"
+              sizes="(max-width: 768px) 100vw, 1024px"
+            />
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  const isTextLeft = layout === 'text-left'
+
   return (
     <section
       ref={ref}
-      className={`min-h-[80vh] py-24 px-4 md:px-8 transition-all duration-1000 ease-out ${
+      className={`min-h-[80vh] py-24 px-4 md:px-8 flex items-center transition-all duration-1000 ease-out ${
         inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
       }`}
     >
-      <div className="max-w-6xl mx-auto">
-        {layout === 'centered' ? (
-          <div className="text-center">
-            <h2 className="text-4xl md:text-5xl font-bold text-brand-gold mb-6">
-              {title}
-            </h2>
-            <p className="text-lg md:text-xl text-gray-300 leading-relaxed mb-12 max-w-3xl mx-auto">
-              {content}
-            </p>
-            <div className="relative w-full h-[400px] md:h-[500px] rounded-lg overflow-hidden">
-              <Image
-                src={image}
-                alt={imageAlt}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 1152px"
-              />
-            </div>
-          </div>
-        ) : (
-          <div
-            className={`flex flex-col ${
-              layout === 'text-right' ? 'md:flex-row-reverse' : 'md:flex-row'
-            } items-center gap-12`}
-          >
-            {/* Text Content */}
-            <div className="flex-1">
-              <h2 className="text-4xl md:text-5xl font-bold text-brand-gold mb-6">
-                {title}
-              </h2>
-              <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
-                {content}
-              </p>
-            </div>
+      <div className={`max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center ${
+        isTextLeft ? '' : 'md:grid-flow-dense'
+      }`}>
+        {/* Text Content */}
+        <div className={isTextLeft ? 'md:order-1' : 'md:order-2'}>
+          <h2 className="text-4xl md:text-5xl font-bold text-brand-gold mb-6">
+            {title}
+          </h2>
+          <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
+            {content}
+          </p>
+        </div>
 
-            {/* Image */}
-            <div className="flex-1 relative w-full h-[400px] md:h-[500px]">
-              <Image
-                src={image}
-                alt={imageAlt}
-                fill
-                className="object-cover rounded-lg"
-                sizes="(max-width: 768px) 100vw, 576px"
-              />
-            </div>
-          </div>
-        )}
+        {/* Image */}
+        <div className={`relative aspect-square ${isTextLeft ? 'md:order-2' : 'md:order-1'}`}>
+          <Image
+            src={image}
+            alt={imageAlt}
+            fill
+            className="object-cover rounded-lg"
+            sizes="(max-width: 768px) 100vw, 50vw"
+          />
+        </div>
       </div>
     </section>
   )
