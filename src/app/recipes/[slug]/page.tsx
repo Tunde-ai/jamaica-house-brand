@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getRecipeBySlug, recipes } from '@/data/recipes'
-import { generateRecipeJsonLd } from '@/lib/seo'
+import { generateRecipeJsonLd, sanitizeJsonLd } from '@/lib/seo'
 import RecipeHero from '@/components/recipes/RecipeHero'
 import IngredientList from '@/components/recipes/IngredientList'
 import InstructionSteps from '@/components/recipes/InstructionSteps'
@@ -54,7 +54,7 @@ export default async function RecipePage({ params }: Props) {
       {/* Schema.org JSON-LD */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(recipeJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: sanitizeJsonLd(recipeJsonLd) }}
       />
 
       <main className="bg-brand-dark min-h-screen">
