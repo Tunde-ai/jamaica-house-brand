@@ -3,7 +3,7 @@ import { recipes } from '@/data/recipes'
 import RecipeGrid from '@/components/recipes/RecipeGrid'
 
 export const metadata: Metadata = {
-  title: 'Recipes - Jamaica House Brand',
+  title: 'Recipes',
   description: 'Discover authentic Jamaican recipes featuring Jamaica House Brand sauces. From jerk chicken to escovitch fish, bring restaurant flavors to your kitchen.',
   openGraph: {
     title: 'Recipes - Jamaica House Brand',

@@ -5,7 +5,9 @@ import { formatPrice } from '@/lib/utils'
 import ClearCartOnSuccess from '@/components/ClearCartOnSuccess'
 
 export const metadata: Metadata = {
-  title: 'Order Confirmed | Jamaica House Brand',
+  title: 'Order Confirmed',
+  description: 'Your Jamaica House Brand order has been confirmed. Thank you for your purchase!',
+  robots: { index: false, follow: false },
 }
 
 export default async function SuccessPage({

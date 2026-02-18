@@ -6,8 +6,32 @@ import CartDrawer from "@/components/CartDrawer";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Jamaica House Brand - Original Jerk Sauce",
-  description: "Authentic Jamaican jerk sauce with 30+ years of restaurant heritage",
+  metadataBase: new URL('https://jamaicahousebrand.com'),
+  title: {
+    template: '%s | Jamaica House Brand',
+    default: 'Jamaica House Brand - Authentic Jamaican Jerk Sauce',
+  },
+  description: 'Authentic Jamaican jerk sauce with 30+ years of restaurant heritage. Shop our collection of all-natural, zero-calorie sauces.',
+  keywords: ['jerk sauce', 'jamaican sauce', 'authentic jerk', 'caribbean sauce', 'jamaica house brand', 'all natural sauce'],
+  authors: [{ name: 'Jamaica House Brand' }],
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    siteName: 'Jamaica House Brand',
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large' as const,
+      'max-snippet': -1,
+    },
+  },
 };
 
 export default function RootLayout({

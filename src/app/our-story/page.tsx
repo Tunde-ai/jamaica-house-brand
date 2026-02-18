@@ -7,7 +7,7 @@ import StoryCTA from '@/components/story/StoryCTA'
 import { storyContent } from '@/data/story-content'
 
 export const metadata: Metadata = {
-  title: 'Our Story - Jamaica House Brand',
+  title: 'Our Story',
   description:
     "From age 11 in Jamaica to three South Florida restaurants — discover how Chef Anthony's 30-year journey led to Jamaica House Brand's authentic jerk sauce.",
   openGraph: {
