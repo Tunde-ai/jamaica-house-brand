@@ -1,11 +1,24 @@
 'use client'
 
+import Image from 'next/image'
+
 export default function MembershipHero() {
   return (
-    <section className="relative py-24 px-4 text-center overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-brand-dark via-brand-dark/95 to-brand-dark" />
+    <section className="relative py-32 md:py-40 px-4 text-center overflow-hidden">
+      {/* Background Image */}
+      <Image
+        src="/images/story/family-hero.jpg"
+        alt=""
+        fill
+        priority
+        className="object-cover"
+        sizes="100vw"
+      />
 
-      <div className="relative max-w-4xl mx-auto">
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/80 via-brand-dark/50 to-brand-dark" />
+
+      <div className="relative z-10 max-w-4xl mx-auto">
         <span className="inline-block text-brand-gold text-sm font-semibold tracking-widest uppercase mb-4">
           Yearly Subscription
         </span>
