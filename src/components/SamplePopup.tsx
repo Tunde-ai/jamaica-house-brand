@@ -12,11 +12,19 @@ const POPUP_DELAY = 2000
 
 export default function SamplePopup() {
   const [isOpen, setIsOpen] = useState(false)
-  const [step, setStep] = useState<1 | 2>(1)
+  const [step, setStep] = useState<1 | 2 | 3>(1)
   const { addItem, openCart } = useCartStore()
 
+  // Registration form state
+  const [firstName, setFirstName] = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [emailOptIn, setEmailOptIn] = useState(true)
+  const [smsOptIn, setSmsOptIn] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
+
   useEffect(() => {
-    // Only show once per visitor
     if (typeof window === 'undefined') return
     if (localStorage.getItem(STORAGE_KEY)) return
 
@@ -29,6 +37,41 @@ export default function SamplePopup() {
   }, [])
 
   const handleGetSample = () => {
+    setStep(2)
+  }
+
+  const handleRegisterSubmit = async () => {
+    setError('')
+
+    if (!firstName.trim()) {
+      setError('Please enter your first name.')
+      return
+    }
+
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('Please enter a valid email address.')
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: firstName.trim(),
+          email: email.trim(),
+          phone: phone.trim() || undefined,
+          emailOptIn,
+          smsOptIn,
+        }),
+      })
+    } catch {
+      // Network error — still give them the sample
+      console.error('[SamplePopup] Subscribe request failed')
+    }
+
     addItem({
       id: 'free-sample-2oz',
       name: 'FREE 2oz Jerk Sauce Sample',
@@ -38,7 +81,9 @@ export default function SamplePopup() {
       originalPrice: 699,
       isSample: true,
     })
-    setStep(2)
+
+    setIsSubmitting(false)
+    setStep(3)
   }
 
   const handleAddUpsell = (product: typeof products[0]) => {
@@ -57,12 +102,11 @@ export default function SamplePopup() {
 
   const handleDismiss = () => {
     setIsOpen(false)
-    if (step === 2) {
+    if (step === 3) {
       openCart()
     }
   }
 
-  // Products available for upsell (exclude 2oz since they already get a sample)
   const upsellProducts = products.filter(
     (p) => p.id !== 'jerk-sauce-2oz'
   )
@@ -108,7 +152,7 @@ export default function SamplePopup() {
               </button>
 
               {step === 1 ? (
-                /* Step 1 — Free Sample */
+                /* Step 1 — Hook */
                 <div className="p-6 text-center">
                   <Image
                     src="/images/branding/logo-full.jpg"
@@ -147,8 +191,106 @@ export default function SamplePopup() {
                     No thanks
                   </button>
                 </div>
+              ) : step === 2 ? (
+                /* Step 2 — Registration */
+                <div className="p-6">
+                  <DialogTitle className="text-xl font-bold text-white text-center mb-1">
+                    Claim Your Free Sample
+                  </DialogTitle>
+                  <p className="text-gray-400 text-center text-sm mb-5">
+                    Enter your info and we&apos;ll add the sample to your cart
+                  </p>
+
+                  <div className="space-y-3">
+                    <div>
+                      <label htmlFor="popup-firstName" className="block text-sm text-gray-300 mb-1">
+                        First Name <span className="text-brand-gold">*</span>
+                      </label>
+                      <input
+                        id="popup-firstName"
+                        type="text"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        placeholder="Your first name"
+                        className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-gold transition-colors"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="popup-email" className="block text-sm text-gray-300 mb-1">
+                        Email <span className="text-brand-gold">*</span>
+                      </label>
+                      <input
+                        id="popup-email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="you@email.com"
+                        className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-gold transition-colors"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="popup-phone" className="block text-sm text-gray-300 mb-1">
+                        Phone <span className="text-gray-500 text-xs">(optional)</span>
+                      </label>
+                      <input
+                        id="popup-phone"
+                        type="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="(555) 123-4567"
+                        className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-gold transition-colors"
+                      />
+                      <p className="text-gray-500 text-xs mt-1">
+                        Add your number for shipping updates &amp; exclusive deals
+                      </p>
+                    </div>
+
+                    <div className="space-y-2 pt-1">
+                      <label className="flex items-start gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={emailOptIn}
+                          onChange={(e) => setEmailOptIn(e.target.checked)}
+                          className="mt-0.5 w-4 h-4 rounded border-white/30 bg-white/10 text-brand-gold focus:ring-brand-gold"
+                        />
+                        <span className="text-gray-400 text-xs leading-tight">
+                          Send me recipes, deals &amp; new drops
+                        </span>
+                      </label>
+
+                      {phone.trim() && (
+                        <label className="flex items-start gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={smsOptIn}
+                            onChange={(e) => setSmsOptIn(e.target.checked)}
+                            className="mt-0.5 w-4 h-4 rounded border-white/30 bg-white/10 text-brand-gold focus:ring-brand-gold"
+                          />
+                          <span className="text-gray-400 text-xs leading-tight">
+                            Text me exclusive offers
+                          </span>
+                        </label>
+                      )}
+                    </div>
+                  </div>
+
+                  {error && (
+                    <p className="text-red-400 text-sm mt-3">{error}</p>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={handleRegisterSubmit}
+                    disabled={isSubmitting}
+                    className="w-full mt-5 bg-brand-gold text-brand-dark font-bold py-4 rounded-lg hover:bg-brand-gold-light transition-colors text-lg disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? 'Submitting...' : 'Claim My Free Sample'}
+                  </button>
+                </div>
               ) : (
-                /* Step 2 — Upsell */
+                /* Step 3 — Upsell */
                 <div className="p-6">
                   <DialogTitle className="text-xl font-bold text-white text-center mb-1">
                     25% Off Any Additional Item
