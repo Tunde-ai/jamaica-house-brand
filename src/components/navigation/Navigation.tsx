@@ -11,6 +11,7 @@ const navItems = [
   { name: 'Recipes', href: '/recipes' },
   { name: 'Catering', href: '/catering-services' },
   { name: 'Family', href: '/family-members' },
+  { name: 'Events', href: '/events' },
 ]
 
 export default function Navigation() {

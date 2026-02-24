@@ -51,6 +51,11 @@ export default function Footer() {
                   Family Members
                 </Link>
               </li>
+              <li>
+                <Link href="/events" className="text-gray-400 hover:text-brand-gold transition-colors">
+                  Events
+                </Link>
+              </li>
             </ul>
           </div>
 
