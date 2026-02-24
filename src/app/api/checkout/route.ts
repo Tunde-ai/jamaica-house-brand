@@ -22,6 +22,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const baseUrl = request.headers.get('origin') || 'https://jamaicahousebrand.com'
+
     // Create Stripe Checkout Session
     const session = await getStripe().checkout.sessions.create({
       payment_method_types: ['card'],
@@ -38,8 +40,8 @@ export async function POST(request: NextRequest) {
         quantity: item.quantity,
       })),
       mode: 'payment',
-      success_url: `${request.headers.get('origin')}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${request.headers.get('origin')}/shop`,
+      success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/shop`,
       metadata: {
         source: 'jamaica-house-brand-web',
       },
