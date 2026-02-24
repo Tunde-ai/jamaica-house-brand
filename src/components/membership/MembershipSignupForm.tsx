@@ -274,7 +274,7 @@ export default function MembershipSignupForm({ selectedTier }: MembershipSignupF
             />
             <span className="text-gray-400 text-sm leading-tight">
               I agree to the terms and conditions. I understand that my subscription will be billed
-              monthly and I can cancel at any time.
+              annually with bottles shipped quarterly (4 times per year).
             </span>
           </label>
 

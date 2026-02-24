@@ -7,23 +7,22 @@ export default function MembershipHero() {
 
       <div className="relative max-w-4xl mx-auto">
         <span className="inline-block text-brand-gold text-sm font-semibold tracking-widest uppercase mb-4">
-          Monthly Subscription
+          Yearly Subscription
         </span>
         <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
           JOIN THE <span className="text-brand-gold">FLAVOR FAMILY</span>
         </h1>
         <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-10">
-          Get authentic Jamaica House sauces delivered to your door every month.
-          Save money, never run out, and enjoy exclusive member perks.
+          Get authentic Jamaica House sauces delivered to your door quarterly.
+          Pay once a year, receive 4 shipments, and never run out of flavor.
         </p>
 
         {/* Perks banner */}
         <div className="flex flex-wrap justify-center gap-4 md:gap-8">
           {[
-            'Free Shipping',
-            'Cancel Anytime',
-            'Exclusive Recipes',
-            'Member Discounts',
+            'Exclusive Members-Only Pricing',
+            'FREE Shipping Always',
+            'Special Edition Access',
           ].map((perk) => (
             <div key={perk} className="flex items-center gap-2 text-gray-300">
               <svg className="w-5 h-5 text-brand-gold flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
