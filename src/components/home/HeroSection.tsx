@@ -68,7 +68,7 @@ export default function HeroSection() {
                 alt="Jamaica House Brand product collection"
                 fill
                 sizes="(max-width: 1024px) 0vw, 400px"
-                className="object-contain drop-shadow-2xl"
+                className="object-contain object-bottom drop-shadow-2xl"
               />
             </div>
           </div>

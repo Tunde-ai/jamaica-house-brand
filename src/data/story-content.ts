@@ -11,7 +11,7 @@ export const storyContent = {
       id: 'chef-anthony-origin',
       title: 'Carrying the Legacy Forward',
       content:
-        "Born in New York to Jamaican parents, Chef Anthony grew up immersed in the rich flavors and traditions of Jamaican cuisine. His father built the Jamaica House restaurant legacy in South Florida — three thriving locations known for authentic island cooking. Now Chef Anthony is extending that legacy by bringing the family recipe from the restaurant kitchen to every table in America.",
+        "Born in New York to Jamaican parents, Chef Anthony grew up immersed in the rich flavors and traditions of Jamaican cuisine. His father built the Jamaica House restaurant legacy in South Florida — three thriving locations known for authentic island cooking. Now Chef Anthony is extending that legacy by bringing the family recipe from our kitchen to every table in the World.",
       image: '/images/story/chef-anthony.jpg',
       imageAlt: 'Chef Anthony, carrying on the Jamaica House legacy',
       layout: 'text-left',

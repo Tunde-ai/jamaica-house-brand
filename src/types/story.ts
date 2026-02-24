@@ -18,10 +18,11 @@ export interface TeamMember {
 export interface Restaurant {
   id: string
   name: string
-  address: string
+  address?: string
   city: string
   state: string
-  zip: string
-  phone: string
+  zip?: string
+  phone?: string
   image: string
+  comingSoon?: boolean
 }

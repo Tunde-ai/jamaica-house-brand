@@ -43,7 +43,7 @@ export default function BrandStory() {
                 When 92% of customers started asking to buy the sauce by the bottle, we knew we had something special.
               </p>
               <p>
-                Now Chef Anthony is extending the family legacy by bringing that same authentic recipe from the restaurant kitchen to every table in America.
+                Now Chef Anthony is extending the family legacy by bringing that same authentic recipe from our kitchen to every table in the World.
               </p>
             </div>
             <Link

@@ -80,7 +80,7 @@ export default function ScrollSection({
             src={image}
             alt={imageAlt}
             fill
-            className="object-cover rounded-lg"
+            className={`object-cover rounded-lg ${image.includes('sauce-bottling') ? 'object-[center_85%]' : ''}`}
             sizes="(max-width: 768px) 100vw, 50vw"
           />
         </div>

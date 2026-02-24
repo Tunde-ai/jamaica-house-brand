@@ -26,7 +26,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           alt={`${product.name} - ${product.size}`}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-          className="object-cover group-hover:scale-105 transition-transform duration-300"
+          className={`object-cover group-hover:scale-105 transition-transform duration-300 ${product.category === 'bundle' ? 'object-bottom' : ''}`}
         />
         {savings > 0 && (
           <span className="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
