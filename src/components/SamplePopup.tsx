@@ -7,7 +7,7 @@ import { useCartStore } from '@/lib/cart-store'
 import { products } from '@/data/products'
 import { formatPrice } from '@/lib/utils'
 
-const STORAGE_KEY = 'jhb-sample-popup-shown'
+const SESSION_KEY = 'jhb-sample-popup-shown'
 const POPUP_DELAY = 2000
 
 export default function SamplePopup() {
@@ -26,11 +26,11 @@ export default function SamplePopup() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    if (localStorage.getItem(STORAGE_KEY)) return
+    if (sessionStorage.getItem(SESSION_KEY)) return
 
     const timer = setTimeout(() => {
       setIsOpen(true)
-      localStorage.setItem(STORAGE_KEY, 'true')
+      sessionStorage.setItem(SESSION_KEY, 'true')
     }, POPUP_DELAY)
 
     return () => clearTimeout(timer)
