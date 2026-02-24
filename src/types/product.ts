@@ -6,11 +6,13 @@ export interface Product {
   size: string
   image: string
   slug: string
-  category: 'sauce' | 'pikliz'
+  category: 'sauce' | 'pikliz' | 'bundle'
   inStock: boolean
   rating: number // star rating (e.g., 4.8)
   callouts: string[] // product highlights (e.g., ["Zero Calories", "All Natural"])
   images: string[] // array of image paths for gallery (first image is primary)
+  compareAtPrice?: number // original price in cents for crossed-out display
+  bundleItems?: string[] // product IDs included in bundle
   stripeProductId?: string // Optional - will be set in Phase 3 (Stripe integration)
   stripePriceId?: string
 }

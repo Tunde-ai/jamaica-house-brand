@@ -8,6 +8,8 @@ export interface CartItem {
   quantity: number
   image: string
   size: string
+  originalPrice?: number // in cents, for crossed-out display
+  isSample?: boolean // true for free sample items
 }
 
 interface CartStore {

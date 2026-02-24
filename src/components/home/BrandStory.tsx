@@ -6,18 +6,25 @@ export default function BrandStory() {
     <section className="py-16 sm:py-24 px-4 bg-brand-dark">
       <div className="max-w-5xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          {/* Left column - Image placeholder */}
-          <div className="aspect-square bg-gradient-to-br from-brand-gold/20 to-brand-gold/5 rounded-lg flex flex-col items-center justify-center">
+          {/* Left column - Chef Anthony photo with logo overlay */}
+          <div className="relative aspect-square rounded-lg overflow-hidden">
             <Image
-              src="/images/hummingbird-logo.svg"
-              alt="Jamaica House Brand"
-              width={120}
-              height={120}
-              className="opacity-60"
+              src="/images/story/chef-anthony.jpg"
+              alt="Chef Anthony, founder of Jamaica House Brand"
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover"
             />
-            <p className="text-brand-gold font-semibold mt-4 text-lg">
-              Chef Anthony
-            </p>
+            {/* Gradient + logo overlay at bottom */}
+            <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-center pb-4">
+              <Image
+                src="/images/branding/logo-full.jpg"
+                alt="Jamaica House Brand"
+                width={60}
+                height={60}
+                className="rounded-sm"
+              />
+            </div>
           </div>
 
           {/* Right column - Story text */}
@@ -30,13 +37,13 @@ export default function BrandStory() {
             </h2>
             <div className="text-gray-300 leading-relaxed space-y-4">
               <p>
-                What started as Chef Anthony&apos;s secret recipe at his first South Florida restaurant quickly became legendary.
+                Born in New York to Jamaican parents, Chef Anthony grew up immersed in the rich flavors of his heritage. His father built the Jamaica House restaurant legacy — three thriving locations in South Florida.
               </p>
               <p>
                 When 92% of customers started asking to buy the sauce by the bottle, we knew we had something special.
               </p>
               <p>
-                Three restaurants and 30 years later, we&apos;re bringing that same authentic Jamaican flavor directly to your table.
+                Now Chef Anthony is extending the family legacy by bringing that same authentic recipe from the restaurant kitchen to every table in America.
               </p>
             </div>
             <Link

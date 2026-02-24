@@ -4,8 +4,8 @@ export const team: TeamMember[] = [
   {
     id: 'chef-anthony',
     name: 'Chef Anthony',
-    role: 'Founder & Head Chef',
-    bio: 'Born and raised in Jamaica, Chef Anthony discovered his culinary calling at age 11. After bringing his family recipes to South Florida, he built three thriving Jamaica House restaurants that have become local institutions. Every sauce, every recipe, every dish carries the authentic flavors of his Jamaican heritage.',
+    role: 'Brand Founder & Head Chef',
+    bio: 'Born in New York to Jamaican parents, Chef Anthony grew up surrounded by the authentic flavors of his heritage. His father built the Jamaica House restaurant empire — three thriving South Florida locations. Now Anthony is extending the family legacy by bottling the recipe that made the restaurants famous, bringing it from the kitchen to every table in America.',
     image: '/images/team/chef-anthony.jpg',
   },
   {

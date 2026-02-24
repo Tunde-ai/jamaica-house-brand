@@ -41,10 +41,22 @@ export default function CartItem({ item }: CartItemProps) {
         <h3 className="text-white font-semibold text-sm truncate">
           {item.name}
         </h3>
-        <p className="text-gray-400 text-xs mt-1">{item.size}</p>
-        <p className="text-brand-gold text-sm mt-1">
-          {formatPrice(item.price)}
+        <p className="text-gray-400 text-xs mt-1">
+          {item.size}
+          {item.isSample && (
+            <span className="ml-1 text-brand-gold">(shipping only)</span>
+          )}
         </p>
+        <div className="flex items-center gap-2 mt-1">
+          <span className="text-brand-gold text-sm">
+            {formatPrice(item.price)}
+          </span>
+          {item.originalPrice && item.originalPrice !== item.price && (
+            <span className="text-gray-500 line-through text-xs">
+              {formatPrice(item.originalPrice)}
+            </span>
+          )}
+        </div>
 
         {/* Quantity Controls */}
         <div className="flex items-center gap-2 mt-2">
@@ -54,7 +66,7 @@ export default function CartItem({ item }: CartItemProps) {
             className="w-8 h-8 flex items-center justify-center bg-white/5 border border-brand-gold/30 text-white rounded hover:bg-brand-gold/10 transition-colors"
             aria-label="Decrease quantity"
           >
-            <span className="text-lg leading-none">−</span>
+            <span className="text-lg leading-none">&minus;</span>
           </button>
 
           <span className="w-8 text-center text-white font-semibold text-sm">

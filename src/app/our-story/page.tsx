@@ -9,10 +9,10 @@ import { storyContent } from '@/data/story-content'
 export const metadata: Metadata = {
   title: 'Our Story',
   description:
-    "From age 11 in Jamaica to three South Florida restaurants — discover how Chef Anthony's 30-year journey led to Jamaica House Brand's authentic jerk sauce.",
+    "Born in New York to Jamaican parents, Chef Anthony is extending his father's restaurant legacy by bringing the family recipe to every table. Discover the Jamaica House Brand story.",
   openGraph: {
     title: 'Our Story - Jamaica House Brand',
-    description: "Chef Anthony's journey from Jamaica to your table.",
+    description: "Chef Anthony is extending his father's restaurant legacy by bottling the family recipe for every table.",
     images: ['/images/story/hero.jpg'],
   },
 }

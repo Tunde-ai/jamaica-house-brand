@@ -24,14 +24,15 @@ export default function Navigation() {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <Image
-              src="/images/hummingbird-logo.svg"
+              src="/images/branding/logo-full.jpg"
               alt="Jamaica House Brand"
               width={40}
               height={40}
+              className="rounded-sm"
               priority
             />
             <span className="text-white font-bold text-lg hidden sm:inline">
-              Jamaica House
+              Jamaica House Brand
             </span>
           </Link>
 

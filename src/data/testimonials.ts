@@ -17,7 +17,7 @@ export const testimonials: Testimonial[] = [
   {
     id: 'testimonial-2',
     name: 'James T.',
-    quote: 'Chef Anthony\'s sauce transformed my grilling game. The flavor is authentic and the heat is perfect.',
+    quote: 'This sauce transformed my grilling game. You can taste the restaurant legacy in every drop. The flavor is authentic and the heat is perfect.',
     rating: 5,
     location: 'Atlanta, GA',
   },

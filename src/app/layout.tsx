@@ -4,6 +4,7 @@ import { plusJakarta } from "@/lib/fonts";
 import Navigation from "@/components/navigation/Navigation";
 import Footer from "@/components/layout/Footer";
 import CartDrawer from "@/components/CartDrawer";
+import SamplePopup from "@/components/SamplePopup";
 import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 import MetaPixel from "@/components/analytics/MetaPixel";
 import "./globals.css";
@@ -53,6 +54,7 @@ export default function RootLayout({
           <Footer />
         </div>
         <CartDrawer />
+        <SamplePopup />
         <Suspense fallback={null}>
           <MetaPixel />
         </Suspense>

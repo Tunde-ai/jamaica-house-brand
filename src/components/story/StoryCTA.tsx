@@ -8,7 +8,7 @@ export default function StoryCTA() {
           Ready to Taste the Authentic Flavor?
         </h2>
         <p className="text-xl text-gray-300 mb-8">
-          Bring Chef Anthony&apos;s restaurant recipes to your kitchen
+          The family recipe that built three restaurants — now for your kitchen
         </p>
         <Link
           href="/shop"

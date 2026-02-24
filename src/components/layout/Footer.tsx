@@ -11,10 +11,11 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Image
-                src="/images/hummingbird-logo.svg"
+                src="/images/branding/logo-full.jpg"
                 alt="Jamaica House Brand"
                 width={40}
                 height={40}
+                className="rounded-sm"
               />
               <span className="font-semibold text-white text-lg">Jamaica House Brand</span>
             </div>

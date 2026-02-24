@@ -10,6 +10,10 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const savings = product.compareAtPrice
+    ? product.compareAtPrice - product.price
+    : 0
+
   return (
     <Link
       href={`/products/${product.slug}`}
@@ -24,6 +28,11 @@ export default function ProductCard({ product }: ProductCardProps) {
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
+        {savings > 0 && (
+          <span className="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
+            Save {formatPrice(savings)}
+          </span>
+        )}
       </div>
 
       {/* Product Content */}
@@ -35,10 +44,15 @@ export default function ProductCard({ product }: ProductCardProps) {
           <StarRating rating={product.rating} />
         </div>
 
-        <div className="mt-2">
+        <div className="mt-2 flex items-center gap-2">
           <span className="text-brand-gold font-bold text-lg">
             {formatPrice(product.price)}
           </span>
+          {product.compareAtPrice && (
+            <span className="text-gray-500 line-through text-sm">
+              {formatPrice(product.compareAtPrice)}
+            </span>
+          )}
         </div>
 
         <QuickAddButton
