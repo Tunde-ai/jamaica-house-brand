@@ -5,22 +5,22 @@
 See: .planning/phases/ (phases 02-06)
 
 **Core value:** Jamaica House Brand ecommerce site — Chef Anthony's hot sauce brand at jamaicahousebrand.com
-**Current focus:** Phase 6 — Production Launch
+**Current focus:** COMPLETE — all 6 phases finished
 
 ## Current Position
 
 Phase: 6 of 6 (06-production-launch)
-Plan: 2 of 3 complete in current phase
-Status: In progress — plan 3 (launch verification) is next
-Last activity: 2026-02-24 — Completed 06-02: production env vars, domain, DNS, SSL all live
+Plan: 3 of 3 complete in current phase
+Status: COMPLETE — all plans executed, site live and verified
+Last activity: 2026-02-24 — Completed 06-03: go-live verification, checkout confirmed end-to-end
 
-Progress: [████████░░] 80%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: ~8 (phases 02-06 tracked)
-- Phase 6 plans completed: 2 of 3
+- Total plans completed: ~11 (phases 02-06 tracked)
+- Phase 6 plans completed: 3 of 3
 
 **By Phase:**
 
@@ -30,7 +30,7 @@ Progress: [████████░░] 80%
 | 03-cart-checkout | 2 | Complete |
 | 04-content-storytelling | 3 | Partial (02 summary exists) |
 | 05-seo-performance | 3 | Complete |
-| 06-production-launch | 3 | 2/3 complete |
+| 06-production-launch | 3 | Complete |
 
 *Updated after each plan completion*
 
@@ -38,6 +38,8 @@ Progress: [████████░░] 80%
 
 ### Decisions
 
+- [06-03]: Stripe secret key re-set on Vercel to fix ERR_INVALID_CHAR in Authorization header
+- [06-03]: Checkout route uses hardcoded fallback 'https://jamaicahousebrand.com' when Origin header is absent (null) to ensure valid success_url for Stripe
 - [06-02]: Vercel nameserver delegation (ns1/ns2.vercel-dns.com) instead of A record — Bluehost nameservers updated
 - [06-02]: All 5 env vars configured for production (Stripe live keys, STRIPE_WEBHOOK_SECRET, GA4, Meta Pixel)
 - [06-02]: Production build triggered after env var configuration (NEXT_PUBLIC_ vars baked at build time)
@@ -50,10 +52,10 @@ None.
 
 ### Blockers/Concerns
 
-None — production site is live at https://jamaicahousebrand.com. Plan 3 (launch verification) is the final plan: manual checkout test and analytics verification needed.
+None — project is complete. jamaicahousebrand.com is live and fully verified.
 
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 06-02-PLAN.md — production env vars, domain, SSL live. Next: execute 06-03-PLAN.md (launch verification)
+Stopped at: Completed 06-03-PLAN.md — go-live verification complete. All 6 phases done.
 Resume file: None
