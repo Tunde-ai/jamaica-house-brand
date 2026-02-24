@@ -12,10 +12,30 @@ export default function MembershipHero() {
         <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
           JOIN THE <span className="text-brand-gold">FLAVOR FAMILY</span>
         </h1>
-        <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-10">
+        <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-6">
           Get authentic Jamaica House sauces delivered to your door quarterly.
           Pay once a year, receive 4 shipments, and never run out of flavor.
         </p>
+
+        {/* Use cases */}
+        <div className="flex justify-center gap-3 md:gap-6 mb-4">
+          {['Marinating', 'Grilling', 'Dipping'].map((use, idx) => (
+            <span key={use} className="flex items-center text-white text-lg md:text-2xl font-bold tracking-wide uppercase">
+              {use}
+              {idx < 2 && <span className="ml-3 md:ml-6 text-brand-gold">—</span>}
+            </span>
+          ))}
+        </div>
+
+        {/* Health callouts */}
+        <div className="flex justify-center gap-4 md:gap-8 mb-10">
+          <span className="bg-brand-gold/10 border border-brand-gold/30 text-brand-gold text-sm font-semibold px-4 py-1.5 rounded-full">
+            Low Sodium
+          </span>
+          <span className="bg-brand-gold/10 border border-brand-gold/30 text-brand-gold text-sm font-semibold px-4 py-1.5 rounded-full">
+            Zero Calories
+          </span>
+        </div>
 
         {/* Perks banner */}
         <div className="flex flex-wrap justify-center gap-4 md:gap-8">
