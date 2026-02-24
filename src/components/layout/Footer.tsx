@@ -41,6 +41,16 @@ export default function Footer() {
                   Recipes
                 </Link>
               </li>
+              <li>
+                <Link href="/catering-services" className="text-gray-400 hover:text-brand-gold transition-colors">
+                  Catering
+                </Link>
+              </li>
+              <li>
+                <Link href="/family-members" className="text-gray-400 hover:text-brand-gold transition-colors">
+                  Family Members
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -58,6 +68,7 @@ export default function Footer() {
                 <div>Lauderhill</div>
                 <div>Miramar</div>
                 <div>Pembroke Pines</div>
+                <div>West Park</div>
               </li>
             </ul>
           </div>
