@@ -49,9 +49,9 @@ export default function CartItem({ item }: CartItemProps) {
         </p>
         <div className="flex items-center gap-2 mt-1">
           <span className="text-brand-gold text-sm">
-            {formatPrice(item.price)}
+            {item.isSample ? 'FREE' : formatPrice(item.price)}
           </span>
-          {item.originalPrice && item.originalPrice !== item.price && (
+          {!item.isSample && item.originalPrice && item.originalPrice !== item.price && (
             <span className="text-gray-500 line-through text-xs">
               {formatPrice(item.originalPrice)}
             </span>

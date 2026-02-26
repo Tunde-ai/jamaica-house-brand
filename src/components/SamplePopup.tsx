@@ -75,10 +75,9 @@ export default function SamplePopup() {
     addItem({
       id: 'free-sample-2oz',
       name: 'FREE 2oz Jerk Sauce Sample',
-      price: 599,
+      price: 0,
       image: '/images/products/jerk-sauce-2oz.jpg',
       size: '2oz',
-      originalPrice: 699,
       isSample: true,
     })
 
