@@ -193,13 +193,18 @@ export async function POST(request: NextRequest) {
         customerEmail: session.customer_details?.email,
       })
 
-      // Send notifications (fire-and-forget — don't block Stripe response)
-      sendSlackNotification(session).catch((err) =>
-        console.error('Slack notification failed:', err)
-      )
-      sendFulfillmentEmail(session).catch((err) =>
-        console.error('Fulfillment email failed:', err)
-      )
+      // Send notifications — must await before returning so Vercel doesn't kill the function
+      await Promise.allSettled([
+        sendSlackNotification(session),
+        sendFulfillmentEmail(session),
+      ]).then((results) => {
+        results.forEach((result, i) => {
+          if (result.status === 'rejected') {
+            const label = i === 0 ? 'Slack notification' : 'Fulfillment email'
+            console.error(`${label} failed:`, result.reason)
+          }
+        })
+      })
 
       break
     }
