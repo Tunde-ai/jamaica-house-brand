@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
       // Retrieve full session with line items for the Slack notification
       const session = await getStripe().checkout.sessions.retrieve(
         (event.data.object as Stripe.Checkout.Session).id,
-        { expand: ['line_items'] }
+        { expand: ['line_items', 'collected_information'] }
       )
 
       // Log order details — source of truth for payment confirmation
