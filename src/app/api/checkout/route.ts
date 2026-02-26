@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import Stripe from 'stripe'
 import { getStripe } from '@/lib/stripe'
 
 interface CheckoutItem {
@@ -24,6 +25,51 @@ export async function POST(request: NextRequest) {
 
     const baseUrl = request.headers.get('origin') || 'https://jamaicahousebrand.com'
 
+    // Calculate subtotal in cents to determine free shipping eligibility
+    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    const FREE_SHIPPING_THRESHOLD = 5000 // $50.00 in cents
+
+    // Build shipping options — free tier only available when subtotal ≥ $50
+    const shippingOptions: Stripe.Checkout.SessionCreateParams['shipping_options'] = [
+      ...(subtotal >= FREE_SHIPPING_THRESHOLD
+        ? [
+            {
+              shipping_rate_data: {
+                type: 'fixed_amount' as const,
+                fixed_amount: { amount: 0, currency: 'usd' },
+                display_name: 'Free Shipping',
+                delivery_estimate: {
+                  minimum: { unit: 'business_day' as const, value: 5 },
+                  maximum: { unit: 'business_day' as const, value: 7 },
+                },
+              },
+            },
+          ]
+        : []),
+      {
+        shipping_rate_data: {
+          type: 'fixed_amount' as const,
+          fixed_amount: { amount: 599, currency: 'usd' },
+          display_name: 'Standard Shipping',
+          delivery_estimate: {
+            minimum: { unit: 'business_day' as const, value: 5 },
+            maximum: { unit: 'business_day' as const, value: 7 },
+          },
+        },
+      },
+      {
+        shipping_rate_data: {
+          type: 'fixed_amount' as const,
+          fixed_amount: { amount: 1299, currency: 'usd' },
+          display_name: 'Express Shipping',
+          delivery_estimate: {
+            minimum: { unit: 'business_day' as const, value: 2 },
+            maximum: { unit: 'business_day' as const, value: 3 },
+          },
+        },
+      },
+    ]
+
     // Create Stripe Checkout Session
     const session = await getStripe().checkout.sessions.create({
       payment_method_types: ['card'],
@@ -39,6 +85,10 @@ export async function POST(request: NextRequest) {
         },
         quantity: item.quantity,
       })),
+      shipping_address_collection: {
+        allowed_countries: ['US'],
+      },
+      shipping_options: shippingOptions,
       mode: 'payment',
       success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/shop`,

@@ -130,6 +130,18 @@ export default function CartDrawer() {
                             {formatPrice(subtotal)}
                           </span>
                         </div>
+                        <div className="text-sm text-center">
+                          {subtotal >= 5000 ? (
+                            <p className="text-green-400">FREE shipping at checkout</p>
+                          ) : (
+                            <>
+                              <p className="text-gray-400">Shipping calculated at checkout</p>
+                              <p className="text-brand-gold mt-1">
+                                Add {formatPrice(5000 - subtotal)} more for FREE shipping
+                              </p>
+                            </>
+                          )}
+                        </div>
                         <button
                           type="button"
                           onClick={handleCheckout}
