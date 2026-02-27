@@ -15,8 +15,6 @@ export const products: Product[] = [
     callouts: ['Zero Calories', 'All Natural', '30-Year Recipe'],
     images: [
       '/images/products/jerk-sauce-2oz.jpg',
-      '/images/products/jerk-sauce-2oz-2.jpg',
-      '/images/products/jerk-sauce-2oz-3.jpg',
     ],
   },
   {
@@ -33,8 +31,6 @@ export const products: Product[] = [
     callouts: ['Zero Calories', 'All Natural', '30-Year Recipe'],
     images: [
       '/images/products/jerk-sauce-5oz.jpg',
-      '/images/products/jerk-sauce-5oz-2.jpg',
-      '/images/products/jerk-sauce-5oz-3.jpg',
     ],
   },
   {
@@ -51,8 +47,6 @@ export const products: Product[] = [
     callouts: ['Zero Calories', 'All Natural', '30-Year Recipe'],
     images: [
       '/images/products/jerk-sauce-10oz.jpg',
-      '/images/products/jerk-sauce-10oz-2.jpg',
-      '/images/products/jerk-sauce-10oz-3.jpg',
     ],
   },
   {
@@ -69,8 +63,6 @@ export const products: Product[] = [
     callouts: ['All Natural', 'Handcrafted', 'Authentic Recipe'],
     images: [
       '/images/products/pikliz-12oz.jpg',
-      '/images/products/pikliz-12oz-2.jpg',
-      '/images/products/pikliz-12oz-3.jpg',
     ],
   },
   {

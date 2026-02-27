@@ -6,9 +6,10 @@ import Image from 'next/image'
 interface ImageGalleryProps {
   images: string[]
   productName: string
+  isBundle?: boolean
 }
 
-export default function ImageGallery({ images, productName }: ImageGalleryProps) {
+export default function ImageGallery({ images, productName, isBundle }: ImageGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0)
   const showThumbnails = images.length > 1
 
@@ -21,7 +22,7 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
           alt={`${productName} - Image ${activeIndex + 1}`}
           fill
           sizes="(max-width: 768px) 100vw, 50vw"
-          className="object-cover"
+          className={isBundle ? 'object-contain p-4' : 'object-cover'}
           priority={activeIndex === 0}
         />
       </div>
