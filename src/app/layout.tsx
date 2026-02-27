@@ -7,6 +7,7 @@ import CartDrawer from "@/components/CartDrawer";
 import SamplePopup from "@/components/SamplePopup";
 import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 import MetaPixel from "@/components/analytics/MetaPixel";
+import ChatWidget from "@/components/ChatWidget";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -55,6 +56,7 @@ export default function RootLayout({
         </div>
         <CartDrawer />
         <SamplePopup />
+        <ChatWidget />
         <Suspense fallback={null}>
           <MetaPixel />
         </Suspense>
