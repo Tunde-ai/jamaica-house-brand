@@ -99,6 +99,43 @@ async function sendFulfillmentEmail(session: Stripe.Checkout.Session) {
   })
 }
 
+async function postToCommandCenter(payload: {
+  orderId: string
+  customerEmail: string
+  firstName: string
+  lastName: string
+  phone?: string
+  items: { name: string; qty: number; price: number }[]
+  shippingCost: number
+  orderTotal: number
+  orderDate: string
+}) {
+  const webhookUrl = process.env.COMMAND_CENTER_WEBHOOK_URL
+  const webhookKey = process.env.COMMAND_CENTER_WEBHOOK_API_KEY
+
+  if (!webhookUrl) {
+    console.log('COMMAND_CENTER_WEBHOOK_URL not set — skipping')
+    return
+  }
+
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  if (webhookKey) headers['Authorization'] = `Bearer ${webhookKey}`
+
+  const response = await fetch(webhookUrl, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(payload),
+  })
+
+  if (!response.ok) {
+    const text = await response.text()
+    throw new Error(`Command Center webhook ${response.status}: ${text}`)
+  }
+
+  const data = await response.json()
+  console.log('Command Center webhook success:', data)
+}
+
 async function sendSlackNotification(session: Stripe.Checkout.Session) {
   const webhookUrl = process.env.SLACK_WEBHOOK_URL
   if (!webhookUrl) return
@@ -193,15 +230,38 @@ export async function POST(request: NextRequest) {
         customerEmail: session.customer_details?.email,
       })
 
+      // Build Command Center payload
+      const ccShipping = session.collected_information?.shipping_details
+      const ccName = ccShipping?.name || session.customer_details?.name || ''
+      const ccNameParts = ccName.split(' ')
+      const ccItems = session.line_items?.data.map((item) => ({
+        name: item.description || 'Item',
+        qty: item.quantity || 1,
+        price: item.amount_total != null && item.quantity
+          ? Number((item.amount_total / item.quantity / 100).toFixed(2))
+          : 0,
+      })) || []
+
       // Send notifications — must await before returning so Vercel doesn't kill the function
       await Promise.allSettled([
         sendSlackNotification(session),
         sendFulfillmentEmail(session),
+        postToCommandCenter({
+          orderId: session.id,
+          customerEmail: session.customer_details?.email || '',
+          firstName: ccNameParts[0] || '',
+          lastName: ccNameParts.slice(1).join(' ') || '',
+          phone: session.customer_details?.phone || undefined,
+          items: ccItems,
+          shippingCost: (session.shipping_cost?.amount_total || 0) / 100,
+          orderTotal: (session.amount_total || 0) / 100,
+          orderDate: new Date().toISOString(),
+        }),
       ]).then((results) => {
+        const labels = ['Slack notification', 'Fulfillment email', 'Command Center webhook']
         results.forEach((result, i) => {
           if (result.status === 'rejected') {
-            const label = i === 0 ? 'Slack notification' : 'Fulfillment email'
-            console.error(`${label} failed:`, result.reason)
+            console.error(`${labels[i]} failed:`, result.reason)
           }
         })
       })
@@ -370,6 +430,28 @@ export async function POST(request: NextRequest) {
         } catch (slackErr) {
           console.error('PaymentIntent Slack notification failed:', slackErr)
         }
+      }
+
+      // Post to Command Center
+      const piNameParts = customerName.split(' ')
+      const piItems = items.map((item) => ({
+        name: item.name,
+        qty: item.quantity,
+        price: Number((item.price / 100).toFixed(2)),
+      }))
+      try {
+        await postToCommandCenter({
+          orderId: paymentIntent.id,
+          customerEmail: resolvedEmail || '',
+          firstName: piNameParts[0] || '',
+          lastName: piNameParts.slice(1).join(' ') || '',
+          items: piItems,
+          shippingCost: parseInt(paymentIntent.metadata.shipping_cost || '0') / 100,
+          orderTotal: paymentIntent.amount / 100,
+          orderDate: new Date().toISOString(),
+        })
+      } catch (ccErr) {
+        console.error('PaymentIntent Command Center webhook failed:', ccErr)
       }
 
       break
