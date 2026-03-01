@@ -16,71 +16,6 @@ const QUICK_REPLIES = [
 
 const WHATSAPP_URL = 'https://wa.me/17867091027'
 
-interface Response {
-  keywords: RegExp
-  reply: string
-}
-
-const RESPONSES: Response[] = [
-  {
-    keywords: /product|sauce|pikliz|bundle|buy|sell|price|cost|how much|menu/i,
-    reply: `Here's what we offer!\n\n🌶️ Original Jerk Sauce\n• 2oz — $6.99\n• 5oz — $11.99\n• 10oz — $18.99\n\n🥕 Escovitch Pikliz (12oz) — $11.99\n\n🎁 Jamaica House Bundle — $24.99 (Save $6!)\nIncludes 2oz + 5oz Jerk Sauce + 12oz Pikliz\n\nAll products are all-natural, zero calories, and made from our 30-year family recipe. Shop at jamaicahousebrand.com/shop`,
-  },
-  {
-    keywords: /ship|deliver|free shipping|express|standard/i,
-    reply: `Here are our shipping options:\n\n📦 Standard Shipping — $5.99 (5-7 business days)\n🚀 Express Shipping — $12.99 (2-3 business days)\n🎉 FREE Shipping on orders over $50!\n\nWe currently ship within the US only.`,
-  },
-  {
-    keywords: /cater|event|wedding|corporate|party|reunion|graduation/i,
-    reply: `We cater events of all sizes with authentic Jamaican food!\n\nProteins: Jerk Chicken, Curry Goat, Oxtail, Brown Stew Chicken, Escovitch Fish, Curry Chicken\nSides: Rice & Peas, Fried Plantains, Festival, Mac & Cheese, and more\n\nPricing per person:\n• 20–50 guests: $25\n• 51–100 guests: $22\n• 101–200 guests: $20\n• 201–500 guests: $18\n• 500+: $15 (custom menu)\n\nTo book catering, message us on WhatsApp at +1 (786) 709-1027 or fill out the form at jamaicahousebrand.com/catering-services`,
-  },
-  {
-    keywords: /member|family|subscription|subscribe|annual|plan/i,
-    reply: `Join the Jamaica House Family!\n\n⭐ Standard Annual — $75/year\n• 13 bottles (5oz) delivered quarterly\n• Only $5.77/bottle + FREE shipping\n• 15% off first year\n\n👑 Premium Annual — $125/year\n• 13 bottles (10oz) delivered quarterly\n• Only $9.62/bottle + FREE shipping\n• Exclusive recipes + VIP event invitations\n\nSign up at jamaicahousebrand.com/family-members`,
-  },
-  {
-    keywords: /recipe|cook|make|chicken|shrimp|salmon|wing|burger|fish/i,
-    reply: `We have delicious recipes on our site!\n\n🍗 Authentic Jerk Chicken\n🌮 Jerk Shrimp Tacos\n🐟 Jerk Salmon with Rice & Peas\n🐠 Escovitch Fish\n🍗 Jerk Chicken Wings\n🍔 Pikliz Burger\n\nEach recipe uses our sauces — check them all out at jamaicahousebrand.com/recipes`,
-  },
-  {
-    keywords: /restaurant|location|visit|address|miami|broward|lauderdale|miramar|dine|eat/i,
-    reply: `Visit our restaurants!\n\n📍 Jamaica House Miami\n19555 NW 2nd Ave, Miami, FL 33169\n📞 (305) 651-0083\n\n📍 Jamaica House Broward\n3351 W Broward Blvd, Fort Lauderdale, FL 33312\n📞 (954) 530-2698\n\n📍 Jamaica House Miramar — Coming Soon!`,
-  },
-  {
-    keywords: /story|about|who|history|chef|anthony|brand|family/i,
-    reply: `Jamaica House Brand was born from 30+ years of restaurant heritage. Chef Anthony grew up in New York with Jamaican parents — his father ran Jamaica House restaurants in South Florida. 92% of restaurant customers asked "Can I buy a bottle of that sauce?" — so we bottled the exact family recipe that made the restaurants famous.\n\nLearn more at jamaicahousebrand.com/our-story`,
-  },
-  {
-    keywords: /ingredient|natural|calorie|healthy|allspice|thyme|scotch bonnet|habanero/i,
-    reply: `Our products are made with all-natural ingredients and are zero calories!\n\n🌶️ Jerk Sauce: Allspice, thyme, Scotch bonnet peppers, and our secret family blend\n🥕 Pikliz: Habanero peppers, carrots, onions, vinegar\n\nNo preservatives, no artificial anything — just authentic Jamaican flavor.`,
-  },
-  {
-    keywords: /hello|hi|hey|good morning|good afternoon|good evening|sup|what'?s up/i,
-    reply: `Hey there! Welcome to Jamaica House Brand! 👋\n\nI can help you with:\n• Products & pricing\n• Shipping info\n• Catering services\n• Membership plans\n• Recipes\n• Restaurant locations\n\nWhat would you like to know?`,
-  },
-  {
-    keywords: /thank|thanks|appreciate/i,
-    reply: `You're welcome! If you need anything else, I'm here to help. You can also reach us on WhatsApp at +1 (786) 709-1027 for personalized support. 🙏`,
-  },
-  {
-    keywords: /help|support|contact|phone|email|reach|talk|speak|person|human|agent/i,
-    reply: `You can reach our team directly on WhatsApp for personalized help!\n\n📱 WhatsApp: +1 (786) 709-1027\n\nOr tap the green "Chat with us on WhatsApp" button below.`,
-  },
-  {
-    keywords: /order|track|status|refund|return|cancel/i,
-    reply: `For questions about orders, tracking, returns, or refunds, please reach out to our team directly on WhatsApp at +1 (786) 709-1027 — they'll get you sorted right away!`,
-  },
-]
-
-function getReply(message: string): string {
-  for (const response of RESPONSES) {
-    if (response.keywords.test(message)) {
-      return response.reply
-    }
-  }
-  return `Thanks for your message! I'm not sure about that one, but our team can definitely help.\n\nReach out on WhatsApp at +1 (786) 709-1027 or tap the green button below for personalized support!`
-}
-
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
@@ -99,20 +34,36 @@ export default function ChatWidget() {
     }
   }, [isOpen])
 
-  function sendMessage(text: string) {
+  async function sendMessage(text: string) {
     if (!text.trim()) return
 
     const userMessage: Message = { role: 'user', content: text.trim() }
-    setMessages((prev) => [...prev, userMessage])
+    const updatedMessages = [...messages, userMessage]
+    setMessages(updatedMessages)
     setInput('')
     setIsLoading(true)
 
-    // Simulate a brief typing delay
-    setTimeout(() => {
-      const reply = getReply(text.trim())
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: text.trim(),
+          history: messages,
+        }),
+      })
+
+      const data = await res.json()
+      const reply = data.reply || "I'm having trouble right now. Please reach out on WhatsApp at +1 (786) 709-1027!"
       setMessages((prev) => [...prev, { role: 'assistant', content: reply }])
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: "I'm having trouble connecting right now. Please reach out on WhatsApp at +1 (786) 709-1027 for immediate help!" },
+      ])
+    } finally {
       setIsLoading(false)
-    }, 600)
+    }
   }
 
   function handleQuickReply(reply: typeof QUICK_REPLIES[number]) {

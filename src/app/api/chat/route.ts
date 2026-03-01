@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import OpenAI from 'openai'
 
 const SYSTEM_PROMPT = `You are a friendly, helpful customer service assistant for Jamaica House Brand — an authentic Jamaican sauce company with 30+ years of restaurant heritage. You speak warmly and casually but professionally. Keep responses concise (2-4 sentences when possible).
 
@@ -77,27 +76,43 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    })
+    const accountId = process.env.CLOUDFLARE_ACCOUNT_ID!
+    const apiToken = process.env.CLOUDFLARE_API_TOKEN!
+    const model = '@cf/meta/llama-3.1-8b-instruct'
 
-    const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+    const messages = [
       { role: 'system', content: SYSTEM_PROMPT },
       ...history.slice(-10).map((msg) => ({
-        role: msg.role as 'user' | 'assistant',
+        role: msg.role,
         content: msg.content,
       })),
       { role: 'user', content: message },
     ]
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages,
-      max_tokens: 300,
-      temperature: 0.7,
-    })
+    const res = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages,
+          max_tokens: 300,
+          temperature: 0.7,
+        }),
+      }
+    )
 
-    const reply = completion.choices[0]?.message?.content || "I'm sorry, I couldn't process that. Please try again or reach out to us on WhatsApp at +1 (786) 709-1027."
+    const data = await res.json()
+
+    if (!data.success) {
+      console.error('Cloudflare AI error:', data.errors)
+      throw new Error(data.errors?.[0]?.message || 'Cloudflare AI request failed')
+    }
+
+    const reply = data.result?.response || "I'm sorry, I couldn't process that. Please try again or reach out to us on WhatsApp at +1 (786) 709-1027."
 
     return NextResponse.json({ reply })
   } catch (error) {
