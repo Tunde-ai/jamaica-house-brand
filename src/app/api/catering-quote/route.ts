@@ -89,7 +89,49 @@ async function sendQuoteNotification(body: CateringQuoteBody) {
     `,
   })
 
-  console.log('[catering-quote] Notification email sent to info@jamaicahousebrand.com')
+  console.log('[catering-quote] Notification email sent to olatunde@jamaicahousebrand.com')
+}
+
+async function sendSlackNotification(body: CateringQuoteBody) {
+  const webhookUrl = process.env.SLACK_WEBHOOK_URL
+  if (!webhookUrl) return
+
+  await fetch(webhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      blocks: [
+        {
+          type: 'header',
+          text: { type: 'plain_text', text: '\uD83C\uDF7D\uFE0F New Catering Quote Request' },
+        },
+        {
+          type: 'section',
+          fields: [
+            { type: 'mrkdwn', text: `*Name:*\n${body.name}` },
+            { type: 'mrkdwn', text: `*Email:*\n${body.email}` },
+            { type: 'mrkdwn', text: `*Phone:*\n${body.phone}` },
+            { type: 'mrkdwn', text: `*Event Type:*\n${body.eventType}` },
+          ],
+        },
+        {
+          type: 'section',
+          fields: [
+            { type: 'mrkdwn', text: `*Event Date:*\n${body.eventDate}` },
+            { type: 'mrkdwn', text: `*Guests:*\n${body.guestCount}` },
+            ...(body.venue ? [{ type: 'mrkdwn', text: `*Venue:*\n${body.venue}` }] : []),
+            ...(body.proteins ? [{ type: 'mrkdwn', text: `*Proteins:*\n${body.proteins}` }] : []),
+          ],
+        },
+        ...(body.message ? [{
+          type: 'section',
+          text: { type: 'mrkdwn', text: `*Additional Details:*\n${body.message}` },
+        }] : []),
+      ],
+    }),
+  })
+
+  console.log('[catering-quote] Slack notification sent')
 }
 
 export async function POST(request: Request) {
@@ -117,13 +159,16 @@ export async function POST(request: Request) {
       timestamp: new Date().toISOString(),
     })
 
-    // Send email notification
-    try {
-      await sendQuoteNotification(body)
-    } catch (emailErr) {
-      console.error('[catering-quote] Email send failed:', emailErr)
-      // Don't fail the request — the quote was still received
-    }
+    // Send email + Slack notifications
+    await Promise.allSettled([
+      sendQuoteNotification(body),
+      sendSlackNotification(body),
+    ]).then((results) => {
+      const labels = ['Email', 'Slack']
+      results.forEach((r, i) => {
+        if (r.status === 'rejected') console.error(`[catering-quote] ${labels[i]} failed:`, r.reason)
+      })
+    })
 
     return NextResponse.json({ success: true })
   } catch (error) {

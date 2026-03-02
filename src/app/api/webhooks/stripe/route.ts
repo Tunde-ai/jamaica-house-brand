@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getStripe } from '@/lib/stripe'
 import Stripe from 'stripe'
 import nodemailer from 'nodemailer'
+import { onOrderComplete as mailchimpSync } from '@/lib/mailchimp-sync'
+import { calculateShipping, type ShippingItem } from '@/lib/shipping-calc'
 
 async function sendFulfillmentEmail(session: Stripe.Checkout.Session) {
   const appPassword = process.env.GMAIL_APP_PASSWORD
@@ -242,6 +244,14 @@ export async function POST(request: NextRequest) {
           : 0,
       })) || []
 
+      // Shipping summary for fulfillment records
+      const shippingItems: ShippingItem[] = ccItems.map((item) => ({
+        productId: item.name.toLowerCase().replace(/[^a-z0-9]/g, ''),
+        qty: item.qty,
+      }))
+      const shippingInfo = calculateShipping(shippingItems)
+      console.log(`Shipping: Box ${shippingInfo.boxSize} | ${shippingInfo.carrier}`)
+
       // Send notifications — must await before returning so Vercel doesn't kill the function
       await Promise.allSettled([
         sendSlackNotification(session),
@@ -257,8 +267,15 @@ export async function POST(request: NextRequest) {
           orderTotal: (session.amount_total || 0) / 100,
           orderDate: new Date().toISOString(),
         }),
+        mailchimpSync({
+          customerEmail: session.customer_details?.email || '',
+          firstName: ccNameParts[0] || '',
+          lastName: ccNameParts.slice(1).join(' ') || '',
+          phone: session.customer_details?.phone || undefined,
+          items: shippingItems.map((si) => ({ productId: si.productId, qty: si.qty })),
+        }),
       ]).then((results) => {
-        const labels = ['Slack notification', 'Fulfillment email', 'Command Center webhook']
+        const labels = ['Slack notification', 'Fulfillment email', 'Command Center webhook', 'Mailchimp sync']
         results.forEach((result, i) => {
           if (result.status === 'rejected') {
             console.error(`${labels[i]} failed:`, result.reason)

@@ -70,7 +70,40 @@ async function sendSignupNotification(body: MembershipSignupBody) {
     `,
   })
 
-  console.log('[membership-signup] Notification email sent to info@jamaicahousebrand.com')
+  console.log('[membership-signup] Notification email sent to olatunde@jamaicahousebrand.com')
+}
+
+async function sendSlackNotification(body: MembershipSignupBody) {
+  const webhookUrl = process.env.SLACK_WEBHOOK_URL
+  if (!webhookUrl) return
+
+  await fetch(webhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      blocks: [
+        {
+          type: 'header',
+          text: { type: 'plain_text', text: '\uD83D\uDC51 New Family Member Signup' },
+        },
+        {
+          type: 'section',
+          fields: [
+            { type: 'mrkdwn', text: `*Tier:*\n${body.tier}` },
+            { type: 'mrkdwn', text: `*Name:*\n${body.firstName} ${body.lastName}` },
+            { type: 'mrkdwn', text: `*Email:*\n${body.email}` },
+            { type: 'mrkdwn', text: `*Phone:*\n${body.phone}` },
+          ],
+        },
+        {
+          type: 'section',
+          text: { type: 'mrkdwn', text: `*Address:*\n${body.address}\n${body.city}, ${body.state} ${body.zip}` },
+        },
+      ],
+    }),
+  })
+
+  console.log('[membership-signup] Slack notification sent')
 }
 
 export async function POST(request: Request) {
@@ -105,13 +138,16 @@ export async function POST(request: Request) {
       timestamp: new Date().toISOString(),
     })
 
-    // Send email notification
-    try {
-      await sendSignupNotification(body)
-    } catch (emailErr) {
-      console.error('[membership-signup] Email send failed:', emailErr)
-      // Don't fail the request — the signup was still received
-    }
+    // Send email + Slack notifications
+    await Promise.allSettled([
+      sendSignupNotification(body),
+      sendSlackNotification(body),
+    ]).then((results) => {
+      const labels = ['Email', 'Slack']
+      results.forEach((r, i) => {
+        if (r.status === 'rejected') console.error(`[membership-signup] ${labels[i]} failed:`, r.reason)
+      })
+    })
 
     // Stripe subscription creation deferred to future phase
     return NextResponse.json({ success: true })
