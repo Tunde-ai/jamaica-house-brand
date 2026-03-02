@@ -5,6 +5,7 @@ import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { useCartStore, CartItem } from '@/lib/cart-store'
 import { formatPrice } from '@/lib/utils'
 import { usStates } from '@/data/membership'
+import { getCheckoutShippingCostCents } from '@/lib/shipping-calc'
 
 type Step = 'shipping' | 'payment'
 
@@ -68,12 +69,14 @@ export default function CheckoutForm({ onPaymentSuccess, shippingOption, onShipp
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const isFreeShipping = subtotal >= 5000
+  const EXPRESS_SURCHARGE = 400
+  const standardShippingCost = getCheckoutShippingCostCents(items)
   const shippingCost =
     shippingOption === 'express'
-      ? 1299
+      ? standardShippingCost + EXPRESS_SURCHARGE
       : isFreeShipping || shippingOption === 'free'
         ? 0
-        : 599
+        : standardShippingCost
   const total = subtotal + shippingCost
 
   function updateField(field: keyof ShippingData, value: string) {
@@ -380,7 +383,7 @@ export default function CheckoutForm({ onPaymentSuccess, shippingOption, onShipp
                   <span className="text-white text-sm">Standard Shipping</span>
                   <span className="text-gray-500 text-xs block">5-7 business days</span>
                 </div>
-                <span className="text-white text-sm">$5.99</span>
+                <span className="text-white text-sm">{formatPrice(standardShippingCost)}</span>
               </label>
               <label className="flex items-center gap-3 bg-white/5 rounded-lg p-3 cursor-pointer border border-white/10 hover:border-brand-gold/30 transition-colors">
                 <input
@@ -395,7 +398,7 @@ export default function CheckoutForm({ onPaymentSuccess, shippingOption, onShipp
                   <span className="text-white text-sm">Express Shipping</span>
                   <span className="text-gray-500 text-xs block">2-3 business days</span>
                 </div>
-                <span className="text-white text-sm">$12.99</span>
+                <span className="text-white text-sm">{formatPrice(standardShippingCost + EXPRESS_SURCHARGE)}</span>
               </label>
             </div>
           </div>

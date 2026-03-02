@@ -8,6 +8,7 @@ import { getStripeClient } from '@/lib/stripe-client'
 import { useCartStore } from '@/lib/cart-store'
 import { formatPrice } from '@/lib/utils'
 import { getUpsellOffer, downsellOffer, UpsellOffer } from '@/data/upsell-config'
+import { getCheckoutShippingCostCents } from '@/lib/shipping-calc'
 import CheckoutForm from '@/components/checkout/CheckoutForm'
 import UpsellModal from '@/components/checkout/UpsellModal'
 
@@ -50,12 +51,14 @@ export default function CheckoutPage() {
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const isFreeShipping = subtotal >= 5000
+  const EXPRESS_SURCHARGE = 400
+  const standardShippingCost = getCheckoutShippingCostCents(items)
   const shippingCost =
     shippingOption === 'express'
-      ? 1299
+      ? standardShippingCost + EXPRESS_SURCHARGE
       : isFreeShipping || shippingOption === 'free'
         ? 0
-        : 599
+        : standardShippingCost
   const total = subtotal + shippingCost
 
   const upsellOffer = getUpsellOffer(items.map((i) => i.id))

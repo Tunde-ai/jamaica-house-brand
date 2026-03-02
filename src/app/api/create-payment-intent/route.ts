@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getStripe } from '@/lib/stripe'
 import { getProductById } from '@/data/products'
+import { getCheckoutShippingCostCents } from '@/lib/shipping-calc'
 
 interface RequestItem {
   id: string
@@ -17,12 +18,7 @@ interface ShippingInfo {
   zip: string
 }
 
-const SHIPPING_RATES: Record<string, number> = {
-  standard: 599,
-  express: 1299,
-  free: 0,
-}
-
+const EXPRESS_SURCHARGE = 400 // $4.00 in cents
 const FREE_SHIPPING_THRESHOLD = 5000 // $50.00 in cents
 
 export async function POST(request: NextRequest) {
@@ -83,12 +79,15 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Determine shipping cost
-    let shippingCost = SHIPPING_RATES[shippingOption] ?? SHIPPING_RATES.standard
-    if (subtotal >= FREE_SHIPPING_THRESHOLD && shippingOption === 'free') {
+    // Determine shipping cost using weight/quantity-based calculator
+    const standardShippingCost = getCheckoutShippingCostCents(items)
+    let shippingCost: number
+    if (shippingOption === 'express') {
+      shippingCost = standardShippingCost + EXPRESS_SURCHARGE
+    } else if (subtotal >= FREE_SHIPPING_THRESHOLD) {
       shippingCost = 0
-    } else if (subtotal >= FREE_SHIPPING_THRESHOLD && shippingOption !== 'express') {
-      shippingCost = 0
+    } else {
+      shippingCost = standardShippingCost
     }
 
     const total = subtotal + shippingCost

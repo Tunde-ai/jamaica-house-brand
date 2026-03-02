@@ -160,3 +160,49 @@ export function getCheckoutShippingCost(items: ShippingItem[]): number {
   if (result.totalBottles <= 4) return CUSTOMER_RATES.three_btl.max
   return CUSTOMER_RATES.large.max
 }
+
+// --- Checkout Integration ---
+
+// Maps cart product IDs to shipping calc size IDs
+const CART_TO_SHIPPING: Record<string, { sizes: string[]; bottles: number }> = {
+  'jerk-sauce-2oz':        { sizes: ['2oz'], bottles: 1 },
+  'jerk-sauce-5oz':        { sizes: ['5oz'], bottles: 1 },
+  'jerk-sauce-10oz':       { sizes: ['10oz'], bottles: 1 },
+  'escovitch-pikliz-12oz': { sizes: ['12oz'], bottles: 1 },
+  'jamaica-house-bundle':  { sizes: ['2oz', '5oz', '12oz'], bottles: 3 },
+  'free-sample-2oz':       { sizes: ['2oz'], bottles: 1 },
+}
+
+export function cartItemsToShippingItems(
+  items: { id: string; quantity: number }[]
+): ShippingItem[] {
+  const shippingItems: ShippingItem[] = []
+
+  for (const item of items) {
+    // Strip upsell suffix (e.g. "jerk-sauce-5oz-upsell-25" → "jerk-sauce-5oz")
+    const baseId = item.id.replace(/-upsell-\d+$/, '')
+    const mapping = CART_TO_SHIPPING[baseId]
+
+    if (!mapping) continue
+
+    for (const size of mapping.sizes) {
+      const existing = shippingItems.find((s) => s.productId === size)
+      if (existing) {
+        existing.qty += item.quantity
+      } else {
+        shippingItems.push({ productId: size, qty: item.quantity })
+      }
+    }
+  }
+
+  return shippingItems
+}
+
+export function getCheckoutShippingCostCents(
+  items: { id: string; quantity: number }[]
+): number {
+  const shippingItems = cartItemsToShippingItems(items)
+  if (shippingItems.length === 0) return 0
+  const dollars = getCheckoutShippingCost(shippingItems)
+  return Math.round(dollars * 100)
+}
