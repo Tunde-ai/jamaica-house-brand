@@ -19,6 +19,7 @@ export default function CheckoutPage() {
   const [hydrated, setHydrated] = useState(false)
   const [step, setStep] = useState<CheckoutStep>('form')
   const [isUpsellProcessing, setIsUpsellProcessing] = useState(false)
+  const [shippingOption, setShippingOption] = useState('standard')
   const [paymentData, setPaymentData] = useState<{
     paymentIntentId: string
     customerId: string
@@ -37,7 +38,25 @@ export default function CheckoutPage() {
     }
   }, [hydrated, items.length, step, router])
 
+  // Auto-select free shipping when subtotal qualifies
+  useEffect(() => {
+    const sub = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    if (sub >= 5000 && shippingOption === 'standard') {
+      setShippingOption('free')
+    } else if (sub < 5000 && shippingOption === 'free') {
+      setShippingOption('standard')
+    }
+  }, [items, shippingOption])
+
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const isFreeShipping = subtotal >= 5000
+  const shippingCost =
+    shippingOption === 'express'
+      ? 1299
+      : isFreeShipping || shippingOption === 'free'
+        ? 0
+        : 599
+  const total = subtotal + shippingCost
 
   const upsellOffer = getUpsellOffer(items.map((i) => i.id))
 
@@ -115,7 +134,11 @@ export default function CheckoutPage() {
           <div className="lg:col-span-3">
             <div className="bg-white/5 border border-white/10 rounded-xl p-6">
               <Elements stripe={getStripeClient()}>
-                <CheckoutForm onPaymentSuccess={handlePaymentSuccess} />
+                <CheckoutForm
+                  onPaymentSuccess={handlePaymentSuccess}
+                  shippingOption={shippingOption}
+                  onShippingOptionChange={setShippingOption}
+                />
               </Elements>
             </div>
           </div>
@@ -159,12 +182,14 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-400">Shipping</span>
-                  <span className="text-gray-400 text-xs">Calculated next step</span>
+                  <span className={shippingCost === 0 ? 'text-green-400 text-sm font-medium' : 'text-white'}>
+                    {shippingCost === 0 ? 'FREE' : formatPrice(shippingCost)}
+                  </span>
                 </div>
                 <div className="border-t border-white/10 pt-2 flex justify-between">
                   <span className="text-white font-bold">Total</span>
                   <span className="text-brand-gold font-bold text-lg">
-                    {formatPrice(subtotal)}+
+                    {formatPrice(total)}
                   </span>
                 </div>
               </div>

@@ -147,10 +147,10 @@ export async function POST(request: NextRequest) {
       customerId: customer.id,
       paymentIntentId: paymentIntent.id,
     })
-  } catch (error) {
-    console.error('Create payment intent error:', error)
+  } catch (error: any) {
+    console.error('Create payment intent error:', error?.message || error)
     return NextResponse.json(
-      { error: 'Failed to create payment intent' },
+      { error: 'Failed to create payment intent', details: error?.message || 'Unknown error' },
       { status: 500 }
     )
   }

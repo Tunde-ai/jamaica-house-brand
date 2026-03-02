@@ -63,6 +63,8 @@ export default async function SuccessPage({
 
       const customerEmail = paymentIntent.metadata.customer_email || ''
       const total = paymentIntent.amount
+      const shippingCostCents = parseInt(paymentIntent.metadata.shipping_cost || '0')
+      const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
       return (
         <>
@@ -118,8 +120,18 @@ export default async function SuccessPage({
                 ) : (
                   <p className="text-gray-400 text-sm">Your order has been processed successfully.</p>
                 )}
-                <div className="border-t border-brand-gold/20 pt-4">
-                  <div className="flex justify-between text-lg font-bold">
+                <div className="border-t border-brand-gold/20 pt-4 space-y-2">
+                  {items.length > 0 && (
+                    <div className="flex justify-between text-sm text-gray-400">
+                      <span>Subtotal</span>
+                      <span>{formatPrice(subtotal)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-sm text-gray-400">
+                    <span>Shipping</span>
+                    <span>{shippingCostCents === 0 ? 'FREE' : formatPrice(shippingCostCents)}</span>
+                  </div>
+                  <div className="flex justify-between text-lg font-bold pt-2 border-t border-brand-gold/10">
                     <span className="text-white">Total</span>
                     <span className="text-brand-gold">
                       {formatPrice(total)}

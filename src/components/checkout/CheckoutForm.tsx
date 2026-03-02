@@ -23,6 +23,8 @@ interface CheckoutFormProps {
     paymentIntentId: string
     customerId: string
   }) => void
+  shippingOption: string
+  onShippingOptionChange: (option: string) => void
 }
 
 const CARD_ELEMENT_OPTIONS = {
@@ -40,7 +42,7 @@ const CARD_ELEMENT_OPTIONS = {
   },
 }
 
-export default function CheckoutForm({ onPaymentSuccess }: CheckoutFormProps) {
+export default function CheckoutForm({ onPaymentSuccess, shippingOption, onShippingOptionChange }: CheckoutFormProps) {
   const stripe = useStripe()
   const elements = useElements()
   const { items } = useCartStore()
@@ -59,8 +61,6 @@ export default function CheckoutForm({ onPaymentSuccess }: CheckoutFormProps) {
     state: '',
     zip: '',
   })
-  const [shippingOption, setShippingOption] = useState('standard')
-
   // Payment intent data from Step 1
   const [clientSecret, setClientSecret] = useState('')
   const [customerId, setCustomerId] = useState('')
@@ -360,7 +360,7 @@ export default function CheckoutForm({ onPaymentSuccess }: CheckoutFormProps) {
                     name="shipping"
                     value="free"
                     checked={shippingOption === 'free'}
-                    onChange={() => setShippingOption('free')}
+                    onChange={() => onShippingOptionChange('free')}
                     className="text-brand-gold focus:ring-brand-gold"
                   />
                   <span className="flex-1 text-white text-sm">Free Shipping</span>
@@ -373,7 +373,7 @@ export default function CheckoutForm({ onPaymentSuccess }: CheckoutFormProps) {
                   name="shipping"
                   value="standard"
                   checked={shippingOption === 'standard'}
-                  onChange={() => setShippingOption('standard')}
+                  onChange={() => onShippingOptionChange('standard')}
                   className="text-brand-gold focus:ring-brand-gold"
                 />
                 <div className="flex-1">
@@ -388,7 +388,7 @@ export default function CheckoutForm({ onPaymentSuccess }: CheckoutFormProps) {
                   name="shipping"
                   value="express"
                   checked={shippingOption === 'express'}
-                  onChange={() => setShippingOption('express')}
+                  onChange={() => onShippingOptionChange('express')}
                   className="text-brand-gold focus:ring-brand-gold"
                 />
                 <div className="flex-1">
