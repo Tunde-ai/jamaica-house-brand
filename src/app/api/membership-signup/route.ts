@@ -31,7 +31,7 @@ async function sendSignupNotification(body: MembershipSignupBody) {
 
   await transporter.sendMail({
     from: '"Jamaica House Brand" <olatunde@jamaicahousebrand.com>',
-    to: 'info@jamaicahousebrand.com',
+    to: 'olatunde@jamaicahousebrand.com',
     replyTo: body.email,
     subject: `New Family Member Signup — ${body.tier} (${body.firstName} ${body.lastName})`,
     html: `

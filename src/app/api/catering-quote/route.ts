@@ -30,7 +30,7 @@ async function sendQuoteNotification(body: CateringQuoteBody) {
 
   await transporter.sendMail({
     from: '"Jamaica House Brand" <olatunde@jamaicahousebrand.com>',
-    to: 'info@jamaicahousebrand.com',
+    to: 'olatunde@jamaicahousebrand.com',
     replyTo: body.email,
     subject: `New Catering Quote Request — ${body.eventType} (${body.guestCount} guests)`,
     html: `
