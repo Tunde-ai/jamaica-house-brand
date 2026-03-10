@@ -4,6 +4,7 @@ import Stripe from 'stripe'
 import nodemailer from 'nodemailer'
 import { onOrderComplete as mailchimpSync } from '@/lib/mailchimp-sync'
 import { calculateShipping, type ShippingItem } from '@/lib/shipping-calc'
+import { sendOrderConfirmationEmail } from '@/lib/customer-emails'
 
 async function sendFulfillmentEmail(session: Stripe.Checkout.Session) {
   const appPassword = process.env.GMAIL_APP_PASSWORD
@@ -252,30 +253,49 @@ export async function POST(request: NextRequest) {
       const shippingInfo = calculateShipping(shippingItems)
       console.log(`Shipping: Box ${shippingInfo.boxSize} | ${shippingInfo.carrier}`)
 
+      // Build email data for customer confirmation
+      const customerEmail = session.customer_details?.email || ''
+      const customerFirstName = ccNameParts[0] || 'Customer'
+      const emailItems = ccItems.map((item) => ({
+        name: item.name,
+        quantity: item.qty,
+        price: item.price * item.qty,
+      }))
+      const emailShippingCost = (session.shipping_cost?.amount_total || 0) / 100
+      const emailOrderTotal = (session.amount_total || 0) / 100
+
       // Send notifications — must await before returning so Vercel doesn't kill the function
       await Promise.allSettled([
         sendSlackNotification(session),
         sendFulfillmentEmail(session),
+        sendOrderConfirmationEmail({
+          customerFirstName,
+          customerEmail,
+          orderId: session.id,
+          items: emailItems,
+          shippingCost: emailShippingCost,
+          orderTotal: emailOrderTotal,
+        }),
         postToCommandCenter({
           orderId: session.id,
-          customerEmail: session.customer_details?.email || '',
+          customerEmail,
           firstName: ccNameParts[0] || '',
           lastName: ccNameParts.slice(1).join(' ') || '',
           phone: session.customer_details?.phone || undefined,
           items: ccItems,
-          shippingCost: (session.shipping_cost?.amount_total || 0) / 100,
-          orderTotal: (session.amount_total || 0) / 100,
+          shippingCost: emailShippingCost,
+          orderTotal: emailOrderTotal,
           orderDate: new Date().toISOString(),
         }),
         mailchimpSync({
-          customerEmail: session.customer_details?.email || '',
+          customerEmail,
           firstName: ccNameParts[0] || '',
           lastName: ccNameParts.slice(1).join(' ') || '',
           phone: session.customer_details?.phone || undefined,
           items: shippingItems.map((si) => ({ productId: si.productId, qty: si.qty })),
         }),
       ]).then((results) => {
-        const labels = ['Slack notification', 'Fulfillment email', 'Command Center webhook', 'Mailchimp sync']
+        const labels = ['Slack notification', 'Fulfillment email', 'Customer confirmation email', 'Command Center webhook', 'Mailchimp sync']
         results.forEach((result, i) => {
           if (result.status === 'rejected') {
             console.error(`${labels[i]} failed:`, result.reason)
