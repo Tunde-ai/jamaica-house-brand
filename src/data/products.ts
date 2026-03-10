@@ -72,13 +72,14 @@ export const products: Product[] = [
     price: 2499, // $24.99 in cents
     compareAtPrice: 3097, // $30.97 (6.99 + 11.99 + 11.99)
     size: '2oz + 5oz + 12oz',
-    image: '/images/products/product-group.jpg',
+    image: '/images/products/bundle-shop.jpg',
     slug: 'jamaica-house-bundle',
     category: 'bundle',
     inStock: true,
     rating: 5.0,
     callouts: ['Best Value', 'Save $6', 'Complete Set'],
     images: [
+      '/images/products/bundle-shop.jpg',
       '/images/products/product-group.jpg',
     ],
     bundleItems: ['jerk-sauce-2oz', 'jerk-sauce-5oz', 'escovitch-pikliz-12oz'],
