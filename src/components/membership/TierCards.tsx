@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { membershipTiers } from '@/data/membership'
 
 interface TierCardsProps {
@@ -15,6 +16,17 @@ export default function TierCards({ onSelectTier }: TierCardsProps) {
   return (
     <section className="py-20 px-4">
       <div className="max-w-5xl mx-auto">
+        {/* Bundle Image */}
+        <div className="relative w-full max-w-md mx-auto aspect-[3/4] rounded-2xl overflow-hidden mb-12">
+          <Image
+            src="/images/products/bundle-shop.jpg"
+            alt="Jamaica House Brand product lineup — Jerk Sauce, Spicy Pepper Sauce, and Escovitch Pikliz"
+            fill
+            sizes="(max-width: 640px) 100vw, 400px"
+            className="object-cover"
+          />
+        </div>
+
         <div className="text-center mb-16">
           <span className="text-brand-gold text-sm font-semibold tracking-widest uppercase">
             Choose Your Plan
@@ -22,6 +34,9 @@ export default function TierCards({ onSelectTier }: TierCardsProps) {
           <h2 className="text-3xl md:text-4xl font-bold text-white mt-2">
             Pick the Plan That Fits Your Flavor
           </h2>
+          <p className="text-gray-400 mt-3 text-lg">
+            (Every plan includes a FREE bottle of Escovitch Pikliz as your 13th bottle)
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">

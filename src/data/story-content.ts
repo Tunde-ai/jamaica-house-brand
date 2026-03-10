@@ -21,8 +21,8 @@ export const storyContent = {
       title: 'The Sauce Everyone Asked For',
       content:
         "For years, 92% of Jamaica House restaurant guests asked the same question: 'Can I buy a bottle of that sauce?' After countless requests, Chef Anthony decided to bottle the exact family recipe that made the restaurants famous. Jamaica House Brand brings the authentic restaurant experience to your home kitchen.",
-      image: '/images/story/sauce-bottling.jpg',
-      imageAlt: 'Jamaica House Brand sauce bottles being filled',
+      image: '/images/products/bundle-shop.jpg',
+      imageAlt: 'Jamaica House Brand product lineup — Jerk Sauce, Spicy Pepper Sauce, and Escovitch Pikliz',
       layout: 'text-right',
     },
   ] as StorySection[],
