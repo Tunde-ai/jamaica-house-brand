@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { plusJakarta } from "@/lib/fonts";
 import Navigation from "@/components/navigation/Navigation";
+import FreeShippingBar from "@/components/layout/FreeShippingBar";
 import Footer from "@/components/layout/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import SamplePopup from "@/components/SamplePopup";
@@ -48,6 +49,7 @@ export default function RootLayout({
     <html lang="en" className={`${plusJakarta.variable} dark`}>
       <body className="bg-brand-dark text-white antialiased">
         <div className="flex flex-col min-h-screen">
+          <FreeShippingBar />
           <Navigation />
           <main className="flex-1">
             {children}
