@@ -132,6 +132,7 @@ export default function CheckoutForm({ onPaymentSuccess, shippingOption, onShipp
           items: items.map((i) => ({ id: i.id, quantity: i.quantity })),
           shipping,
           shippingOption: isFreeShipping && shippingOption !== 'express' ? 'free' : shippingOption,
+          promoCode: useCartStore.getState().appliedPromo?.code,
         }),
       })
 

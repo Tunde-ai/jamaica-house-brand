@@ -4,6 +4,9 @@ import Image from 'next/image'
 import { CartItem as CartItemType, useCartStore } from '@/lib/cart-store'
 import { formatPrice } from '@/lib/utils'
 
+// 25% discount on 2oz retail price ($6.99) = $5.24 for additional units
+const ADDITIONAL_2OZ_PRICE = 524
+
 interface CartItemProps {
   item: CartItemType
 }
@@ -23,6 +26,13 @@ export default function CartItem({ item }: CartItemProps) {
     removeItem(item.id)
   }
 
+  // For free sample items: 1st unit is free, additional units are $5.24 each
+  const isSample = item.isSample === true
+  const additionalQty = isSample ? Math.max(0, item.quantity - 1) : 0
+  const lineTotal = isSample
+    ? additionalQty * ADDITIONAL_2OZ_PRICE
+    : item.price * item.quantity
+
   return (
     <div className="flex gap-4 py-4 border-b border-brand-gold/10">
       {/* Product Image */}
@@ -38,25 +48,40 @@ export default function CartItem({ item }: CartItemProps) {
 
       {/* Product Details */}
       <div className="flex-1 min-w-0">
-        <h3 className="text-white font-semibold text-sm truncate">
-          {item.name}
-        </h3>
-        <p className="text-gray-400 text-xs mt-1">
-          {item.size}
-          {item.isSample && (
-            <span className="ml-1 text-brand-gold">(shipping only)</span>
-          )}
-        </p>
-        <div className="flex items-center gap-2 mt-1">
-          <span className="text-brand-gold text-sm">
-            {item.isSample ? 'FREE' : formatPrice(item.price)}
-          </span>
-          {!item.isSample && item.originalPrice && item.originalPrice !== item.price && (
-            <span className="text-gray-500 line-through text-xs">
-              {formatPrice(item.originalPrice)}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <h3 className="text-white font-semibold text-sm truncate">
+            {item.name}
+          </h3>
+          {isSample && (
+            <span className="text-xs bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded flex-shrink-0">
+              FREE
             </span>
           )}
         </div>
+        <p className="text-gray-400 text-xs mt-1">{item.size}</p>
+
+        {/* Pricing for free sample with tiered display */}
+        {isSample ? (
+          <div className="mt-1 space-y-0.5">
+            <p className="text-green-400 text-sm">1× FREE</p>
+            {additionalQty > 0 && (
+              <p className="text-brand-gold text-xs">
+                +{additionalQty}× {formatPrice(ADDITIONAL_2OZ_PRICE)} each (25% off)
+              </p>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-brand-gold text-sm">
+              {formatPrice(item.price)}
+            </span>
+            {item.originalPrice && item.originalPrice !== item.price && (
+              <span className="text-gray-500 line-through text-xs">
+                {formatPrice(item.originalPrice)}
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Quantity Controls */}
         <div className="flex items-center gap-2 mt-2">
@@ -95,7 +120,7 @@ export default function CartItem({ item }: CartItemProps) {
 
       {/* Line Total */}
       <div className="text-white font-semibold text-sm">
-        {formatPrice(item.price * item.quantity)}
+        {formatPrice(lineTotal)}
       </div>
     </div>
   )

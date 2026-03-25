@@ -16,7 +16,7 @@ type CheckoutStep = 'form' | 'processing' | 'upsell' | 'downsell' | 'complete'
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const { items, clearCart } = useCartStore()
+  const { items, clearCart, appliedPromo } = useCartStore()
   const [hydrated, setHydrated] = useState(false)
   const [step, setStep] = useState<CheckoutStep>('form')
   const [isUpsellProcessing, setIsUpsellProcessing] = useState(false)
@@ -49,7 +49,14 @@ export default function CheckoutPage() {
     }
   }, [items, shippingOption])
 
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const ADDITIONAL_2OZ_PRICE = 524
+  const subtotal = items.reduce((sum, item) => {
+    if (item.isSample) {
+      const additionalQty = Math.max(0, item.quantity - 1)
+      return sum + additionalQty * ADDITIONAL_2OZ_PRICE
+    }
+    return sum + item.price * item.quantity
+  }, 0)
   const isFreeShipping = subtotal >= 5000
   const EXPRESS_SURCHARGE = 400
   const standardShippingCost = getCheckoutShippingCostCents(items)
@@ -59,7 +66,18 @@ export default function CheckoutPage() {
       : isFreeShipping || shippingOption === 'free'
         ? 0
         : standardShippingCost
-  const total = subtotal + shippingCost
+  // Promo discount
+  let promoDiscountAmount = 0
+  if (appliedPromo && subtotal > 0) {
+    if (appliedPromo.discount_type === 'percentage') {
+      promoDiscountAmount = Math.round((subtotal * appliedPromo.discount_value) / 100)
+    } else {
+      promoDiscountAmount = Math.round(appliedPromo.discount_value * 100)
+    }
+    if (promoDiscountAmount > subtotal) promoDiscountAmount = subtotal
+  }
+
+  const total = subtotal - promoDiscountAmount + shippingCost
 
   const upsellOffer = getUpsellOffer(items.map((i) => i.id))
 
@@ -172,7 +190,9 @@ export default function CheckoutPage() {
                       </p>
                     </div>
                     <span className="text-white text-sm font-medium">
-                      {item.isSample ? 'FREE' : formatPrice(item.price * item.quantity)}
+                      {item.isSample
+                        ? formatPrice(Math.max(0, item.quantity - 1) * ADDITIONAL_2OZ_PRICE)
+                        : formatPrice(item.price * item.quantity)}
                     </span>
                   </div>
                 ))}
@@ -183,6 +203,16 @@ export default function CheckoutPage() {
                   <span className="text-gray-400">Subtotal</span>
                   <span className="text-white">{formatPrice(subtotal)}</span>
                 </div>
+                {promoDiscountAmount > 0 && appliedPromo && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-green-400">
+                      Promo: {appliedPromo.code} (-{appliedPromo.discount_type === 'percentage' ? `${appliedPromo.discount_value}%` : formatPrice(promoDiscountAmount)})
+                    </span>
+                    <span className="text-green-400 font-medium">
+                      -{formatPrice(promoDiscountAmount)}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-400">Shipping</span>
                   <span className={shippingCost === 0 ? 'text-green-400 text-sm font-medium' : 'text-white'}>

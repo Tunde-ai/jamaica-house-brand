@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getStripe } from '@/lib/stripe'
+import { getSupabase } from '@/lib/supabase'
 import Stripe from 'stripe'
 import nodemailer from 'nodemailer'
 import { onOrderComplete as mailchimpSync } from '@/lib/mailchimp-sync'
@@ -469,27 +470,78 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Post to Command Center
+      // Increment promo code usage if one was used
+      const usedPromoCode = paymentIntent.metadata.promoCode
+      if (usedPromoCode) {
+        try {
+          const { data: promo } = await getSupabase()
+            .from('promo_codes')
+            .select('usage_count')
+            .eq('code', usedPromoCode)
+            .single()
+
+          if (promo) {
+            await getSupabase()
+              .from('promo_codes')
+              .update({ usage_count: promo.usage_count + 1 })
+              .eq('code', usedPromoCode)
+          }
+        } catch (promoErr) {
+          console.error('Failed to increment promo usage:', promoErr)
+        }
+      }
+
+      // Post to Command Center, send customer email, and sync Mailchimp
       const piNameParts = customerName.split(' ')
       const piItems = items.map((item) => ({
         name: item.name,
         qty: item.quantity,
         price: Number((item.price / 100).toFixed(2)),
       }))
-      try {
-        await postToCommandCenter({
+      const piShippingCost = parseInt(paymentIntent.metadata.shipping_cost || '0') / 100
+      const piOrderTotal = paymentIntent.amount / 100
+
+      await Promise.allSettled([
+        postToCommandCenter({
           orderId: paymentIntent.id,
           customerEmail: resolvedEmail || '',
           firstName: piNameParts[0] || '',
           lastName: piNameParts.slice(1).join(' ') || '',
           items: piItems,
-          shippingCost: parseInt(paymentIntent.metadata.shipping_cost || '0') / 100,
-          orderTotal: paymentIntent.amount / 100,
+          shippingCost: piShippingCost,
+          orderTotal: piOrderTotal,
           orderDate: new Date().toISOString(),
+        }),
+        resolvedEmail ? sendOrderConfirmationEmail({
+          customerFirstName: piNameParts[0] || 'Customer',
+          customerEmail: resolvedEmail,
+          orderId: paymentIntent.id,
+          items: items.map((item) => ({
+            name: item.name,
+            quantity: item.quantity,
+            price: (item.price * item.quantity) / 100,
+          })),
+          shippingCost: piShippingCost,
+          orderTotal: piOrderTotal,
+        }) : Promise.resolve(),
+        mailchimpSync({
+          customerEmail: resolvedEmail || '',
+          firstName: piNameParts[0] || '',
+          lastName: piNameParts.slice(1).join(' ') || '',
+          phone: undefined,
+          items: items.map((item) => ({
+            productId: item.name.toLowerCase().replace(/[^a-z0-9]/g, ''),
+            qty: item.quantity,
+          })),
+        }),
+      ]).then((results) => {
+        const labels = ['Command Center webhook', 'Customer confirmation email', 'Mailchimp sync']
+        results.forEach((result, i) => {
+          if (result.status === 'rejected') {
+            console.error(`PI ${labels[i]} failed:`, result.reason)
+          }
         })
-      } catch (ccErr) {
-        console.error('PaymentIntent Command Center webhook failed:', ccErr)
-      }
+      })
 
       break
     }

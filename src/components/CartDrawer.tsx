@@ -7,9 +7,13 @@ import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from '@
 import { useCartStore } from '@/lib/cart-store'
 import { formatPrice } from '@/lib/utils'
 import CartItem from './CartItem'
+import PromoCodeInput from './PromoCodeInput'
+
+// 25% discount on 2oz retail price ($6.99) = $5.24 for additional free sample units
+const ADDITIONAL_2OZ_PRICE = 524
 
 export default function CartDrawer() {
-  const { items, isOpen, closeCart } = useCartStore()
+  const { items, isOpen, closeCart, appliedPromo, setPromo } = useCartStore()
   const router = useRouter()
 
   // Rehydrate from localStorage after SSR
@@ -17,7 +21,29 @@ export default function CartDrawer() {
     useCartStore.persist.rehydrate()
   }, [])
 
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  // Subtotal: free sample 1st unit = $0, additional = $5.24 each; other items at face value
+  const subtotal = items.reduce((sum, item) => {
+    if (item.isSample) {
+      const additionalQty = Math.max(0, item.quantity - 1)
+      return sum + additionalQty * ADDITIONAL_2OZ_PRICE
+    }
+    return sum + item.price * item.quantity
+  }, 0)
+
+  // Promo code discount (applied to paid subtotal)
+  let promoDiscountAmount = 0
+  if (appliedPromo && subtotal > 0) {
+    if (appliedPromo.discount_type === 'percentage') {
+      promoDiscountAmount = Math.round((subtotal * appliedPromo.discount_value) / 100)
+    } else {
+      promoDiscountAmount = Math.round(appliedPromo.discount_value * 100)
+    }
+    if (promoDiscountAmount > subtotal) {
+      promoDiscountAmount = subtotal
+    }
+  }
+
+  const discountedTotal = subtotal - promoDiscountAmount
 
   function handleCheckout() {
     closeCart()
@@ -109,21 +135,53 @@ export default function CartDrawer() {
                     {/* Footer */}
                     {items.length > 0 && (
                       <div className="border-t border-brand-gold/20 px-6 py-6 space-y-4">
+                        {/* Promo Code Input */}
+                        <PromoCodeInput
+                          appliedPromo={appliedPromo}
+                          onApply={setPromo}
+                          onRemove={() => setPromo(null)}
+                        />
+
                         <div className="flex justify-between text-lg">
                           <span className="text-gray-400">Subtotal</span>
                           <span className="text-white font-bold">
                             {formatPrice(subtotal)}
                           </span>
                         </div>
+
+                        {/* Promo code discount */}
+                        {promoDiscountAmount > 0 && appliedPromo && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-green-400">
+                              Promo: {appliedPromo.code} (-{appliedPromo.discount_type === 'percentage' ? `${appliedPromo.discount_value}%` : formatPrice(promoDiscountAmount)})
+                            </span>
+                            <span className="text-green-400 font-semibold">
+                              -{formatPrice(promoDiscountAmount)}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Total with discount */}
+                        {promoDiscountAmount > 0 && (
+                          <div className="flex justify-between text-lg border-t border-brand-gold/10 pt-3">
+                            <span className="text-white font-bold">Total</span>
+                            <span className="text-white font-bold">
+                              {formatPrice(discountedTotal)}
+                            </span>
+                          </div>
+                        )}
+
                         <div className="text-sm text-center">
                           {subtotal >= 5000 ? (
                             <p className="text-green-400">FREE shipping at checkout</p>
                           ) : (
                             <>
                               <p className="text-gray-400">Shipping calculated at checkout</p>
-                              <p className="text-brand-gold mt-1">
-                                Add {formatPrice(5000 - subtotal)} more for FREE shipping
-                              </p>
+                              {subtotal > 0 && subtotal < 5000 && (
+                                <p className="text-brand-gold mt-1">
+                                  Add {formatPrice(5000 - subtotal)} more for FREE shipping
+                                </p>
+                              )}
                             </>
                           )}
                         </div>
