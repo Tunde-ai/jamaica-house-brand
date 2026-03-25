@@ -37,7 +37,7 @@ export const products: Product[] = [
     id: 'jerk-sauce-10oz',
     name: 'Original Jerk Sauce',
     description: 'Authentic Jamaican jerk sauce crafted from the family recipe that built three restaurants. Features allspice, thyme, and Scotch bonnet peppers. Zero calories, all natural ingredients.',
-    price: 1899, // $18.99 in cents
+    price: 1999, // $19.99 in cents
     size: '10oz',
     image: '/images/products/jerk-sauce-10oz.jpg',
     slug: 'jerk-sauce-10oz',
