@@ -22,6 +22,7 @@ export default function RestaurantOrderForm() {
   const [qtyCase, setQtyCase] = useState(0)
   const [paymentMethod, setPaymentMethod] = useState('Cash')
   const [notes, setNotes] = useState('')
+  const [taxCertFile, setTaxCertFile] = useState<File | null>(null)
 
   // Auto-calc
   const gallonTotal = qtyGallon * GALLON_PRICE
@@ -53,6 +54,17 @@ export default function RestaurantOrderForm() {
     setErrorMsg('')
 
     try {
+      // Convert tax cert file to base64 if provided
+      let taxCertBase64: string | null = null
+      let taxCertFileName: string | null = null
+      if (taxCertFile) {
+        taxCertFileName = taxCertFile.name
+        const buffer = await taxCertFile.arrayBuffer()
+        taxCertBase64 = btoa(
+          new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
+        )
+      }
+
       const res = await fetch('/api/restaurant-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -67,6 +79,8 @@ export default function RestaurantOrderForm() {
           qtyCase,
           paymentMethod,
           notes: notes.trim(),
+          taxCertBase64,
+          taxCertFileName,
         }),
       })
 
@@ -300,6 +314,59 @@ export default function RestaurantOrderForm() {
               {method}
             </button>
           ))}
+        </div>
+      </div>
+
+      {/* Resale Tax Certificate Upload */}
+      <div>
+        <label className={labelClass}>Resale Tax Certificate</label>
+        <p className="text-gray-500 text-xs mb-2">
+          Upload a copy of your resale tax certificate for tax-exempt wholesale pricing. Accepted: PDF, JPG, PNG (max 5MB).
+        </p>
+        <div
+          className={`relative rounded-lg border-2 border-dashed px-4 py-6 text-center transition-colors ${
+            taxCertFile
+              ? 'border-brand-green/50 bg-brand-green/5'
+              : 'border-brand-gold/20 hover:border-brand-gold/40'
+          }`}
+        >
+          {taxCertFile ? (
+            <div className="flex items-center justify-center gap-3">
+              <svg className="w-5 h-5 text-brand-green flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              </svg>
+              <span className="text-white text-sm truncate max-w-[200px]">{taxCertFile.name}</span>
+              <button
+                type="button"
+                onClick={() => setTaxCertFile(null)}
+                className="text-gray-400 hover:text-red-400 text-xs transition-colors"
+              >
+                Remove
+              </button>
+            </div>
+          ) : (
+            <div>
+              <svg className="w-8 h-8 text-gray-500 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+              </svg>
+              <p className="text-gray-400 text-sm">Click to upload or drag and drop</p>
+            </div>
+          )}
+          <input
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png"
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                  alert('File must be under 5MB')
+                  return
+                }
+                setTaxCertFile(file)
+              }
+            }}
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          />
         </div>
       </div>
 

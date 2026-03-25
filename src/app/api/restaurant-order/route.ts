@@ -12,6 +12,8 @@ interface OrderPayload {
   qtyCase: number
   paymentMethod: string
   notes: string
+  taxCertBase64: string | null
+  taxCertFileName: string | null
 }
 
 async function sendEmails(body: OrderPayload) {
@@ -65,6 +67,8 @@ Payment Method: ${body.paymentMethod || 'Not specified'}
 
 Notes: ${body.notes || 'None'}
 
+Resale Tax Certificate: ${body.taxCertBase64 ? `ATTACHED (${body.taxCertFileName})` : 'Not provided'}
+
 ─────────────────────────────────────────
 Submitted: ${timestamp}
 Source: jamaicahousebrand.com/restaurant-partners
@@ -91,6 +95,11 @@ From Our Family to Yours 🇯🇲
 jamaicahousebrand.com
 `.trim()
 
+  // Build attachment if tax cert was uploaded
+  const attachments = body.taxCertBase64 && body.taxCertFileName
+    ? [{ filename: body.taxCertFileName, content: Buffer.from(body.taxCertBase64, 'base64') }]
+    : []
+
   await Promise.allSettled([
     transporter.sendMail({
       from: '"Jamaica House Brand" <olatunde@jamaicahousebrand.com>',
@@ -98,6 +107,7 @@ jamaicahousebrand.com
       replyTo: body.email,
       subject: `🌶️ New Restaurant Order Request — ${body.businessName}`,
       text: internalText,
+      attachments,
     }),
     transporter.sendMail({
       from: '"Jamaica House Brand" <olatunde@jamaicahousebrand.com>',
