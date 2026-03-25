@@ -113,6 +113,8 @@ async function postToCommandCenter(payload: {
   shippingCost: number
   orderTotal: number
   orderDate: string
+  promoCode?: string
+  promoDiscount?: number
 }) {
   const webhookUrl = process.env.COMMAND_CENTER_WEBHOOK_URL
   const webhookKey = process.env.COMMAND_CENTER_WEBHOOK_API_KEY
@@ -511,6 +513,10 @@ export async function POST(request: NextRequest) {
           shippingCost: piShippingCost,
           orderTotal: piOrderTotal,
           orderDate: new Date().toISOString(),
+          promoCode: usedPromoCode || undefined,
+          promoDiscount: paymentIntent.metadata.promoDiscount
+            ? parseInt(paymentIntent.metadata.promoDiscount) / 100
+            : undefined,
         }),
         resolvedEmail ? sendOrderConfirmationEmail({
           customerFirstName: piNameParts[0] || 'Customer',
