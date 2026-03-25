@@ -141,7 +141,7 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-brand-gold/10 flex flex-col md:flex-row justify-between items-center gap-4 text-gray-400 text-sm">
-          <p>&copy; 2024 Jamaica House Brand. All rights reserved.</p>
+          <p>&copy; 2025 Jamaica House Brand. All rights reserved.</p>
           <p>Made with love in South Florida</p>
         </div>
       </div>
