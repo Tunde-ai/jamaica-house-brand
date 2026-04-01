@@ -1,6 +1,10 @@
-import { googleReviews, googleBusinessInfo } from '@/data/google-reviews'
-import StarRating from '@/components/ui/StarRating'
+'use client'
+
+import { useEffect, useRef } from 'react'
+import { googleBusinessInfo } from '@/data/google-reviews'
 import { sanitizeJsonLd } from '@/lib/seo'
+
+const PLACE_ID = googleBusinessInfo.placeId
 
 function GoogleIcon() {
   return (
@@ -13,28 +17,25 @@ function GoogleIcon() {
   )
 }
 
-function ReviewStars({ rating }: { rating: number }) {
-  return (
-    <div className="flex gap-0.5">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <svg
-          key={star}
-          className={`w-4 h-4 ${star <= rating ? 'text-yellow-400' : 'text-gray-600'}`}
-          fill="currentColor"
-          viewBox="0 0 20 20"
-        >
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-        </svg>
-      ))}
-    </div>
-  )
-}
-
 export default function GoogleReviews() {
+  const widgetRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    // Load Elfsight Google Reviews widget script
+    const existing = document.querySelector('script[src*="elfsight.com"]')
+    if (!existing) {
+      const script = document.createElement('script')
+      script.src = 'https://static.elfsight.com/platform/platform.js'
+      script.async = true
+      document.body.appendChild(script)
+    }
+  }, [])
+
   const reviewSchemaJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
     name: googleBusinessInfo.businessName,
+    '@id': `https://www.google.com/maps/place/?q=place_id:${PLACE_ID}`,
     aggregateRating: {
       '@type': 'AggregateRating',
       ratingValue: googleBusinessInfo.averageRating.toString(),
@@ -42,16 +43,6 @@ export default function GoogleReviews() {
       bestRating: '5',
       worstRating: '1',
     },
-    review: googleReviews.slice(0, 3).map((review) => ({
-      '@type': 'Review',
-      author: { '@type': 'Person', name: review.authorName },
-      reviewRating: {
-        '@type': 'Rating',
-        ratingValue: review.rating.toString(),
-        bestRating: '5',
-      },
-      reviewBody: review.text,
-    })),
   }
 
   return (
@@ -61,62 +52,56 @@ export default function GoogleReviews() {
         dangerouslySetInnerHTML={{ __html: sanitizeJsonLd(reviewSchemaJsonLd) }}
       />
       <div className="max-w-6xl mx-auto">
-        {/* Header with Google branding */}
-        <div className="text-center mb-12">
+        {/* Header */}
+        <div className="text-center mb-10">
           <div className="flex items-center justify-center gap-3 mb-4">
             <GoogleIcon />
             <h2 className="text-3xl md:text-4xl font-bold text-white">
-              Google Reviews
+              What Our Customers Say
             </h2>
           </div>
-          <div className="flex items-center justify-center gap-3">
-            <StarRating rating={googleBusinessInfo.averageRating} showValue />
-            <span className="text-gray-400 text-sm">
-              {googleBusinessInfo.averageRating} out of 5 based on {googleBusinessInfo.totalReviews} reviews
-            </span>
-          </div>
+          <p className="text-gray-400 text-sm">
+            {googleBusinessInfo.totalReviews} reviews on Google · {googleBusinessInfo.averageRating} out of 5 stars
+          </p>
         </div>
 
-        {/* Reviews grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {googleReviews.map((review) => (
-            <div
-              key={review.id}
-              className="bg-white/5 border border-brand-gold/10 rounded-lg p-6 hover:border-brand-gold/25 transition-colors"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-brand-gold/20 flex items-center justify-center text-brand-gold font-bold text-sm">
-                    {review.authorName.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="text-white font-medium text-sm">{review.authorName}</p>
-                    <p className="text-gray-500 text-xs">{review.relativeTime}</p>
-                  </div>
-                </div>
-                <GoogleIcon />
-              </div>
-              <ReviewStars rating={review.rating} />
-              <p className="text-gray-300 mt-3 text-sm leading-relaxed">
-                {review.text}
-              </p>
-            </div>
-          ))}
+        {/* Live Google Reviews Widget via Google Maps embed */}
+        <div ref={widgetRef} className="rounded-xl overflow-hidden">
+          <iframe
+            src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d0!2d0!3d0!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m3!3e0!4m0!4m0!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus&q=place_id:${PLACE_ID}`}
+            width="100%"
+            height="450"
+            style={{ border: 0, borderRadius: '12px' }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="Jamaica House Brand on Google Maps"
+            className="w-full"
+          />
         </div>
 
-        {/* CTA to leave a review */}
-        <div className="text-center mt-10">
+        {/* Direct links */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
           <a
-            href={`https://search.google.com/local/writereview?placeid=${googleBusinessInfo.placeId}`}
+            href={`https://search.google.com/local/reviews?placeid=${PLACE_ID}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-brand-gold hover:text-brand-gold/80 transition-colors text-sm font-medium"
+            className="inline-flex items-center gap-2 bg-white/5 border border-brand-gold/20 text-white px-5 py-2.5 rounded-lg hover:bg-white/10 transition-colors text-sm font-medium"
           >
             <GoogleIcon />
-            Leave us a review on Google
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            Read All {googleBusinessInfo.totalReviews} Reviews
+            <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
+          </a>
+          <a
+            href={`https://search.google.com/local/writereview?placeid=${PLACE_ID}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-brand-gold/10 border border-brand-gold/30 text-brand-gold px-5 py-2.5 rounded-lg hover:bg-brand-gold/20 transition-colors text-sm font-medium"
+          >
+            <GoogleIcon />
+            Leave a Review
           </a>
         </div>
       </div>

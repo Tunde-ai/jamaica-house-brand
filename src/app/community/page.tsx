@@ -1,8 +1,8 @@
 import { Metadata } from 'next'
 import { socialProfiles } from '@/data/social-media'
-import { googleReviews, googleBusinessInfo } from '@/data/google-reviews'
+import { googleBusinessInfo } from '@/data/google-reviews'
+import GoogleReviews from '@/components/home/GoogleReviews'
 import { InstagramFeed, TikTokFeed, YouTubeFeed } from '@/components/social/PlatformFeed'
-import StarRating from '@/components/ui/StarRating'
 import { generateBreadcrumbJsonLd, sanitizeJsonLd } from '@/lib/seo'
 
 export const metadata: Metadata = {
@@ -96,45 +96,10 @@ export default function CommunityPage() {
         </div>
       </section>
 
-      {/* Google Reviews section */}
-      <section className="py-12 px-4 border-t border-brand-gold/10">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center gap-3 mb-8">
-            <GoogleIcon />
-            <h2 className="text-2xl md:text-3xl font-bold text-white">Google Reviews</h2>
-            <div className="ml-auto flex items-center gap-2">
-              <StarRating rating={googleBusinessInfo.averageRating} showValue />
-              <span className="text-gray-400 text-sm hidden sm:inline">
-                ({googleBusinessInfo.totalReviews} reviews)
-              </span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {googleReviews.map((review) => (
-              <div
-                key={review.id}
-                className="bg-white/5 border border-brand-gold/10 rounded-lg p-5"
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-9 h-9 rounded-full bg-brand-gold/20 flex items-center justify-center text-brand-gold font-bold text-sm">
-                    {review.authorName.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="text-white font-medium text-sm">{review.authorName}</p>
-                    <p className="text-gray-500 text-xs">{review.relativeTime}</p>
-                  </div>
-                  <div className="ml-auto">
-                    <GoogleIcon />
-                  </div>
-                </div>
-                <ReviewStars rating={review.rating} />
-                <p className="text-gray-300 mt-3 text-sm leading-relaxed">{review.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Live Google Reviews */}
+      <div className="border-t border-brand-gold/10">
+        <GoogleReviews />
+      </div>
 
       {/* YouTube — live channel feed */}
       <section className="py-12 px-4 border-t border-brand-gold/10">
