@@ -21,6 +21,43 @@ export const socialProfiles = {
 // TikTok: https://www.tiktok.com/embed/v2/{VIDEO_ID}
 // YouTube: https://www.youtube.com/embed/{VIDEO_ID}
 export const featuredPosts: SocialPost[] = [
+  // ── YouTube Shorts (real videos from @JAMAICAHOUSEBRAND) ─────
+  {
+    id: 'yt-1',
+    platform: 'youtube',
+    embedUrl: 'https://www.youtube.com/embed/X8bDPDYhYZ0',
+    caption: 'Ready For Some Real Jerk Chicken?',
+  },
+  {
+    id: 'yt-2',
+    platform: 'youtube',
+    embedUrl: 'https://www.youtube.com/embed/7vg4mVqnfJI',
+    caption: 'Libby Loves Our Sauce',
+  },
+  {
+    id: 'yt-3',
+    platform: 'youtube',
+    embedUrl: 'https://www.youtube.com/embed/uvr3f1kTa6A',
+    caption: 'Alicia Echevarria Cooking With Jerk Sauce',
+  },
+  {
+    id: 'yt-4',
+    platform: 'youtube',
+    embedUrl: 'https://www.youtube.com/embed/R49cqTiZEZk',
+    caption: 'Gulsah Basaran With Jerk Sauce',
+  },
+  {
+    id: 'yt-5',
+    platform: 'youtube',
+    embedUrl: 'https://www.youtube.com/embed/XajFAKvE-Jc',
+    caption: 'Sausages & Jerk Sauce',
+  },
+  {
+    id: 'yt-6',
+    platform: 'youtube',
+    embedUrl: 'https://www.youtube.com/embed/ynxkIVcDoCM',
+    caption: 'Adding Sauce To Ramen!?',
+  },
   // ── Instagram Posts ──────────────────────────────────────────
   {
     id: 'ig-1',
@@ -34,12 +71,6 @@ export const featuredPosts: SocialPost[] = [
     embedUrl: 'https://www.instagram.com/p/PLACEHOLDER_2/embed',
     caption: 'Behind the scenes at Jamaica House Restaurant',
   },
-  {
-    id: 'ig-3',
-    platform: 'instagram',
-    embedUrl: 'https://www.instagram.com/p/PLACEHOLDER_3/embed',
-    caption: 'Chef Anthony crafting the perfect jerk marinade',
-  },
   // ── TikTok Videos ────────────────────────────────────────────
   {
     id: 'tt-1',
@@ -52,18 +83,5 @@ export const featuredPosts: SocialPost[] = [
     platform: 'tiktok',
     embedUrl: 'https://www.tiktok.com/embed/v2/PLACEHOLDER_2',
     caption: 'Taste test reaction',
-  },
-  // ── YouTube Videos ───────────────────────────────────────────
-  {
-    id: 'yt-1',
-    platform: 'youtube',
-    embedUrl: 'https://www.youtube.com/embed/PLACEHOLDER_1',
-    caption: 'The Jamaica House Brand Story',
-  },
-  {
-    id: 'yt-2',
-    platform: 'youtube',
-    embedUrl: 'https://www.youtube.com/embed/PLACEHOLDER_2',
-    caption: 'Jerk Chicken Recipe with Original Sauce',
   },
 ]

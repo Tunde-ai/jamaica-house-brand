@@ -88,28 +88,35 @@ export function TikTokFeed() {
 }
 
 // ── YouTube Feed Widget ────────────────────────────────────────────
-// Embeds YouTube channel's latest uploads as a playlist.
-// Uses the channel page embed which shows recent videos.
-export function YouTubeFeed({ channelId }: { channelId?: string }) {
-  // If we have a channel ID, embed the uploads playlist (UU prefix)
-  // Otherwise, embed the channel page
-  const embedUrl = channelId
-    ? `https://www.youtube.com/embed?listType=playlist&list=UU${channelId.replace('UC', '')}&autoplay=0`
-    : `https://www.youtube.com/embed?listType=user_uploads&list=JAMAICAHOUSEBRAND`
+// Embeds all YouTube Shorts from the channel as a responsive grid.
+export function YouTubeFeed() {
+  const shorts = [
+    { id: 'X8bDPDYhYZ0', title: 'Ready For Some Real Jerk Chicken?' },
+    { id: '7vg4mVqnfJI', title: 'Libby Loves Our Sauce' },
+    { id: 'uvr3f1kTa6A', title: 'Alicia Echevarria Cooking With Jerk Sauce' },
+    { id: 'R49cqTiZEZk', title: 'Gulsah Basaran With Jerk Sauce' },
+    { id: 'XajFAKvE-Jc', title: 'Sausages & Jerk Sauce' },
+    { id: 'ynxkIVcDoCM', title: 'Adding Sauce To Ramen!?' },
+  ]
 
   return (
-    <div className="relative rounded-xl overflow-hidden bg-white/5 border border-brand-gold/10">
-      <iframe
-        src={embedUrl}
-        width="100%"
-        height="450"
-        frameBorder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-        loading="lazy"
-        title="Jamaica House Brand YouTube Channel"
-        className="w-full"
-      />
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      {shorts.map((short) => (
+        <div key={short.id} className="relative rounded-xl overflow-hidden bg-white/5 border border-brand-gold/10">
+          <iframe
+            src={`https://www.youtube.com/embed/${short.id}`}
+            width="100%"
+            height="320"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            loading="lazy"
+            title={short.title}
+            className="w-full"
+          />
+          <p className="text-gray-400 text-xs p-2 truncate">{short.title}</p>
+        </div>
+      ))}
     </div>
   )
 }
