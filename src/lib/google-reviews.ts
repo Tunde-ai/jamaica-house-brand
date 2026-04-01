@@ -22,29 +22,31 @@ export async function fetchGoogleReviews(): Promise<PlaceDetails | null> {
   const apiKey = process.env.GOOGLE_PLACES_API_KEY
 
   if (!apiKey) {
-    console.warn('GOOGLE_PLACES_API_KEY not set — Google Reviews will not load')
+    console.warn('[GoogleReviews] GOOGLE_PLACES_API_KEY not set')
     return null
   }
 
-  try {
-    const res = await fetch(
-      `https://maps.googleapis.com/maps/api/place/details/json?place_id=${PLACE_ID}&fields=name,rating,user_ratings_total,reviews,url&reviews_sort=newest&key=${apiKey}`,
-      { next: { revalidate: 3600 } } // Cache for 1 hour
-    )
+  console.log('[GoogleReviews] API key found, fetching reviews...')
 
-    if (!res.ok) {
-      console.error('Google Places API error:', res.status)
-      return null
-    }
+  try {
+    const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${PLACE_ID}&fields=name,rating,user_ratings_total,reviews,url&reviews_sort=newest&key=${apiKey}`
+    const res = await fetch(url, { next: { revalidate: 3600 } })
 
     const data = await res.json()
+    console.log('[GoogleReviews] API response status:', data.status)
 
-    if (data.status !== 'OK' || !data.result) {
-      console.error('Google Places API returned:', data.status)
+    if (data.status !== 'OK') {
+      console.error('[GoogleReviews] API error:', data.status, data.error_message || '')
+      // If the Places API isn't enabled or key is wrong, try Places API (New)
+      if (data.status === 'REQUEST_DENIED') {
+        console.error('[GoogleReviews] Try enabling "Places API" at console.cloud.google.com/apis')
+      }
       return null
     }
 
     const place = data.result
+
+    console.log('[GoogleReviews] Got', place.reviews?.length || 0, 'reviews for', place.name)
 
     return {
       name: place.name || 'Jamaica House Brand',
@@ -61,7 +63,7 @@ export async function fetchGoogleReviews(): Promise<PlaceDetails | null> {
       })),
     }
   } catch (err) {
-    console.error('Failed to fetch Google reviews:', err)
+    console.error('[GoogleReviews] Fetch failed:', err)
     return null
   }
 }
