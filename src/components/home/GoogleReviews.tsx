@@ -107,7 +107,7 @@ export default function GoogleReviews() {
         {/* CTA to leave a review */}
         <div className="text-center mt-10">
           <a
-            href="https://search.google.com/local/writereview?placeid=YOUR_PLACE_ID"
+            href={`https://search.google.com/local/writereview?placeid=${googleBusinessInfo.placeId}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-brand-gold hover:text-brand-gold/80 transition-colors text-sm font-medium"

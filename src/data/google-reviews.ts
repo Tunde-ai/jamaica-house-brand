@@ -57,7 +57,7 @@ export const googleReviews: GoogleReview[] = [
 
 // Google Business Profile info for schema.org markup
 export const googleBusinessInfo = {
-  placeId: '', // Add your Google Place ID when available — search "Jamaica House Brand" on Google and find the Place ID
+  placeId: 'ChIJmca2LsTZCUgRHUn8HZt5nUw',
   averageRating: 4.2,
   totalReviews: 188,
   businessName: 'Jamaica House Brand',
