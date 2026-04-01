@@ -13,6 +13,7 @@ const navItems = [
   { name: 'Catering', href: '/catering-services' },
   { name: 'Family', href: '/family-members' },
   { name: 'Events', href: '/events' },
+  { name: 'Community', href: '/community' },
 ]
 
 export default function Navigation() {
