@@ -1,8 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { socialProfiles } from '@/data/social-media'
-import { InstagramFeed } from './PlatformFeed'
+import { socialProfiles, featuredPosts } from '@/data/social-media'
+import SocialCarousel from './SocialCarousel'
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -59,6 +59,16 @@ const platforms = [
 ]
 
 export default function SocialFeedPreview() {
+  // Only YouTube slides (real content) for the homepage carousel
+  const youtubeSlides = featuredPosts
+    .filter((p) => p.platform === 'youtube')
+    .map((post) => ({
+      id: post.id,
+      platform: post.platform,
+      embedUrl: post.embedUrl,
+      caption: post.caption,
+    }))
+
   return (
     <section className="py-16 sm:py-24 px-4">
       <div className="max-w-6xl mx-auto">
@@ -71,9 +81,16 @@ export default function SocialFeedPreview() {
           </p>
         </div>
 
-        {/* Live Instagram feed embed on homepage */}
-        <div className="max-w-xl mx-auto mb-12">
-          <InstagramFeed />
+        {/* YouTube Shorts carousel */}
+        <div className="max-w-3xl mx-auto mb-12">
+          <SocialCarousel
+            slides={youtubeSlides}
+            autoPlay
+            interval={5000}
+            title="Latest Videos"
+            profileUrl={socialProfiles.youtube}
+            profileLabel="Subscribe"
+          />
         </div>
 
         {/* Platform follow cards */}
