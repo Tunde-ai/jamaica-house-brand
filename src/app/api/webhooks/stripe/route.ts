@@ -115,6 +115,12 @@ async function postToCommandCenter(payload: {
   orderDate: string
   promoCode?: string
   promoDiscount?: number
+  shippingAddressLine1?: string
+  shippingAddressLine2?: string
+  shippingCity?: string
+  shippingState?: string
+  shippingZip?: string
+  shippingCountry?: string
 }) {
   const webhookUrl = process.env.COMMAND_CENTER_WEBHOOK_URL
   const webhookKey = process.env.COMMAND_CENTER_WEBHOOK_API_KEY
@@ -289,6 +295,12 @@ export async function POST(request: NextRequest) {
           shippingCost: emailShippingCost,
           orderTotal: emailOrderTotal,
           orderDate: new Date().toISOString(),
+          shippingAddressLine1: ccShipping?.address?.line1 || undefined,
+          shippingAddressLine2: ccShipping?.address?.line2 || undefined,
+          shippingCity: ccShipping?.address?.city || undefined,
+          shippingState: ccShipping?.address?.state || undefined,
+          shippingZip: ccShipping?.address?.postal_code || undefined,
+          shippingCountry: ccShipping?.address?.country || 'US',
         }),
         mailchimpSync({
           customerEmail,
@@ -517,6 +529,12 @@ export async function POST(request: NextRequest) {
           promoDiscount: paymentIntent.metadata.promoDiscount
             ? parseInt(paymentIntent.metadata.promoDiscount) / 100
             : undefined,
+          // Parse shipping address from metadata (stored by checkout form)
+          shippingAddressLine1: paymentIntent.shipping?.address?.line1 || paymentIntent.metadata.shipping_address?.split(',')[0]?.trim() || undefined,
+          shippingCity: paymentIntent.shipping?.address?.city || undefined,
+          shippingState: paymentIntent.shipping?.address?.state || undefined,
+          shippingZip: paymentIntent.shipping?.address?.postal_code || undefined,
+          shippingCountry: paymentIntent.shipping?.address?.country || 'US',
         }),
         resolvedEmail ? sendOrderConfirmationEmail({
           customerFirstName: piNameParts[0] || 'Customer',
