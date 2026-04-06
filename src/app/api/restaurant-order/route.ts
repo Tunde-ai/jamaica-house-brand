@@ -10,6 +10,7 @@ interface OrderPayload {
   requestedDate: string
   qtyGallon: number
   qtyCase: number
+  qtyEscovitch: number
   paymentMethod: string
   notes: string
   taxCertBase64: string | null
@@ -33,7 +34,8 @@ async function sendEmails(body: OrderPayload) {
 
   const gallonTotal = (body.qtyGallon || 0) * 50
   const caseTotal = (body.qtyCase || 0) * 60
-  const orderTotal = gallonTotal + caseTotal
+  const escovitchTotal = (body.qtyEscovitch || 0) * 72
+  const orderTotal = gallonTotal + caseTotal + escovitchTotal
   const firstName = body.contactName.trim().split(' ')[0]
 
   const timestamp = new Date().toLocaleString('en-US', {
@@ -60,6 +62,7 @@ ORDER DETAILS
 Product                              Qty    Total
 ${body.qtyGallon > 0 ? `Jerk Sauce · 1 Gallon ($50 ea)       ${body.qtyGallon}      $${gallonTotal.toFixed(2)}` : ''}
 ${body.qtyCase > 0 ? `Jerk Sauce · 5oz Case ($60 ea)        ${body.qtyCase}      $${caseTotal.toFixed(2)}` : ''}
+${body.qtyEscovitch > 0 ? `Escovitch / Pikliz · 12oz Case ($72 ea)  ${body.qtyEscovitch}      $${escovitchTotal.toFixed(2)}` : ''}
 ─────────────────────────────────────────
 ORDER TOTAL:                                 $${orderTotal.toFixed(2)}
 
@@ -84,6 +87,7 @@ YOUR ORDER SUMMARY
 ──────────────────
 ${body.qtyGallon > 0 ? `Jerk Sauce · 1 Gallon ($50 ea)  ×${body.qtyGallon}  $${gallonTotal.toFixed(2)}` : ''}
 ${body.qtyCase > 0 ? `Jerk Sauce · 5oz Case ($60 ea)  ×${body.qtyCase}  $${caseTotal.toFixed(2)}` : ''}
+${body.qtyEscovitch > 0 ? `Escovitch / Pikliz · 12oz Case ($72 ea)  ×${body.qtyEscovitch}  $${escovitchTotal.toFixed(2)}` : ''}
 
 Order Total: $${orderTotal.toFixed(2)}
 Payment Method: ${body.paymentMethod || 'Not specified'}
@@ -135,7 +139,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email is required.' }, { status: 400 })
     }
 
-    const orderTotal = ((body.qtyGallon || 0) * 50) + ((body.qtyCase || 0) * 60)
+    const orderTotal = ((body.qtyGallon || 0) * 50) + ((body.qtyCase || 0) * 60) + ((body.qtyEscovitch || 0) * 72)
     if (orderTotal === 0) {
       return NextResponse.json({ error: 'Please add at least one product.' }, { status: 400 })
     }
@@ -144,6 +148,37 @@ export async function POST(request: NextRequest) {
       await sendEmails(body)
     } catch (emailError) {
       console.error('[restaurant-order] Email send failed:', emailError)
+    }
+
+    // Also POST to command center as a lead (non-blocking)
+    try {
+      const ccUrl = process.env.COMMAND_CENTER_WEBHOOK_URL?.replace('/incoming-order', '/incoming-lead')
+      const ccKey = process.env.COMMAND_CENTER_WEBHOOK_API_KEY
+      if (ccUrl && ccKey) {
+        await fetch(ccUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${ccKey}`,
+          },
+          body: JSON.stringify({
+            businessName: body.businessName,
+            contactName: body.contactName,
+            phone: body.phone,
+            email: body.email,
+            deliveryAddress: body.deliveryAddress,
+            requestedDate: body.requestedDate,
+            qtyGallon: body.qtyGallon,
+            qtyCase: body.qtyCase,
+            qtyEscovitch: body.qtyEscovitch,
+            paymentMethod: body.paymentMethod,
+            notes: body.notes,
+            taxCertFileName: body.taxCertFileName,
+          }),
+        })
+      }
+    } catch (ccError) {
+      console.error('[restaurant-order] Command Center lead sync failed:', ccError)
     }
 
     return NextResponse.json({ success: true })
