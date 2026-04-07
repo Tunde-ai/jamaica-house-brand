@@ -17,6 +17,68 @@ interface OrderPayload {
   taxCertFileName: string | null
 }
 
+async function sendSlackAlert(body: OrderPayload, orderTotal: number) {
+  const webhookUrl = process.env.SLACK_WEBHOOK_URL
+  if (!webhookUrl) return
+
+  const lineItems: string[] = []
+  if (body.qtyGallon > 0) lineItems.push(`${body.qtyGallon}× Gallon`)
+  if (body.qtyCase > 0) lineItems.push(`${body.qtyCase}× 5oz Case`)
+  if (body.qtyEscovitch > 0) lineItems.push(`${body.qtyEscovitch}× Pikliz Case`)
+
+  const payload = {
+    text: `🌶️ NEW WHOLESALE LEAD — $${orderTotal.toFixed(0)}`,
+    blocks: [
+      {
+        type: 'header',
+        text: {
+          type: 'plain_text',
+          text: `🌶️ NEW WHOLESALE LEAD — $${orderTotal.toFixed(0)}`,
+        },
+      },
+      {
+        type: 'section',
+        fields: [
+          { type: 'mrkdwn', text: `*Business:*\n${body.businessName}` },
+          { type: 'mrkdwn', text: `*Contact:*\n${body.contactName}` },
+          { type: 'mrkdwn', text: `*Phone:*\n<tel:${body.phone}|${body.phone}>` },
+          { type: 'mrkdwn', text: `*Email:*\n<mailto:${body.email}|${body.email}>` },
+        ],
+      },
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `*Order:* ${lineItems.join(' · ') || 'No items'}\n*Delivery:* ${body.requestedDate || 'Not specified'}\n*Address:* ${body.deliveryAddress || 'Not provided'}\n*Payment:* ${body.paymentMethod || 'Not specified'}`,
+        },
+      },
+      ...(body.notes ? [{
+        type: 'section',
+        text: { type: 'mrkdwn', text: `*Notes:* ${body.notes}` },
+      }] : []),
+      {
+        type: 'context',
+        elements: [
+          {
+            type: 'mrkdwn',
+            text: `⏱️ Respond fast — leads contacted within 5 minutes are 9× more likely to convert. View in <https://command-center-psi-nine.vercel.app/dashboard/restaurant-leads|Command Center>`,
+          },
+        ],
+      },
+    ],
+  }
+
+  try {
+    await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+  } catch (err) {
+    console.error('[restaurant-order] Slack alert failed:', err)
+  }
+}
+
 async function sendEmails(body: OrderPayload) {
   const appPassword = process.env.GMAIL_APP_PASSWORD
   if (!appPassword) {
@@ -77,26 +139,31 @@ Submitted: ${timestamp}
 Source: jamaicahousebrand.com/restaurant-partners
 `.trim()
 
-  // ── Customer confirmation ──────────────────────────────────
+  // ── Customer confirmation — warm, fast-response promise ───────
   const customerText = `
 Hi ${firstName},
 
-Thanks for reaching out to Jamaica House Brand! We've received your order request and will be in touch within 1 business day to confirm your order and arrange delivery.
+Thanks so much for reaching out about a wholesale partnership with Jamaica House Brand! I personally received your request for ${body.businessName} and I'm excited to work with you.
 
-YOUR ORDER SUMMARY
+YOUR ORDER REQUEST
 ──────────────────
 ${body.qtyGallon > 0 ? `Jerk Sauce · 1 Gallon ($50 ea)  ×${body.qtyGallon}  $${gallonTotal.toFixed(2)}` : ''}
 ${body.qtyCase > 0 ? `Jerk Sauce · 5oz Case ($60 ea)  ×${body.qtyCase}  $${caseTotal.toFixed(2)}` : ''}
 ${body.qtyEscovitch > 0 ? `Escovitch / Pikliz · 12oz Case ($72 ea)  ×${body.qtyEscovitch}  $${escovitchTotal.toFixed(2)}` : ''}
 
-Order Total: $${orderTotal.toFixed(2)}
-Payment Method: ${body.paymentMethod || 'Not specified'}
+Estimated Total: $${orderTotal.toFixed(2)}
 
-Questions? Call us at 786-709-1027 or reply to this email.
+WHAT HAPPENS NEXT
+─────────────────
+I'll personally call or email you within 24 hours to confirm pricing, answer any questions, and lock in your delivery date. If you need anything sooner, feel free to text or call me directly at 786-709-1027.
 
-— The Jamaica House Brand Team
-From Our Family to Yours 🇯🇲
+Looking forward to bringing the island to your kitchen.
+
+— Tunde
+Jamaica House Brand
+786-709-1027
 jamaicahousebrand.com
+From Our Family to Yours 🇯🇲
 `.trim()
 
   // Build attachment if tax cert was uploaded
@@ -148,6 +215,13 @@ export async function POST(request: NextRequest) {
       await sendEmails(body)
     } catch (emailError) {
       console.error('[restaurant-order] Email send failed:', emailError)
+    }
+
+    // Slack alert — fast response trigger
+    try {
+      await sendSlackAlert(body, orderTotal)
+    } catch (slackError) {
+      console.error('[restaurant-order] Slack alert failed:', slackError)
     }
 
     // Also POST to command center as a lead (non-blocking)
