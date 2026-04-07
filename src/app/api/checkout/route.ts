@@ -89,6 +89,7 @@ export async function POST(request: NextRequest) {
         allowed_countries: ['US'],
       },
       shipping_options: shippingOptions,
+      allow_promotion_codes: true,
       mode: 'payment',
       success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/shop`,
