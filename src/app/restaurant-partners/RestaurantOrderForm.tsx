@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 const GALLON_PRICE = 50
 const CASE_PRICE = 60
+const ESCOVITCH_PRICE = 72
 
 type FormStatus = 'idle' | 'submitting' | 'success' | 'error'
 
@@ -20,6 +21,7 @@ export default function RestaurantOrderForm() {
   const [requestedDate, setRequestedDate] = useState('')
   const [qtyGallon, setQtyGallon] = useState(0)
   const [qtyCase, setQtyCase] = useState(0)
+  const [qtyEscovitch, setQtyEscovitch] = useState(0)
   const [paymentMethod, setPaymentMethod] = useState('Cash')
   const [notes, setNotes] = useState('')
   const [taxCertFile, setTaxCertFile] = useState<File | null>(null)
@@ -27,7 +29,8 @@ export default function RestaurantOrderForm() {
   // Auto-calc
   const gallonTotal = qtyGallon * GALLON_PRICE
   const caseTotal = qtyCase * CASE_PRICE
-  const subtotal = gallonTotal + caseTotal
+  const escovitchTotal = qtyEscovitch * ESCOVITCH_PRICE
+  const subtotal = gallonTotal + caseTotal + escovitchTotal
   const orderTotal = subtotal
 
   // Validation
@@ -77,6 +80,7 @@ export default function RestaurantOrderForm() {
           requestedDate,
           qtyGallon,
           qtyCase,
+          qtyEscovitch,
           paymentMethod,
           notes: notes.trim(),
           taxCertBase64,
@@ -278,6 +282,41 @@ export default function RestaurantOrderForm() {
             </div>
             <p className="text-white text-sm sm:text-right font-semibold">
               ${caseTotal.toFixed(2)}
+            </p>
+          </div>
+
+          {/* Escovitch / Pikliz row */}
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 sm:gap-4 px-4 py-4 border-t border-brand-gold/10 items-center">
+            <div className="sm:col-span-1">
+              <p className="text-white text-sm font-medium">Escovitch / Pikliz</p>
+              <p className="text-gray-500 text-xs">Case of 12 × 12oz bottles</p>
+            </div>
+            <p className="text-brand-gold text-sm sm:text-right font-semibold">$72.00/case</p>
+            <div className="flex items-center sm:justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => setQtyEscovitch(Math.max(0, qtyEscovitch - 1))}
+                className="w-8 h-8 rounded bg-white/5 border border-brand-gold/20 text-white flex items-center justify-center hover:bg-brand-gold/10 transition-colors"
+              >
+                −
+              </button>
+              <input
+                type="number"
+                min="0"
+                value={qtyEscovitch}
+                onChange={(e) => setQtyEscovitch(Math.max(0, parseInt(e.target.value) || 0))}
+                className="w-14 text-center bg-white/5 border border-brand-gold/20 rounded py-1.5 text-white text-sm focus:outline-none focus:border-brand-gold/50"
+              />
+              <button
+                type="button"
+                onClick={() => setQtyEscovitch(qtyEscovitch + 1)}
+                className="w-8 h-8 rounded bg-white/5 border border-brand-gold/20 text-white flex items-center justify-center hover:bg-brand-gold/10 transition-colors"
+              >
+                +
+              </button>
+            </div>
+            <p className="text-white text-sm sm:text-right font-semibold">
+              ${escovitchTotal.toFixed(2)}
             </p>
           </div>
 
