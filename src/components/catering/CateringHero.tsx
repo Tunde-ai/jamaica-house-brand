@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 
 export default function CateringHero() {
   const scrollToForm = () => {
@@ -34,13 +35,29 @@ export default function CateringHero() {
           Caribbean cuisine that turns any occasion into a celebration. 30+ years of restaurant
           heritage, now at your venue.
         </p>
-        <button
-          type="button"
-          onClick={scrollToForm}
-          className="bg-brand-gold text-brand-dark font-bold px-8 py-4 rounded-lg hover:bg-brand-gold-light transition-colors text-lg"
-        >
-          Get Your Custom Quote
-        </button>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <button
+            type="button"
+            onClick={scrollToForm}
+            className="bg-brand-gold text-brand-dark font-bold px-8 py-4 rounded-lg hover:bg-brand-gold-light transition-colors text-lg"
+          >
+            Get Your Custom Quote
+          </button>
+          <Link
+            href="/catering-menu"
+            className="border-2 border-brand-gold text-brand-gold font-bold px-8 py-4 rounded-lg hover:bg-brand-gold/10 transition-colors text-lg inline-flex items-center justify-center gap-2 group"
+          >
+            <span>Order by the Tray</span>
+            <svg
+              className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </Link>
+        </div>
       </div>
     </section>
   )

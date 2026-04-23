@@ -10,7 +10,7 @@ const navItems = [
   { name: 'Our Story', href: '/our-story' },
   { name: 'Restaurant Partners', href: '/restaurant-partners' },
   { name: 'Recipes', href: '/recipes' },
-  { name: 'Catering', href: '/catering-services' },
+  { name: 'Catering', href: '/catering-menu' },
   { name: 'Family', href: '/family-members' },
   { name: 'Events', href: '/events' },
   { name: 'Community', href: '/community' },

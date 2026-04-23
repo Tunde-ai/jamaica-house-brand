@@ -58,6 +58,24 @@ export default function HeroSection() {
                 Our Story
               </Link>
             </div>
+
+            {/* Floating Catering CTA */}
+            <div className="absolute bottom-8 right-8 hidden lg:block">
+              <Link
+                href="/catering-menu"
+                className="bg-brand-gold text-brand-dark font-bold px-6 py-3 rounded-full hover:bg-brand-gold-light transition-all duration-300 shadow-2xl hover:scale-105 flex items-center gap-2 group"
+              >
+                <span>Order by the Tray</span>
+                <svg
+                  className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </Link>
+            </div>
           </div>
 
           {/* Right — Product group shot (desktop only) */}

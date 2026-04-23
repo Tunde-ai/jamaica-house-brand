@@ -1,0 +1,11 @@
+{
+  "mode": "interactive",
+  "planning": {
+    "commit_docs": true
+  },
+  "gates": {
+    "researcher": true,
+    "plan_checker": true,
+    "verifier": true
+  }
+}
