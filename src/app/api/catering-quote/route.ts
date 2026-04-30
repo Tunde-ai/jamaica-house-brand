@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
+import { getCountyStatus, type ServiceAreaStatus } from '@/lib/florida-counties'
 
 interface CateringQuoteBody {
   name: string
@@ -11,6 +12,11 @@ interface CateringQuoteBody {
   venue: string
   proteins: string
   message: string
+  // New service area fields
+  venueState?: string
+  venueCounty?: string
+  serviceAreaStatus?: ServiceAreaStatus
+  phoneCountryCode?: string
 }
 
 async function sendQuoteNotification(body: CateringQuoteBody) {
@@ -28,16 +34,55 @@ async function sendQuoteNotification(body: CateringQuoteBody) {
     },
   })
 
+  // Determine email subject prefix based on service area status
+  const statusLabels = {
+    in_area: 'IN_AREA',
+    tier_2: 'TIER_2',
+    out_of_area: 'OUT_OF_AREA'
+  }
+  const statusLabel = body.serviceAreaStatus ? statusLabels[body.serviceAreaStatus] : 'UNKNOWN'
+
+  // Determine response timeline based on status
+  const responseTimeline = {
+    in_area: '24 hours',
+    tier_2: '48 hours (availability confirmation)',
+    out_of_area: '48 hours (limited availability)'
+  }
+  const timeline = body.serviceAreaStatus ? responseTimeline[body.serviceAreaStatus] : '48 hours'
+
   await transporter.sendMail({
     from: '"Jamaica House Brand" <olatunde@jamaicahousebrand.com>',
     to: 'olatunde@jamaicahousebrand.com',
     replyTo: body.email,
-    subject: `New Catering Quote Request — ${body.eventType} (${body.guestCount} guests)`,
+    subject: `[CATERING INQUIRY - ${statusLabel}] ${body.name} - ${body.eventDate}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #1a1a1a; border-bottom: 2px solid #d4a017; padding-bottom: 10px;">
-          New Catering Quote Request
+          🍽️ Catering Quote Request
         </h2>
+
+        ${body.serviceAreaStatus ? `
+        <div style="margin: 16px 0; padding: 12px; border-radius: 6px; ${
+          body.serviceAreaStatus === 'in_area' ? 'background: #e8f5e8; border: 1px solid #4caf50;' :
+          body.serviceAreaStatus === 'tier_2' ? 'background: #fff3cd; border: 1px solid #ffc107;' :
+          'background: #f8d7da; border: 1px solid #dc3545;'
+        }">
+          <strong style="color: ${
+            body.serviceAreaStatus === 'in_area' ? '#2e7d32' :
+            body.serviceAreaStatus === 'tier_2' ? '#856404' :
+            '#721c24'
+          };">
+            Service Area: ${
+              body.serviceAreaStatus === 'in_area' ? '✅ Primary Service Area' :
+              body.serviceAreaStatus === 'tier_2' ? '⚠️ Tier 2 (Premium Pricing)' :
+              '❌ Out of Area'
+            }
+          </strong>
+          <br>
+          <span style="color: #555; font-size: 14px;">
+            Expected response time: ${timeline}
+          </span>
+        </div>` : ''}
 
         <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
           <tr>
@@ -64,13 +109,18 @@ async function sendQuoteNotification(body: CateringQuoteBody) {
             <td style="padding: 8px 12px; font-weight: bold; color: #555;">Guest Count</td>
             <td style="padding: 8px 12px;">${body.guestCount}</td>
           </tr>
-          ${body.venue ? `
+          ${body.venueState && body.venueCounty ? `
           <tr>
+            <td style="padding: 8px 12px; font-weight: bold; color: #555;">Location</td>
+            <td style="padding: 8px 12px;">${body.venueCounty} County, ${body.venueState}</td>
+          </tr>` : ''}
+          ${body.venue ? `
+          <tr style="background: #f9f9f9;">
             <td style="padding: 8px 12px; font-weight: bold; color: #555;">Venue</td>
             <td style="padding: 8px 12px;">${body.venue}</td>
           </tr>` : ''}
           ${body.proteins ? `
-          <tr style="background: #f9f9f9;">
+          <tr>
             <td style="padding: 8px 12px; font-weight: bold; color: #555;">Preferred Proteins</td>
             <td style="padding: 8px 12px;">${body.proteins}</td>
           </tr>` : ''}
@@ -96,6 +146,13 @@ async function sendSlackNotification(body: CateringQuoteBody) {
   const webhookUrl = process.env.SLACK_WEBHOOK_URL
   if (!webhookUrl) return
 
+  const statusEmojis = {
+    in_area: ':white_check_mark:',
+    tier_2: ':warning:',
+    out_of_area: ':x:'
+  }
+  const statusEmoji = body.serviceAreaStatus ? statusEmojis[body.serviceAreaStatus] : ':question:'
+
   await fetch(webhookUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -103,8 +160,21 @@ async function sendSlackNotification(body: CateringQuoteBody) {
       blocks: [
         {
           type: 'header',
-          text: { type: 'plain_text', text: '\uD83C\uDF7D\uFE0F New Catering Quote Request' },
+          text: { type: 'plain_text', text: `🍽️ Catering Quote Request ${statusEmoji}` },
         },
+        ...(body.serviceAreaStatus ? [{
+          type: 'context',
+          elements: [
+            {
+              type: 'mrkdwn',
+              text: `*Service Area:* ${
+                body.serviceAreaStatus === 'in_area' ? 'Primary Service Area' :
+                body.serviceAreaStatus === 'tier_2' ? 'Tier 2 (Premium Pricing)' :
+                'Out of Area'
+              }`
+            }
+          ]
+        }] : []),
         {
           type: 'section',
           fields: [
@@ -119,10 +189,14 @@ async function sendSlackNotification(body: CateringQuoteBody) {
           fields: [
             { type: 'mrkdwn', text: `*Event Date:*\n${body.eventDate}` },
             { type: 'mrkdwn', text: `*Guests:*\n${body.guestCount}` },
+            ...(body.venueState && body.venueCounty ? [{ type: 'mrkdwn', text: `*Location:*\n${body.venueCounty} County, ${body.venueState}` }] : []),
             ...(body.venue ? [{ type: 'mrkdwn', text: `*Venue:*\n${body.venue}` }] : []),
-            ...(body.proteins ? [{ type: 'mrkdwn', text: `*Proteins:*\n${body.proteins}` }] : []),
           ],
         },
+        ...(body.proteins ? [{
+          type: 'section',
+          fields: [{ type: 'mrkdwn', text: `*Proteins:*\n${body.proteins}` }],
+        }] : []),
         ...(body.message ? [{
           type: 'section',
           text: { type: 'mrkdwn', text: `*Additional Details:*\n${body.message}` },
@@ -137,7 +211,7 @@ async function sendSlackNotification(body: CateringQuoteBody) {
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as CateringQuoteBody
-    const { name, email, phone, eventType, eventDate, guestCount } = body
+    const { name, email, phone, eventType, eventDate, guestCount, venueState, venueCounty } = body
 
     if (!name || !email || !phone || !eventType || !eventDate || !guestCount) {
       return NextResponse.json(
@@ -154,8 +228,18 @@ export async function POST(request: Request) {
       )
     }
 
+    // Determine service area status
+    let serviceAreaStatus: ServiceAreaStatus = 'out_of_area'
+    if (venueState === 'Florida' && venueCounty) {
+      serviceAreaStatus = getCountyStatus(venueCounty)
+    }
+
+    // Add service area metadata to body
+    body.serviceAreaStatus = serviceAreaStatus
+
     console.log('[catering-quote] New quote request:', {
       ...body,
+      serviceAreaStatus,
       timestamp: new Date().toISOString(),
     })
 
@@ -170,7 +254,11 @@ export async function POST(request: Request) {
       })
     })
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({
+      success: true,
+      leadType: 'catering',
+      serviceAreaStatus
+    })
   } catch (error) {
     console.error('[catering-quote] Request error:', error)
     return NextResponse.json(

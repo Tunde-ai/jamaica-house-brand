@@ -17,6 +17,8 @@
     "@stripe/stripe-js": "^8.8.0",
     "@supabase/supabase-js": "^2.100.0",
     "clsx": "^2.1.1",
+    "libphonenumber-js": "^1.12.42",
+    "lucide-react": "^1.14.0",
     "next": "16.1.6",
     "nodemailer": "^8.0.1",
     "react": "19.2.3",
