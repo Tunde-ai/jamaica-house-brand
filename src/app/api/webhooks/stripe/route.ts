@@ -149,6 +149,55 @@ async function postToCommandCenter(payload: {
   console.log('Command Center webhook success:', data)
 }
 
+async function fulfillInventoryOrder(payload: {
+  orderId: string
+  items: { name: string; qty: number; price: number }[]
+}) {
+  const commandCenterUrl = process.env.COMMAND_CENTER_WEBHOOK_URL
+  const webhookKey = process.env.COMMAND_CENTER_WEBHOOK_API_KEY
+
+  if (!commandCenterUrl) {
+    console.log('COMMAND_CENTER_WEBHOOK_URL not set — skipping inventory fulfillment')
+    return
+  }
+
+  // Extract base URL and construct fulfillment endpoint
+  const baseUrl = commandCenterUrl.replace(/\/api\/incoming-order$/, '')
+  const fulfillmentUrl = `${baseUrl}/api/fulfill-order`
+
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  if (webhookKey) headers['Authorization'] = `Bearer ${webhookKey}`
+
+  const response = await fetch(fulfillmentUrl, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      orderId: payload.orderId,
+      items: payload.items,
+      orderReference: `Website Order ${payload.orderId}`,
+    }),
+  })
+
+  if (!response.ok) {
+    const text = await response.text()
+    throw new Error(`Inventory fulfillment ${response.status}: ${text}`)
+  }
+
+  const data = await response.json()
+  console.log('🏭 Inventory fulfilled from main warehouse:', {
+    orderId: payload.orderId,
+    fulfilled: data.fulfilled,
+    errors: data.errors,
+  })
+
+  // Log any fulfillment errors for monitoring
+  if (data.errors > 0) {
+    console.warn('⚠️ Inventory fulfillment warnings:', data.errorMessages)
+  }
+
+  return data
+}
+
 async function sendSlackNotification(session: Stripe.Checkout.Session) {
   const webhookUrl = process.env.SLACK_WEBHOOK_URL
   if (!webhookUrl) return
@@ -437,6 +486,10 @@ export async function POST(request: NextRequest) {
           shippingZip: ccShipping?.address?.postal_code || undefined,
           shippingCountry: ccShipping?.address?.country || 'US',
         }),
+        fulfillInventoryOrder({
+          orderId: session.id,
+          items: ccItems,
+        }),
         mailchimpSync({
           customerEmail,
           firstName: ccNameParts[0] || '',
@@ -445,7 +498,7 @@ export async function POST(request: NextRequest) {
           items: shippingItems.map((si) => ({ productId: si.productId, qty: si.qty })),
         }),
       ]).then((results) => {
-        const labels = ['Slack notification', 'Fulfillment email', 'Customer confirmation email', 'Command Center webhook', 'Mailchimp sync']
+        const labels = ['Slack notification', 'Fulfillment email', 'Customer confirmation email', 'Command Center webhook', 'Inventory fulfillment', 'Mailchimp sync']
         results.forEach((result, i) => {
           if (result.status === 'rejected') {
             console.error(`${labels[i]} failed:`, result.reason)
@@ -671,6 +724,10 @@ export async function POST(request: NextRequest) {
           shippingZip: paymentIntent.shipping?.address?.postal_code || undefined,
           shippingCountry: paymentIntent.shipping?.address?.country || 'US',
         }),
+        fulfillInventoryOrder({
+          orderId: paymentIntent.id,
+          items: piItems,
+        }),
         resolvedEmail ? sendOrderConfirmationEmail({
           customerFirstName: piNameParts[0] || 'Customer',
           customerEmail: resolvedEmail,
@@ -694,7 +751,7 @@ export async function POST(request: NextRequest) {
           })),
         }),
       ]).then((results) => {
-        const labels = ['Command Center webhook', 'Customer confirmation email', 'Mailchimp sync']
+        const labels = ['Command Center webhook', 'Inventory fulfillment', 'Customer confirmation email', 'Mailchimp sync']
         results.forEach((result, i) => {
           if (result.status === 'rejected') {
             console.error(`PI ${labels[i]} failed:`, result.reason)
