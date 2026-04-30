@@ -1,0 +1,54 @@
+# Daily Health Check - Automated monitoring via GitHub Actions
+# Runs every day at 9 AM EST and emails you the health status
+
+name: Daily Health Check
+
+on:
+  schedule:
+    # Run at 9:00 AM EST (2:00 PM UTC) every day
+    - cron: '0 14 * * *'
+
+  # Allow manual triggering
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run daily health check
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          NODE_ENV: production
+        run: node scripts/daily-health-email.js
+
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🚨 Daily Health Check Failed',
+              body: `
+                The daily health check failed on ${new Date().toDateString()}.
+
+                **Action Required:** Check the website health and API status.
+
+                **Workflow Run:** ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}
+              `,
+              labels: ['bug', 'urgent']
+            })
