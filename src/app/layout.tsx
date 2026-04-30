@@ -7,6 +7,7 @@ import Footer from "@/components/layout/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import SamplePopup from "@/components/SamplePopup";
 import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
+import GoogleAds from "@/components/analytics/GoogleAds";
 import MetaPixel from "@/components/analytics/MetaPixel";
 import ChatWidget from "@/components/ChatWidget";
 import { generateOrganizationJsonLd, generateWebSiteJsonLd, sanitizeJsonLd } from "@/lib/seo";
@@ -82,6 +83,7 @@ export default function RootLayout({
         </Suspense>
       </body>
       <GoogleAnalytics />
+      <GoogleAds />
     </html>
   );
 }

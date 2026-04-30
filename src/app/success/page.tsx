@@ -21,11 +21,128 @@ interface ParsedItem {
 export default async function SuccessPage({
   searchParams,
 }: {
-  searchParams: Promise<{ session_id?: string; payment_intent_id?: string }>
+  searchParams: Promise<{
+    session_id?: string;
+    payment_intent_id?: string;
+    order?: string;
+    type?: string;
+  }>
 }) {
   const params = await searchParams
   const sessionId = params.session_id
   const paymentIntentId = params.payment_intent_id
+  const orderId = params.order
+  const orderType = params.type
+
+  // --- Catering Deposit Success Flow ---
+  if (orderId && orderType === 'deposit') {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 py-12">
+        <div className="max-w-2xl w-full space-y-8">
+          {/* Success Animation */}
+          <div className="flex justify-center">
+            <div className="relative">
+              <svg
+                className="w-32 h-32 text-green-500 animate-pulse"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <div className="absolute -top-2 -right-2 text-4xl">🎉</div>
+            </div>
+          </div>
+
+          {/* Success Message */}
+          <div className="text-center space-y-4">
+            <h1 className="text-4xl font-bold text-white">
+              🔒 Your Date is SECURED!
+            </h1>
+            <p className="text-xl text-green-400 font-semibold">
+              Deposit Payment Successful
+            </p>
+            <div className="bg-green-500/20 border border-green-400/30 rounded-lg p-6">
+              <p className="text-white text-lg mb-2">
+                <span className="font-bold">Order #{orderId}</span> is confirmed!
+              </p>
+              <p className="text-gray-300">
+                Your authentic Jamaican catering is reserved. We'll handle the rest!
+              </p>
+            </div>
+          </div>
+
+          {/* What's Next */}
+          <div className="bg-white/5 rounded-lg p-6 space-y-4 border border-brand-gold/20">
+            <h2 className="text-2xl font-bold text-brand-gold mb-4">What happens next?</h2>
+
+            <div className="space-y-4">
+              <div className="flex items-start gap-4">
+                <div className="bg-brand-gold text-brand-dark rounded-full w-8 h-8 flex items-center justify-center font-bold">1</div>
+                <div>
+                  <h3 className="text-white font-semibold">Confirmation Email Sent</h3>
+                  <p className="text-gray-400 text-sm">Check your inbox for order details and receipt</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="bg-brand-gold text-brand-dark rounded-full w-8 h-8 flex items-center justify-center font-bold">2</div>
+                <div>
+                  <h3 className="text-white font-semibold">Pre-Event Reminders</h3>
+                  <p className="text-gray-400 text-sm">We'll email you 2 weeks before for balance payment & final details</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="bg-brand-gold text-brand-dark rounded-full w-8 h-8 flex items-center justify-center font-bold">3</div>
+                <div>
+                  <h3 className="text-white font-semibold">Day-Of Excellence</h3>
+                  <p className="text-gray-400 text-sm">Fresh, authentic Jamaican food delivered on time</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Contact Info */}
+          <div className="text-center bg-brand-gold/10 border border-brand-gold/30 rounded-lg p-6">
+            <h3 className="text-brand-gold font-bold text-lg mb-2">Need to make changes?</h3>
+            <p className="text-gray-300 mb-3">
+              Contact us up to 3 weeks before your event for modifications or cancellations
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a
+                href="tel:7867091027"
+                className="bg-brand-gold text-brand-dark font-bold px-6 py-3 rounded-lg hover:bg-brand-gold-light transition-colors"
+              >
+                📞 (786) 709-1027
+              </a>
+              <a
+                href="mailto:olatunde@jamaicahousebrand.com"
+                className="border border-brand-gold text-brand-gold font-bold px-6 py-3 rounded-lg hover:bg-brand-gold/10 transition-colors"
+              >
+                📧 Email Us
+              </a>
+            </div>
+          </div>
+
+          {/* Return to Site */}
+          <div className="text-center">
+            <Link
+              href="/"
+              className="inline-block text-gray-400 hover:text-white transition-colors underline"
+            >
+              ← Back to Jamaica House Brand
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   // --- PaymentIntent path (custom checkout) ---
   if (paymentIntentId) {

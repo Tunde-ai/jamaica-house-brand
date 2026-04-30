@@ -3,6 +3,10 @@ import nodemailer from 'nodemailer'
 import { EmailWorkflowEngine, calculateDepositAmount, calculateMinimumOrder } from '@/lib/email/workflow'
 import { render } from '@react-email/render'
 import OrderConfirmationEmail from '@/components/email-templates/OrderConfirmationEmail'
+import { db } from '@/lib/database'
+import { trayCategories } from '@/data/catering-menu'
+import type { DiscountApplication } from '@/lib/discounts/early-booking'
+import type { CreateOrderItemInput } from '@/types/database'
 
 interface CateringMenuQuoteBody {
   name: string
@@ -22,6 +26,9 @@ interface CateringMenuQuoteBody {
   orderTotal: number
   deliveryFee: number
   actionType: 'quote_only' | 'pay_deposit'
+  discountApplication?: DiscountApplication | null
+  selectedDiscountId?: string | null
+  finalTotal?: number
 }
 
 function formatSelectedItems(selectedItems: CateringMenuQuoteBody['selectedItems']): string {
@@ -83,7 +90,8 @@ async function sendInternalNotification(body: CateringMenuQuoteBody, orderId: st
   })
 
   const selectedItemsText = formatSelectedItems(body.selectedItems)
-  const depositAmount = calculateDepositAmount(body.orderTotal)
+  const actualTotal = body.finalTotal || (body.orderTotal + body.deliveryFee)
+  const depositAmount = calculateDepositAmount(actualTotal)
   const totalWithDelivery = body.orderTotal + body.deliveryFee
 
   await transporter.sendMail({
@@ -141,10 +149,20 @@ ${selectedItemsText}
           <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; background: #fff;">
             <tr><td style="padding: 12px; font-weight: bold; color: #555;">Food Subtotal:</td><td style="padding: 12px; text-align: right; font-weight: bold;">$${body.orderTotal.toFixed(2)}</td></tr>
             <tr style="background: #f9f9f9;"><td style="padding: 12px; font-weight: bold; color: #555;">Delivery Fee:</td><td style="padding: 12px; text-align: right; font-weight: bold;">${body.deliveryFee === 0 ? 'FREE' : '$' + body.deliveryFee.toFixed(2)}</td></tr>
-            <tr style="background: #d4a843; color: #1a1a1a;"><td style="padding: 15px; font-weight: bold; font-size: 18px;">TOTAL:</td><td style="padding: 15px; text-align: right; font-weight: bold; font-size: 18px;">$${totalWithDelivery.toFixed(2)}</td></tr>
+            ${body.discountApplication ? `
+            <tr style="background: #d4f8d4;"><td style="padding: 12px; font-weight: bold; color: #2d7a2d;">🎁 Early Booking Discount (${body.discountApplication.discountPercentage}%):</td><td style="padding: 12px; text-align: right; font-weight: bold; color: #2d7a2d;">-$${body.discountApplication.discountAmount.toFixed(2)}</td></tr>
+            <tr style="background: #f0f0f0;"><td style="padding: 12px; font-weight: bold; color: #999;">Subtotal before discount:</td><td style="padding: 12px; text-align: right; font-weight: bold; color: #999; text-decoration: line-through;">$${totalWithDelivery.toFixed(2)}</td></tr>
+            ` : ''}
+            <tr style="background: #d4a843; color: #1a1a1a;"><td style="padding: 15px; font-weight: bold; font-size: 18px;">TOTAL:</td><td style="padding: 15px; text-align: right; font-weight: bold; font-size: 18px;">$${actualTotal.toFixed(2)}</td></tr>
             <tr style="background: #e8f4f8;"><td style="padding: 12px; font-weight: bold; color: #1a1a1a;">33% Deposit:</td><td style="padding: 12px; text-align: right; font-weight: bold; color: #1a1a1a;">$${depositAmount.toFixed(2)}</td></tr>
-            <tr style="background: #f0f0f0;"><td style="padding: 12px; font-weight: bold; color: #666;">Balance Due:</td><td style="padding: 12px; text-align: right; font-weight: bold; color: #666;">$${(totalWithDelivery - depositAmount).toFixed(2)}</td></tr>
+            <tr style="background: #f0f0f0;"><td style="padding: 12px; font-weight: bold; color: #666;">Balance Due:</td><td style="padding: 12px; text-align: right; font-weight: bold; color: #666;">$${(actualTotal - depositAmount).toFixed(2)}</td></tr>
           </table>
+          ${body.discountApplication ? `
+          <div style="background: #d4f8d4; border: 1px solid #2d7a2d; border-radius: 5px; padding: 15px; margin: 20px 0;">
+            <h3 style="margin: 0 0 10px 0; color: #2d7a2d;">🎉 ${body.discountApplication.savingsMessage}</h3>
+            <p style="margin: 0; color: #2d7a2d; font-weight: bold;">Discount Applied: ${body.discountApplication.offerApplied.name} - ${body.discountApplication.offerApplied.badge}</p>
+          </div>
+          ` : ''}
 
           ${body.notes ? `
           <h2 style="color: #1a1a1a; border-bottom: 2px solid #d4a843; padding-bottom: 10px;">Special Requests</h2>
@@ -180,42 +198,54 @@ async function sendSlackNotification(body: CateringMenuQuoteBody, orderId: strin
   if (!webhookUrl) return
 
   const selectedItemsText = formatSelectedItems(body.selectedItems)
-  const depositAmount = calculateDepositAmount(body.orderTotal)
+  const actualTotal = body.finalTotal || (body.orderTotal + body.deliveryFee)
+  const depositAmount = calculateDepositAmount(actualTotal)
   const totalWithDelivery = body.orderTotal + body.deliveryFee
+
+  const blocks = [
+    {
+      type: 'header',
+      text: { type: 'plain_text', text: `🍽️ New Order: ${orderId}` },
+    },
+    {
+      type: 'section',
+      fields: [
+        { type: 'mrkdwn', text: `*Customer:*\n${body.name}` },
+        { type: 'mrkdwn', text: `*Event Date:*\n${body.eventDate}` },
+        { type: 'mrkdwn', text: `*Guests:*\n${body.guestCount}` },
+        { type: 'mrkdwn', text: `*Total:*\n$${actualTotal.toFixed(2)}${body.discountApplication ? ` (was $${totalWithDelivery.toFixed(2)})` : ''}` },
+      ],
+    },
+    {
+      type: 'section',
+      fields: [
+        { type: 'mrkdwn', text: `*Email:*\n${body.email}` },
+        { type: 'mrkdwn', text: `*Phone:*\n${body.phone}` },
+        { type: 'mrkdwn', text: `*Deposit:*\n$${depositAmount.toFixed(2)}` },
+        { type: 'mrkdwn', text: `*Action:*\n${body.actionType === 'pay_deposit' ? '💳 Pay Deposit' : '📝 Quote Only'}` },
+      ],
+    },
+    {
+      type: 'section',
+      text: { type: 'mrkdwn', text: `*Tray Selection:*\n\`\`\`${selectedItemsText}\`\`\`` },
+    },
+  ]
+
+  // Add discount block if applicable
+  if (body.discountApplication) {
+    blocks.push({
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `:gift: *Discount Applied:* ${body.discountApplication.offerApplied.name} - Saved $${body.discountApplication.discountAmount.toFixed(2)} (${body.discountApplication.discountPercentage}%)`
+      },
+    })
+  }
 
   await fetch(webhookUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      blocks: [
-        {
-          type: 'header',
-          text: { type: 'plain_text', text: `🍽️ New Order: ${orderId}` },
-        },
-        {
-          type: 'section',
-          fields: [
-            { type: 'mrkdwn', text: `*Customer:*\n${body.name}` },
-            { type: 'mrkdwn', text: `*Event Date:*\n${body.eventDate}` },
-            { type: 'mrkdwn', text: `*Guests:*\n${body.guestCount}` },
-            { type: 'mrkdwn', text: `*Total:*\n$${totalWithDelivery.toFixed(2)}` },
-          ],
-        },
-        {
-          type: 'section',
-          fields: [
-            { type: 'mrkdwn', text: `*Email:*\n${body.email}` },
-            { type: 'mrkdwn', text: `*Phone:*\n${body.phone}` },
-            { type: 'mrkdwn', text: `*Deposit:*\n$${depositAmount.toFixed(2)}` },
-            { type: 'mrkdwn', text: `*Action:*\n${body.actionType === 'pay_deposit' ? '💳 Pay Deposit' : '📝 Quote Only'}` },
-          ],
-        },
-        {
-          type: 'section',
-          text: { type: 'mrkdwn', text: `*Tray Selection:*\n\`\`\`${selectedItemsText}\`\`\`` },
-        },
-      ],
-    }),
+    body: JSON.stringify({ blocks }),
   })
 
   console.log('[catering-menu-quote] Slack notification sent')
@@ -277,44 +307,125 @@ export async function POST(request: Request) {
       )
     }
 
-    // Generate unique order ID
-    const orderId = `JHB-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
+    // Calculate totals (using discounted total if applicable)
+    const actualTotal = body.finalTotal || (body.orderTotal + body.deliveryFee)
+    const depositAmount = calculateDepositAmount(actualTotal)
+    const balanceDue = actualTotal - depositAmount
 
-    // Calculate deposit and balance
-    const depositAmount = calculateDepositAmount(body.orderTotal)
-    const balanceDue = body.orderTotal - depositAmount
+    // Prepare order items with pricing from menu data
+    const orderItems: CreateOrderItemInput[] = []
+    Object.entries(selectedItems).forEach(([itemName, quantities]) => {
+      if (quantities.small > 0 || quantities.large > 0) {
+        // Find item pricing from menu data
+        const menuItem = trayCategories
+          .flatMap(cat => cat.items)
+          .find(item => item.name === itemName)
 
-    // Create order data for workflow
+        if (menuItem) {
+          const smallTotal = quantities.small * menuItem.smallPrice
+          const largeTotal = quantities.large * menuItem.largePrice
+
+          orderItems.push({
+            order_id: '', // Will be filled when order is created
+            item_name: itemName,
+            small_quantity: quantities.small,
+            large_quantity: quantities.large,
+            small_price: menuItem.smallPrice,
+            large_price: menuItem.largePrice,
+            total_price: smallTotal + largeTotal
+          })
+        }
+      }
+    })
+
+    // Calculate lead score based on order details
+    const eventDateTime = new Date(eventDate)
+    const daysUntilEvent = Math.floor((eventDateTime.getTime() - new Date().getTime()) / (1000 * 3600 * 24))
+
+    // Check for premium items
+    const premiumItems = ['Oxtail Stew', 'Jerk Shrimp', 'Curry Goat']
+    const hasPremiumItems = orderItems.some(item =>
+      premiumItems.some(premium => item.item_name.includes(premium))
+    )
+
+    // Save complete order to database
+    console.log('[catering-menu-quote] Saving order to database...', email)
+
+    const { customer, order, items, discount } = await db.createCompleteOrder({
+      customer: {
+        name,
+        email,
+        phone,
+        lead_source: 'website'
+      },
+      order: {
+        event_date: eventDate,
+        guest_count: parseInt(guestCount),
+        subtotal: body.orderTotal,
+        delivery_fee: body.deliveryFee,
+        discount_amount: body.discountApplication?.discountAmount || 0,
+        discount_percentage: body.discountApplication?.discountPercentage || 0,
+        total_amount: actualTotal,
+        deposit_amount: depositAmount,
+        balance_due: balanceDue,
+        delivery_method: body.deliveryMethod,
+        delivery_address: body.zipCode,
+        special_requests: body.notes,
+        status: actionType === 'pay_deposit' ? 'quote_requested' : 'quote_requested',
+        payment_status: 'pending',
+        workflow_stage: actionType === 'pay_deposit' ? 'deposit_requested' : 'quote_requested'
+      },
+      items: orderItems,
+      discount: body.discountApplication ? {
+        discount_id: body.selectedDiscountId || 'unknown',
+        name: body.discountApplication.offerApplied.name,
+        description: body.discountApplication.offerApplied.description,
+        percentage: body.discountApplication.discountPercentage,
+        amount: body.discountApplication.discountAmount,
+        minimum_order: body.discountApplication.offerApplied.minimumOrder,
+        days_in_advance: daysUntilEvent
+      } : undefined
+    })
+
+    const orderId = order.order_number
+
+    // Create order data for email workflows (backward compatibility)
     const orderData = {
-      id: orderId,
+      id: order.id, // Use database order ID for email scheduling
+      orderNumber: orderId, // Keep order number for display
       customerName: name,
       customerEmail: email,
       customerPhone: phone,
       eventDate,
       guestCount: parseInt(guestCount),
       orderTotal: body.orderTotal,
+      finalTotal: actualTotal,
       depositAmount,
       balanceDue,
-      selectedItems: Object.entries(selectedItems).map(([name, quantities]) => ({
-        name,
-        smallQty: quantities.small,
-        largeQty: quantities.large,
-        smallPrice: 0, // Will be filled from data
-        largePrice: 0, // Will be filled from data
+      deliveryFee: body.deliveryFee,
+      discountApplication: body.discountApplication,
+      selectedDiscountId: body.selectedDiscountId,
+      selectedItems: orderItems.map(item => ({
+        name: item.item_name,
+        smallQty: item.small_quantity,
+        largeQty: item.large_quantity,
+        smallPrice: item.small_price,
+        largePrice: item.large_price,
       })),
       deliveryMethod: body.deliveryMethod,
       deliveryAddress: body.zipCode,
       specialRequests: body.notes,
       paymentStatus: 'pending' as const,
-      workflowStage: 'order_confirmation',
+      workflowStage: order.workflow_stage,
     }
 
-    console.log('[catering-menu-quote] New order created:', {
+    console.log('[catering-menu-quote] Order saved to database:', {
       orderId,
+      customerId: customer.id,
+      orderDbId: order.id,
       actionType,
-      orderTotal: body.orderTotal,
+      totalAmount: actualTotal,
       depositAmount,
-      timestamp: new Date().toISOString(),
     })
 
     // Initialize email workflow

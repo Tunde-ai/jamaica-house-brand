@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getStripe } from '@/lib/stripe'
 import { getSupabase } from '@/lib/supabase'
+import { db } from '@/lib/database'
 import Stripe from 'stripe'
 import nodemailer from 'nodemailer'
 import { onOrderComplete as mailchimpSync } from '@/lib/mailchimp-sync'
@@ -200,6 +201,133 @@ async function sendSlackNotification(session: Stripe.Checkout.Session) {
   })
 }
 
+async function handleCateringPayment(session: Stripe.Checkout.Session) {
+  console.log('[stripe-webhook] Handling catering payment:', session.id)
+
+  try {
+    // Check if this is a catering payment
+    const paymentType = session.metadata?.paymentType
+    const dbOrderId = session.metadata?.dbOrderId
+    const orderId = session.metadata?.orderId
+    const paymentId = session.metadata?.paymentId
+
+    if (paymentType !== 'catering_deposit' || !dbOrderId || !paymentId) {
+      console.log('[stripe-webhook] Not a catering payment, skipping')
+      return
+    }
+
+    console.log('[stripe-webhook] Processing catering deposit payment:', {
+      sessionId: session.id,
+      orderId,
+      dbOrderId,
+      paymentId,
+      amount: session.amount_total
+    })
+
+    // Update payment status
+    await db.updatePaymentStatus(paymentId, 'succeeded', {
+      charge_id: session.payment_intent as string,
+      payment_intent_id: session.payment_intent as string
+    })
+
+    // Update order status
+    await db.updateOrder(dbOrderId, {
+      payment_status: 'deposit_paid',
+      status: 'confirmed',
+      workflow_stage: 'deposit_received'
+    })
+
+    // Track lead activity
+    const order = await db.getOrder(dbOrderId)
+    if (order?.customer_id) {
+      await db.trackLeadActivity({
+        customer_id: order.customer_id,
+        order_id: dbOrderId,
+        activity_type: 'deposit_paid',
+        description: `Deposit payment of $${(session.amount_total! / 100).toFixed(2)} received`,
+        metadata: {
+          stripe_session_id: session.id,
+          amount: session.amount_total! / 100
+        }
+      })
+
+      // Update customer stats
+      await db.updateCustomerStats(order.customer_id, session.amount_total! / 100)
+    }
+
+    console.log('[stripe-webhook] Catering payment processed successfully')
+
+    // Send catering-specific notifications
+    await sendCateringDepositNotification(session, order)
+
+  } catch (error) {
+    console.error('[stripe-webhook] Error processing catering payment:', error)
+    throw error
+  }
+}
+
+async function sendCateringDepositNotification(
+  session: Stripe.Checkout.Session,
+  order: any
+) {
+  const appPassword = process.env.GMAIL_APP_PASSWORD
+  if (!appPassword) return
+
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'olatunde@jamaicahousebrand.com',
+      pass: appPassword,
+    },
+  })
+
+  const amount = session.amount_total ? `$${(session.amount_total / 100).toFixed(2)}` : 'N/A'
+  const customerEmail = session.customer_details?.email || order?.customer?.email || 'No email'
+  const customerName = order?.customer?.name || 'Customer'
+  const orderNumber = order?.order_number || session.metadata?.orderId || 'Unknown'
+
+  await transporter.sendMail({
+    from: '"Jamaica House Brand" <olatunde@jamaicahousebrand.com>',
+    to: 'olatunde@jamaicahousebrand.com',
+    subject: `🎉 DEPOSIT RECEIVED: ${orderNumber} - ${amount}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: #28a745; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+          <h1 style="margin: 0; font-size: 24px;">💰 Deposit Received!</h1>
+          <p style="margin: 5px 0 0 0; font-size: 16px;">Order: ${orderNumber}</p>
+        </div>
+
+        <div style="background: #f9f9f9; padding: 20px; border-radius: 0 0 8px 8px;">
+          <h2 style="color: #28a745; margin-top: 0;">Payment Details</h2>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr><td style="padding: 8px 0; font-weight: bold;">Customer:</td><td>${customerName}</td></tr>
+            <tr><td style="padding: 8px 0; font-weight: bold;">Email:</td><td><a href="mailto:${customerEmail}">${customerEmail}</a></td></tr>
+            <tr><td style="padding: 8px 0; font-weight: bold;">Deposit Amount:</td><td style="font-size: 18px; font-weight: bold; color: #28a745;">${amount}</td></tr>
+            <tr><td style="padding: 8px 0; font-weight: bold;">Event Date:</td><td>${order?.event_date || 'Not available'}</td></tr>
+            <tr><td style="padding: 8px 0; font-weight: bold;">Guest Count:</td><td>${order?.guest_count || 'Not available'}</td></tr>
+            <tr><td style="padding: 8px 0; font-weight: bold;">Status:</td><td style="color: #28a745; font-weight: bold;">CONFIRMED ✅</td></tr>
+          </table>
+
+          <div style="background: #d4f8d4; border: 1px solid #28a745; border-radius: 5px; padding: 15px; margin: 20px 0;">
+            <h3 style="margin: 0 0 10px 0; color: #28a745;">🎯 Next Steps:</h3>
+            <ul style="margin: 0; padding-left: 20px;">
+              <li>Order is confirmed and date reserved</li>
+              <li>Balance payment will be due 2 weeks before event</li>
+              <li>Customer will receive automated reminders</li>
+            </ul>
+          </div>
+
+          <p style="font-size: 12px; color: #666; text-align: center; margin-top: 20px;">
+            Payment processed: ${new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })}
+          </p>
+        </div>
+      </div>
+    `,
+  })
+
+  console.log('[stripe-webhook] Catering deposit notification sent')
+}
+
 export async function POST(request: NextRequest) {
   const body = await request.text() // CRITICAL: Use raw body text for signature verification
   const signature = request.headers.get('stripe-signature')
@@ -240,7 +368,14 @@ export async function POST(request: NextRequest) {
         paymentStatus: session.payment_status,
         amountTotal: session.amount_total,
         customerEmail: session.customer_details?.email,
+        paymentType: session.metadata?.paymentType
       })
+
+      // Handle catering payments first
+      if (session.metadata?.paymentType === 'catering_deposit') {
+        await handleCateringPayment(session)
+        return NextResponse.json({ received: true })
+      }
 
       // Build Command Center payload
       const ccShipping = session.collected_information?.shipping_details

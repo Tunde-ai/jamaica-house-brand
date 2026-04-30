@@ -39,6 +39,27 @@ export const emailWorkflow: EmailTemplate[] = [
     condition: (order) => order.paymentStatus === 'pending',
   },
   {
+    id: 'quote_follow_up_3_day',
+    subject: '📋 Your Jamaica House Catering Quote - Still Planning Your Event?',
+    trigger: 'after_order',
+    daysOffset: 3,
+    condition: (order) => order.paymentStatus === 'pending' && order.workflowStage === 'quote_requested',
+  },
+  {
+    id: 'quote_urgency_7_day',
+    subject: '🔥 Popular Date Alert - Your Event Date is Filling Up Fast!',
+    trigger: 'after_order',
+    daysOffset: 7,
+    condition: (order) => order.paymentStatus === 'pending' && order.workflowStage === 'quote_requested',
+  },
+  {
+    id: 'quote_final_14_day',
+    subject: '⏰ Final Notice - Secure Your Authentic Jamaican Catering',
+    trigger: 'after_order',
+    daysOffset: 14,
+    condition: (order) => order.paymentStatus === 'pending' && order.workflowStage === 'quote_requested',
+  },
+  {
     id: 'headcount_confirmation',
     subject: '📋 Final Headcount Check - 3 Weeks to Go!',
     trigger: 'before_event',
@@ -141,11 +162,33 @@ export class EmailWorkflowEngine {
   async scheduleEmails() {
     const schedule = this.calculateEmailSchedule()
 
-    // This would integrate with your email service (Resend, SendGrid, etc.)
-    // For now, we'll log the schedule
     console.log('📧 Email Schedule for Order:', this.orderData.id)
-    schedule.forEach(email => {
-      console.log(`  ${email.scheduledDate.toLocaleDateString()} - ${email.subject}`)
+
+    // Import database service dynamically to avoid circular dependencies
+    const { db } = await import('@/lib/database')
+
+    // Save each email to the database for actual scheduling
+    const scheduledEmails = await Promise.allSettled(
+      schedule.map(async (email) => {
+        console.log(`  Scheduling: ${email.scheduledDate.toLocaleDateString()} - ${email.subject}`)
+
+        return await db.scheduleEmail({
+          order_id: this.orderData.id, // This will be the database order ID, not the order number
+          template_id: email.emailId,
+          subject: email.subject,
+          recipient_email: this.orderData.customerEmail,
+          scheduled_for: email.scheduledDate.toISOString(),
+        })
+      })
+    )
+
+    // Log results
+    scheduledEmails.forEach((result, index) => {
+      if (result.status === 'fulfilled') {
+        console.log(`  ✅ Scheduled: ${schedule[index].subject}`)
+      } else {
+        console.error(`  ❌ Failed to schedule: ${schedule[index].subject}`, result.reason)
+      }
     })
 
     return schedule

@@ -1,8 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { trayCategories, deliveryTiers } from '@/data/catering-menu'
+import { earlyBookingDiscounts } from '@/lib/discounts/early-booking'
+import type { DiscountOffer, DiscountApplication } from '@/lib/discounts/early-booking'
 
 interface FormData {
   name: string
@@ -31,6 +33,9 @@ export default function CateringMenuQuoteForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [errors, setErrors] = useState<FormErrors>({})
+  const [availableOffers, setAvailableOffers] = useState<DiscountOffer[]>([])
+  const [selectedDiscount, setSelectedDiscount] = useState<string | null>(null)
+  const [discountApplication, setDiscountApplication] = useState<DiscountApplication | null>(null)
 
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -128,6 +133,44 @@ export default function CateringMenuQuoteForm() {
     }, 0)
   }
 
+  // Update available discounts when order details change
+  useEffect(() => {
+    if (formData.eventDate && calculateOrderTotal() > 0) {
+      const orderTotal = calculateOrderTotal()
+      const offers = earlyBookingDiscounts.getAvailableOffers(orderTotal, formData.eventDate)
+      setAvailableOffers(offers)
+
+      // Auto-select best offer for pay_deposit mode
+      if (formData.actionType === 'pay_deposit' && offers.length > 0) {
+        const bestOffer = earlyBookingDiscounts.getBestOffer(orderTotal, formData.eventDate)
+        if (bestOffer) {
+          setSelectedDiscount(bestOffer.id)
+          const discount = earlyBookingDiscounts.calculateDiscount(orderTotal, formData.eventDate, bestOffer.id)
+          setDiscountApplication(discount)
+        }
+      } else if (formData.actionType === 'quote_only') {
+        setSelectedDiscount(null)
+        setDiscountApplication(null)
+      }
+    } else {
+      setAvailableOffers([])
+      setSelectedDiscount(null)
+      setDiscountApplication(null)
+    }
+  }, [formData.selectedItems, formData.eventDate, formData.actionType])
+
+  const applyDiscount = (offerId: string) => {
+    const orderTotal = calculateOrderTotal()
+    const discount = earlyBookingDiscounts.calculateDiscount(orderTotal, formData.eventDate, offerId)
+    setSelectedDiscount(offerId)
+    setDiscountApplication(discount)
+  }
+
+  const removeDiscount = () => {
+    setSelectedDiscount(null)
+    setDiscountApplication(null)
+  }
+
   const updateItemQuantity = (itemName: string, size: 'small' | 'large', quantity: number) => {
     setFormData(prev => ({
       ...prev,
@@ -164,6 +207,9 @@ export default function CateringMenuQuoteForm() {
           ...formData,
           orderTotal,
           deliveryFee: finalDeliveryFee,
+          discountApplication,
+          selectedDiscountId: selectedDiscount,
+          finalTotal: discountApplication ? discountApplication.finalTotal + finalDeliveryFee - (discountApplication.originalTotal - orderTotal) : orderTotal + finalDeliveryFee,
         }),
       })
 
@@ -222,6 +268,9 @@ export default function CateringMenuQuoteForm() {
   const orderTotal = calculateOrderTotal()
   const deliveryFee = formData.deliveryMethod === 'pickup' ? 0 : calculateDeliveryFee()
   const finalDeliveryFee = orderTotal >= 250 && deliveryFee === 0 ? 0 : deliveryFee
+  const subtotalWithDelivery = orderTotal + finalDeliveryFee
+  const discountAmount = discountApplication?.discountAmount || 0
+  const finalTotal = discountApplication ? discountApplication.finalTotal + finalDeliveryFee - (discountApplication.originalTotal - orderTotal) : subtotalWithDelivery
 
   return (
     <section id="quote-form" ref={ref} className="py-20 px-4 bg-brand-dark">
@@ -478,6 +527,75 @@ export default function CateringMenuQuoteForm() {
             ))}
           </div>
 
+          {/* Early Booking Discounts */}
+          {availableOffers.length > 0 && formData.actionType === 'pay_deposit' && (
+            <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/5 border border-green-400/30 rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-2xl">🎁</span>
+                <h3 className="text-white font-bold text-xl">Limited Time Savings!</h3>
+                <span className="bg-green-500 text-white px-2 py-1 rounded text-xs font-bold animate-pulse">
+                  EXCLUSIVE
+                </span>
+              </div>
+
+              <div className="space-y-3">
+                {availableOffers.map((offer) => {
+                  const isSelected = selectedDiscount === offer.id
+                  const urgencyMessage = earlyBookingDiscounts.generateUrgencyMessage(offer)
+
+                  return (
+                    <div
+                      key={offer.id}
+                      className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                        isSelected
+                          ? 'border-green-400 bg-green-500/10'
+                          : 'border-white/20 hover:border-green-400/50'
+                      }`}
+                      onClick={() => applyDiscount(offer.id)}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-white font-semibold">{offer.name}</span>
+                            <span className="bg-green-500 text-white px-2 py-1 rounded text-xs font-bold">
+                              {offer.badge}
+                            </span>
+                          </div>
+                          <p className="text-gray-300 text-sm mb-2">{offer.description}</p>
+                          <div className="text-green-400 text-sm font-medium mb-2">
+                            {urgencyMessage}
+                          </div>
+                          <div className="text-gray-400 text-xs space-y-1">
+                            {offer.conditions.map((condition, idx) => (
+                              <div key={idx}>• {condition}</div>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-green-400 font-bold text-lg">
+                            Save ${((orderTotal * offer.discountPercentage) / 100).toFixed(2)}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+
+                {selectedDiscount && (
+                  <div className="text-center">
+                    <button
+                      type="button"
+                      onClick={removeDiscount}
+                      className="text-gray-400 hover:text-white text-sm underline"
+                    >
+                      Remove discount
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Order Summary */}
           {orderTotal > 0 && (
             <div className="bg-gradient-to-r from-brand-gold/10 to-brand-gold/5 border border-brand-gold/20 rounded-2xl p-6">
@@ -491,10 +609,30 @@ export default function CateringMenuQuoteForm() {
                   <span>Delivery Fee:</span>
                   <span>${finalDeliveryFee.toFixed(2)}</span>
                 </div>
+                {discountApplication && (
+                  <div className="flex justify-between text-green-400 font-semibold">
+                    <span>Discount ({discountApplication.discountPercentage}% off):</span>
+                    <span>-${discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="border-t border-brand-gold/20 pt-2 flex justify-between text-white font-bold text-lg">
                   <span>Total:</span>
-                  <span>${(orderTotal + finalDeliveryFee).toFixed(2)}</span>
+                  <span>
+                    {discountApplication && (
+                      <span className="line-through text-gray-500 text-base mr-2">
+                        ${subtotalWithDelivery.toFixed(2)}
+                      </span>
+                    )}
+                    ${finalTotal.toFixed(2)}
+                  </span>
                 </div>
+                {discountApplication && (
+                  <div className="text-center">
+                    <div className="text-green-400 font-semibold text-lg">
+                      🎉 {discountApplication.savingsMessage}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Action Type Selection */}
@@ -527,7 +665,12 @@ export default function CateringMenuQuoteForm() {
                         </span>
                       </div>
                       <div className="text-gray-300 text-sm space-y-1">
-                        <div>• Pay $${Math.round((orderTotal + finalDeliveryFee) * 0.33).toFixed(2)} deposit (33%)</div>
+                        <div>• Pay $${Math.round(finalTotal * 0.33).toFixed(2)} deposit (33%)</div>
+                        {discountApplication && (
+                          <div className="text-green-400 font-semibold">
+                            • 🎁 {discountApplication.discountPercentage}% instant discount applied!
+                          </div>
+                        )}
                         <div>• 🔒 Your date is instantly reserved</div>
                         <div>• ⚡ No waiting - immediate confirmation</div>
                         <div>• 💳 Balance due 2 weeks before event</div>
@@ -596,7 +739,7 @@ export default function CateringMenuQuoteForm() {
             >
               {isSubmitting ? 'Processing...' :
                 formData.actionType === 'pay_deposit'
-                  ? `🚀 Secure Date - Pay $${Math.round((orderTotal + finalDeliveryFee) * 0.33).toFixed(2)} Deposit`
+                  ? `🚀 Secure Date - Pay $${Math.round(finalTotal * 0.33).toFixed(2)} Deposit${discountApplication ? ' (Discounted!)' : ''}`
                   : '📝 Request Quote Only'
               }
             </button>

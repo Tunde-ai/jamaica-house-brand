@@ -1,11 +1,16 @@
+import type { DiscountApplication } from '@/lib/discounts/early-booking'
+
 interface OrderConfirmationEmailProps {
   customerName: string
   orderId: string
   eventDate: string
   guestCount: number
   orderTotal: number
+  finalTotal?: number
+  deliveryFee?: number
   depositAmount: number
   balanceDue: number
+  discountApplication?: DiscountApplication | null
   selectedItems: Array<{
     name: string
     smallQty: number
@@ -26,8 +31,11 @@ export default function OrderConfirmationEmail({
   eventDate,
   guestCount,
   orderTotal,
+  finalTotal,
+  deliveryFee,
   depositAmount,
   balanceDue,
+  discountApplication,
   selectedItems,
   deliveryMethod,
   deliveryAddress,
@@ -115,8 +123,30 @@ export default function OrderConfirmationEmail({
 
           <div style={{ borderTop: '1px solid #eee', paddingTop: '10px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-              <span>Order Total:</span>
+              <span>Food Subtotal:</span>
               <span style={{ fontWeight: 'bold' }}>${orderTotal.toFixed(2)}</span>
+            </div>
+            {deliveryFee !== undefined && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                <span>Delivery Fee:</span>
+                <span style={{ fontWeight: 'bold' }}>{deliveryFee === 0 ? 'FREE' : `$${deliveryFee.toFixed(2)}`}</span>
+              </div>
+            )}
+            {discountApplication && (
+              <>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', color: '#28a745' }}>
+                  <span>🎁 {discountApplication.offerApplied.name} ({discountApplication.discountPercentage}% off):</span>
+                  <span style={{ fontWeight: 'bold' }}>-${discountApplication.discountAmount.toFixed(2)}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', color: '#999', textDecoration: 'line-through', fontSize: '14px' }}>
+                  <span>Total before discount:</span>
+                  <span>${(orderTotal + (deliveryFee || 0)).toFixed(2)}</span>
+                </div>
+              </>
+            )}
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', fontSize: '18px', fontWeight: 'bold', borderTop: '2px solid #d4a843', paddingTop: '10px' }}>
+              <span>TOTAL:</span>
+              <span>${(finalTotal || orderTotal + (deliveryFee || 0)).toFixed(2)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', color: '#d4a843' }}>
               <span>33% Deposit:</span>
@@ -127,6 +157,25 @@ export default function OrderConfirmationEmail({
               <span>${balanceDue.toFixed(2)}</span>
             </div>
           </div>
+
+          {discountApplication && (
+            <div style={{
+              marginTop: '15px',
+              padding: '15px',
+              backgroundColor: '#d4f8d4',
+              borderRadius: '8px',
+              border: '2px solid #28a745',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '20px', marginBottom: '5px' }}>🎉</div>
+              <div style={{ color: '#28a745', fontWeight: 'bold', fontSize: '16px' }}>
+                {discountApplication.savingsMessage}
+              </div>
+              <div style={{ color: '#28a745', fontSize: '14px', marginTop: '5px' }}>
+                Discount: {discountApplication.offerApplied.name} - {discountApplication.offerApplied.badge}
+              </div>
+            </div>
+          )}
 
           {specialRequests && (
             <div style={{ marginTop: '15px', padding: '10px', backgroundColor: '#fff4e6', borderRadius: '4px', borderLeft: '4px solid #d4a843' }}>
