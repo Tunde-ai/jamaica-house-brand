@@ -6,7 +6,7 @@
     },
     {
       "path": "/api/cron/payment-health-check",
-      "schedule": "0 * * * *"
+      "schedule": "0 8,14,20 * * *"
     }
   ]
 }
