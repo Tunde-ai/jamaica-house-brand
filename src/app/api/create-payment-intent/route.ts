@@ -42,14 +42,10 @@ export async function POST(request: NextRequest) {
 
     // =========================================================================
     // SERVER-SIDE 2OZ PRICING ENFORCEMENT
-    // Consolidate all 2oz items. Rule: 1st unit = $0, additional = $5.24.
+    // Handle free samples vs regular products separately
     // =========================================================================
     const freeSampleItems = items.filter((i) => i.id === 'free-sample-2oz')
     const regular2ozItems = items.filter((i) => i.id === 'jerk-sauce-2oz')
-    const total2ozQty =
-      freeSampleItems.reduce((sum, item) => sum + item.quantity, 0) +
-      regular2ozItems.reduce((sum, item) => sum + item.quantity, 0)
-    const has2oz = total2ozQty > 0
 
     // Non-2oz items validated against product catalog
     const otherItems = items.filter(
@@ -59,8 +55,10 @@ export async function POST(request: NextRequest) {
     let subtotal = 0
     const validatedItems: { id: string; name: string; size: string; price: number; quantity: number }[] = []
 
-    // Add enforced 2oz items
-    if (has2oz) {
+    // Handle free samples: 1st unit FREE, additional units $5.24
+    if (freeSampleItems.length > 0) {
+      const totalFreeSampleQty = freeSampleItems.reduce((sum, item) => sum + item.quantity, 0)
+
       // 1 free unit
       validatedItems.push({
         id: 'free-sample-2oz',
@@ -69,8 +67,9 @@ export async function POST(request: NextRequest) {
         price: 0,
         quantity: 1,
       })
-      // Additional units at $5.24
-      const additionalQty = total2ozQty - 1
+
+      // Additional free sample units at $5.24
+      const additionalQty = totalFreeSampleQty - 1
       if (additionalQty > 0) {
         validatedItems.push({
           id: 'jerk-sauce-2oz-additional',
@@ -81,6 +80,28 @@ export async function POST(request: NextRequest) {
         })
         subtotal += ADDITIONAL_2OZ_PRICE * additionalQty
       }
+    }
+
+    // Handle regular 2oz products: Full price for all units
+    if (regular2ozItems.length > 0) {
+      const totalRegular2ozQty = regular2ozItems.reduce((sum, item) => sum + item.quantity, 0)
+      const product = getProductById('jerk-sauce-2oz')
+
+      if (!product) {
+        return NextResponse.json(
+          { error: 'Product not found: jerk-sauce-2oz' },
+          { status: 400 }
+        )
+      }
+
+      validatedItems.push({
+        id: 'jerk-sauce-2oz',
+        name: product.name,
+        size: product.size,
+        price: product.price,
+        quantity: totalRegular2ozQty,
+      })
+      subtotal += product.price * totalRegular2ozQty
     }
 
     // Validate other items
