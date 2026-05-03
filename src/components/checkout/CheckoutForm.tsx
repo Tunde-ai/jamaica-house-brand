@@ -6,6 +6,7 @@ import { useCartStore, CartItem } from '@/lib/cart-store'
 import { formatPrice } from '@/lib/utils'
 import { usStates } from '@/data/membership'
 import { getCheckoutShippingCostCents } from '@/lib/shipping-calc'
+import PromoCodeInput from '@/components/PromoCodeInput'
 
 type Step = 'shipping' | 'payment'
 
@@ -46,7 +47,7 @@ const CARD_ELEMENT_OPTIONS = {
 export default function CheckoutForm({ onPaymentSuccess, shippingOption, onShippingOptionChange }: CheckoutFormProps) {
   const stripe = useStripe()
   const elements = useElements()
-  const { items } = useCartStore()
+  const { items, setPromo, appliedPromo } = useCartStore()
 
   const [step, setStep] = useState<Step>('shipping')
   const [isProcessing, setIsProcessing] = useState(false)
@@ -424,6 +425,15 @@ export default function CheckoutForm({ onPaymentSuccess, shippingOption, onShipp
             <div className="bg-white/10 border border-white/20 rounded-lg px-4 py-4">
               <CardElement options={CARD_ELEMENT_OPTIONS} />
             </div>
+          </div>
+
+          <div>
+            <p className="text-sm text-gray-300 mb-3 font-medium">Promo Code</p>
+            <PromoCodeInput
+              onApply={setPromo}
+              onRemove={() => setPromo(null)}
+              appliedPromo={appliedPromo}
+            />
           </div>
 
           <div className="bg-white/5 rounded-lg p-4 border border-white/10">
