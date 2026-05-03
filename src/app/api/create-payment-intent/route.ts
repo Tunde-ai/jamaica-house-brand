@@ -173,10 +173,21 @@ export async function POST(request: NextRequest) {
     // =========================================================================
     const standardShippingCost = getCheckoutShippingCostCents(items)
     let shippingCost: number
+
+    // Special handling for free samples - always charge shipping even if shipping calc returns 0
+    const hasFreeItemsOnly = subtotal === 0 && freeSampleItems.length > 0
+
     if (shippingOption === 'express') {
       shippingCost = standardShippingCost + EXPRESS_SURCHARGE
+      // For free samples, ensure minimum shipping cost
+      if (hasFreeItemsOnly && shippingCost === EXPRESS_SURCHARGE) {
+        shippingCost = 699 + EXPRESS_SURCHARGE // $6.99 + express surcharge
+      }
     } else if (subtotal >= FREE_SHIPPING_THRESHOLD) {
       shippingCost = 0
+    } else if (hasFreeItemsOnly) {
+      // Free samples always pay shipping (minimum $6.99) even if shipping calc says free
+      shippingCost = Math.max(standardShippingCost, 699) // $6.99 minimum
     } else {
       shippingCost = standardShippingCost
     }
