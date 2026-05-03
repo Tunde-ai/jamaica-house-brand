@@ -1,4 +1,4 @@
--- Add AJBAR26 promo code (20% discount for AJ Bar promotional campaign)
+-- Add AJBAR26 promo code (10% discount for AJ Bar promotional campaign)
 INSERT INTO promo_codes (
     code,
     discount_type,
@@ -10,7 +10,7 @@ INSERT INTO promo_codes (
 ) VALUES (
     'AJBAR26',
     'percentage',
-    20,
+    10,
     true,
     NULL, -- No expiration
     NULL, -- Unlimited uses
