@@ -87,47 +87,43 @@ export default function ChatWidget() {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-brand-gold shadow-lg transition-transform hover:scale-110 hover:bg-brand-gold-light"
+          className="fixed bottom-4 right-3 z-50 flex h-14 w-14 sm:bottom-5 sm:right-5 items-center justify-center rounded-full bg-brand-gold shadow-lg transition-all duration-200 hover:scale-110 hover:bg-brand-gold-light hover:shadow-xl"
+          style={{ boxShadow: '0 4px 15px rgba(196, 169, 97, 0.4)' }}
           aria-label="Open chat"
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand-dark">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-          </svg>
+          <span className="text-2xl">🥘</span>
         </button>
       )}
 
       {/* Chat Panel */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 flex w-[360px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#1A1A1A] shadow-2xl sm:bottom-6 sm:right-6" style={{ height: 'min(520px, calc(100dvh - 3rem))' }}>
+        <div className="fixed bottom-[70px] right-3 z-50 flex w-[calc(100vw-24px)] max-w-[320px] sm:bottom-20 sm:right-5 sm:w-[360px] sm:max-w-[360px] md:w-[380px] md:max-w-[380px] flex-col overflow-hidden rounded-xl border-2 border-brand-gold bg-white shadow-2xl" style={{ height: 'min(450px, calc(100dvh - 140px))', boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }}>
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-white/10 bg-brand-gold/10 px-4 py-3">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-gold text-xs font-bold text-brand-dark">
-                JH
+          <div className="flex items-center justify-between bg-gradient-to-r from-[#2D2D2D] to-[#1A1A1A] text-brand-gold px-3 py-3 sm:px-4 rounded-t-xl">
+            <div className="flex items-center gap-2.5">
+              <div className="text-2xl sm:text-3xl min-w-[32px] sm:min-w-[36px] flex-shrink-0">
+                🥘
               </div>
-              <div>
-                <p className="text-sm font-semibold text-white">Jamaica House Brand</p>
-                <p className="text-xs text-white/50">Ask us anything</p>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-sm sm:text-base font-semibold text-brand-gold m-0">Chef's Chat</h3>
+                <p className="text-xs text-gray-400 m-0 mt-0.5">Ask about our products</p>
               </div>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="flex h-8 w-8 items-center justify-center rounded-full text-white/50 transition-colors hover:bg-white/10 hover:text-white"
+              className="flex h-11 w-11 items-center justify-center text-brand-gold text-3xl bg-none border-none cursor-pointer flex-shrink-0 transition-colors hover:bg-white/10"
               aria-label="Close chat"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
+              ×
             </button>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-4 py-4">
+          <div className="flex-1 overflow-y-auto px-3 py-3 sm:px-4 sm:py-4 bg-white">
             {messages.length === 0 && (
               <div className="space-y-3">
-                <p className="text-sm text-white/70">
-                  Welcome! I can help with products, shipping, catering, and more. What would you like to know?
+                <p className="text-sm text-gray-700">
+                  Hey there! 🔥 What would you like to know about our authentic Jamaican jerk sauce?
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {QUICK_REPLIES.map((reply) => (
@@ -149,10 +145,10 @@ export default function ChatWidget() {
                 className={`mb-3 flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-[80%] whitespace-pre-line rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
+                  className={`max-w-[85%] whitespace-pre-line rounded-lg px-3 py-2.5 text-sm leading-relaxed ${
                     msg.role === 'user'
                       ? 'bg-brand-gold text-brand-dark'
-                      : 'bg-white/10 text-white/90'
+                      : 'bg-gray-100 border-l-3 border-brand-gold text-gray-800'
                   }`}
                 >
                   {msg.content}
@@ -162,10 +158,10 @@ export default function ChatWidget() {
 
             {isLoading && (
               <div className="mb-3 flex justify-start">
-                <div className="flex gap-1.5 rounded-2xl bg-white/10 px-4 py-3">
-                  <span className="h-2 w-2 animate-bounce rounded-full bg-brand-gold/60" style={{ animationDelay: '0ms' }} />
-                  <span className="h-2 w-2 animate-bounce rounded-full bg-brand-gold/60" style={{ animationDelay: '150ms' }} />
-                  <span className="h-2 w-2 animate-bounce rounded-full bg-brand-gold/60" style={{ animationDelay: '300ms' }} />
+                <div className="flex gap-1.5 rounded-lg bg-gray-100 border-l-3 border-brand-gold px-4 py-3">
+                  <span className="h-2 w-2 animate-bounce rounded-full bg-brand-gold" style={{ animationDelay: '0ms' }} />
+                  <span className="h-2 w-2 animate-bounce rounded-full bg-brand-gold" style={{ animationDelay: '150ms' }} />
+                  <span className="h-2 w-2 animate-bounce rounded-full bg-brand-gold" style={{ animationDelay: '300ms' }} />
                 </div>
               </div>
             )}
@@ -187,27 +183,24 @@ export default function ChatWidget() {
           </a>
 
           {/* Input */}
-          <form onSubmit={handleSubmit} className="border-t border-white/10 px-4 py-3">
+          <form onSubmit={handleSubmit} className="border-t border-gray-200 px-3 py-2.5 sm:px-4 sm:py-3 bg-white">
             <div className="flex gap-2">
               <input
                 ref={inputRef}
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Type a message..."
+                placeholder="Ask us anything..."
                 disabled={isLoading}
-                className="flex-1 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder-white/30 outline-none transition-colors focus:border-brand-gold/50 disabled:opacity-50"
+                className="flex-1 rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-500 outline-none transition-colors focus:border-brand-gold focus:ring-1 focus:ring-brand-gold disabled:opacity-50 min-h-[44px]"
               />
               <button
                 type="submit"
                 disabled={!input.trim() || isLoading}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-gold text-brand-dark transition-colors hover:bg-brand-gold-light disabled:opacity-30"
+                className="flex h-11 w-11 items-center justify-center rounded-md bg-brand-gold text-brand-dark transition-colors hover:bg-brand-gold-light disabled:opacity-30 flex-shrink-0"
                 aria-label="Send message"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="22" y1="2" x2="11" y2="13" />
-                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                </svg>
+                <span className="text-lg font-bold">→</span>
               </button>
             </div>
           </form>
