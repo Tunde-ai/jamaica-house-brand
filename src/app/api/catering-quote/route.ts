@@ -12,11 +12,16 @@ interface CateringQuoteBody {
   venue: string
   proteins: string
   message: string
-  // New service area fields
+  // Location fields
   venueState?: string
   venueCounty?: string
   serviceAreaStatus?: ServiceAreaStatus
   phoneCountryCode?: string
+  // New service area selection
+  serviceArea: 'miami' | 'jamaica' | 'atlanta' | 'other'
+  jamaicaAddress?: string
+  atlantaAddress?: string
+  otherLocationDetails?: string
 }
 
 async function sendQuoteNotification(body: CateringQuoteBody) {
@@ -34,13 +39,24 @@ async function sendQuoteNotification(body: CateringQuoteBody) {
     },
   })
 
-  // Determine email subject prefix based on service area status
+  // Determine email subject prefix based on service area
+  const serviceAreaLabels = {
+    miami: 'MIAMI/BROWARD',
+    jamaica: 'JAMAICA',
+    atlanta: 'ATLANTA',
+    other: 'OTHER_LOCATION'
+  }
+  const serviceAreaLabel = serviceAreaLabels[body.serviceArea]
+
+  // Fallback to legacy status labels for Miami area
   const statusLabels = {
     in_area: 'IN_AREA',
     tier_2: 'TIER_2',
     out_of_area: 'OUT_OF_AREA'
   }
-  const statusLabel = body.serviceAreaStatus ? statusLabels[body.serviceAreaStatus] : 'UNKNOWN'
+  const statusLabel = (body.serviceArea === 'miami' && body.serviceAreaStatus)
+    ? statusLabels[body.serviceAreaStatus]
+    : serviceAreaLabel
 
   // Determine response timeline based on status
   const responseTimeline = {
@@ -61,28 +77,33 @@ async function sendQuoteNotification(body: CateringQuoteBody) {
           🍽️ Catering Quote Request
         </h2>
 
-        ${body.serviceAreaStatus ? `
         <div style="margin: 16px 0; padding: 12px; border-radius: 6px; ${
-          body.serviceAreaStatus === 'in_area' ? 'background: #e8f5e8; border: 1px solid #4caf50;' :
-          body.serviceAreaStatus === 'tier_2' ? 'background: #fff3cd; border: 1px solid #ffc107;' :
-          'background: #f8d7da; border: 1px solid #dc3545;'
+          body.serviceArea === 'miami' ? 'background: #e8f5e8; border: 1px solid #4caf50;' :
+          body.serviceArea === 'jamaica' ? 'background: #e3f2fd; border: 1px solid #2196f3;' :
+          body.serviceArea === 'atlanta' ? 'background: #f3e5f5; border: 1px solid #9c27b0;' :
+          'background: #fff3e0; border: 1px solid #ff9800;'
         }">
           <strong style="color: ${
-            body.serviceAreaStatus === 'in_area' ? '#2e7d32' :
-            body.serviceAreaStatus === 'tier_2' ? '#856404' :
-            '#721c24'
+            body.serviceArea === 'miami' ? '#2e7d32' :
+            body.serviceArea === 'jamaica' ? '#1565c0' :
+            body.serviceArea === 'atlanta' ? '#7b1fa2' :
+            '#ef6c00'
           };">
             Service Area: ${
-              body.serviceAreaStatus === 'in_area' ? '✅ Primary Service Area' :
-              body.serviceAreaStatus === 'tier_2' ? '⚠️ Tier 2 (Premium Pricing)' :
-              '❌ Out of Area'
+              body.serviceArea === 'miami' ? '🇺🇸 Miami/Broward, Florida' :
+              body.serviceArea === 'jamaica' ? '🇯🇲 Jamaica' :
+              body.serviceArea === 'atlanta' ? '🏢 Atlanta, Georgia' :
+              '❓ Other Location'
             }
           </strong>
           <br>
           <span style="color: #555; font-size: 14px;">
-            Expected response time: ${timeline}
+            ${body.serviceArea === 'miami' && body.serviceAreaStatus
+              ? `Expected response time: ${timeline}`
+              : 'Expected response time: 24 hours with custom pricing'
+            }
           </span>
-        </div>` : ''}
+        </div>
 
         <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
           <tr>
@@ -109,10 +130,25 @@ async function sendQuoteNotification(body: CateringQuoteBody) {
             <td style="padding: 8px 12px; font-weight: bold; color: #555;">Guest Count</td>
             <td style="padding: 8px 12px;">${body.guestCount}</td>
           </tr>
-          ${body.venueState && body.venueCounty ? `
+          ${body.serviceArea === 'miami' && body.venueState && body.venueCounty ? `
           <tr>
             <td style="padding: 8px 12px; font-weight: bold; color: #555;">Location</td>
             <td style="padding: 8px 12px;">${body.venueCounty} County, ${body.venueState}</td>
+          </tr>` : ''}
+          ${body.serviceArea === 'jamaica' && body.jamaicaAddress ? `
+          <tr>
+            <td style="padding: 8px 12px; font-weight: bold; color: #555;">🇯🇲 Jamaica Address</td>
+            <td style="padding: 8px 12px; white-space: pre-wrap;">${body.jamaicaAddress}</td>
+          </tr>` : ''}
+          ${body.serviceArea === 'atlanta' && body.atlantaAddress ? `
+          <tr>
+            <td style="padding: 8px 12px; font-weight: bold; color: #555;">🏢 Atlanta Address</td>
+            <td style="padding: 8px 12px; white-space: pre-wrap;">${body.atlantaAddress}</td>
+          </tr>` : ''}
+          ${body.serviceArea === 'other' && body.otherLocationDetails ? `
+          <tr>
+            <td style="padding: 8px 12px; font-weight: bold; color: #555;">❓ Location Details</td>
+            <td style="padding: 8px 12px; white-space: pre-wrap;">${body.otherLocationDetails}</td>
           </tr>` : ''}
           ${body.venue ? `
           <tr style="background: #f9f9f9;">
@@ -211,11 +247,44 @@ async function sendSlackNotification(body: CateringQuoteBody) {
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as CateringQuoteBody
-    const { name, email, phone, eventType, eventDate, guestCount, venueState, venueCounty } = body
+    const {
+      name, email, phone, eventType, eventDate, guestCount,
+      venueState, venueCounty, serviceArea,
+      jamaicaAddress, atlantaAddress, otherLocationDetails
+    } = body
 
     if (!name || !email || !phone || !eventType || !eventDate || !guestCount) {
       return NextResponse.json(
         { error: 'Name, email, phone, event type, date, and guest count are required' },
+        { status: 400 }
+      )
+    }
+
+    // Validate service area specific requirements
+    if (serviceArea === 'jamaica' && !jamaicaAddress?.trim()) {
+      return NextResponse.json(
+        { error: 'Please provide the event address for Jamaica delivery' },
+        { status: 400 }
+      )
+    }
+
+    if (serviceArea === 'atlanta' && !atlantaAddress?.trim()) {
+      return NextResponse.json(
+        { error: 'Please provide the event address for Atlanta delivery' },
+        { status: 400 }
+      )
+    }
+
+    if (serviceArea === 'other' && !otherLocationDetails?.trim()) {
+      return NextResponse.json(
+        { error: 'Please provide details about your event location' },
+        { status: 400 }
+      )
+    }
+
+    if (serviceArea === 'miami' && venueState === 'Florida' && !venueCounty) {
+      return NextResponse.json(
+        { error: 'Please select your venue county for Miami/Broward events' },
         { status: 400 }
       )
     }
