@@ -6,6 +6,8 @@ import { trayCategories, deliveryTiers } from '@/data/catering-menu'
 import { earlyBookingDiscounts } from '@/lib/discounts/early-booking'
 import type { DiscountOffer, DiscountApplication } from '@/lib/discounts/early-booking'
 
+type ServiceArea = 'miami' | 'jamaica' | 'atlanta' | 'other'
+
 interface FormData {
   name: string
   email: string
@@ -22,6 +24,10 @@ interface FormData {
   }
   notes: string
   actionType: 'quote_only' | 'pay_deposit'
+  serviceArea: ServiceArea
+  jamaicaAddress: string
+  atlantaAddress: string
+  otherLocationDetails: string
 }
 
 interface FormErrors {
@@ -37,6 +43,23 @@ export default function CateringMenuQuoteForm() {
   const [selectedDiscount, setSelectedDiscount] = useState<string | null>(null)
   const [discountApplication, setDiscountApplication] = useState<DiscountApplication | null>(null)
 
+  const [serviceArea, setServiceArea] = useState<ServiceArea>('miami')
+
+  // Handle service area change
+  const handleServiceAreaChange = (area: ServiceArea) => {
+    setServiceArea(area)
+    setFormData(prev => ({
+      ...prev,
+      serviceArea: area,
+      // Reset location fields when changing areas
+      jamaicaAddress: area === 'jamaica' ? prev.jamaicaAddress : '',
+      atlantaAddress: area === 'atlanta' ? prev.atlantaAddress : '',
+      otherLocationDetails: area === 'other' ? prev.otherLocationDetails : '',
+      // Reset delivery fields
+      zipCode: area === 'miami' ? prev.zipCode : '',
+    }))
+  }
+
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -48,6 +71,10 @@ export default function CateringMenuQuoteForm() {
     selectedItems: {},
     notes: '',
     actionType: 'pay_deposit',
+    serviceArea: 'miami',
+    jamaicaAddress: '',
+    atlantaAddress: '',
+    otherLocationDetails: '',
   })
 
   const validateForm = (): boolean => {
@@ -89,8 +116,21 @@ export default function CateringMenuQuoteForm() {
       }
     }
 
-    // Delivery method validation
-    if (formData.deliveryMethod === 'delivery' && !formData.zipCode.trim()) {
+    // Service area specific validation
+    if (formData.serviceArea === 'jamaica' && !formData.jamaicaAddress.trim()) {
+      newErrors.jamaicaAddress = 'Please provide the event address for Jamaica delivery'
+    }
+
+    if (formData.serviceArea === 'atlanta' && !formData.atlantaAddress.trim()) {
+      newErrors.atlantaAddress = 'Please provide the event address for Atlanta delivery'
+    }
+
+    if (formData.serviceArea === 'other' && !formData.otherLocationDetails.trim()) {
+      newErrors.otherLocationDetails = 'Please provide details about your event location'
+    }
+
+    // Delivery method validation (only for Miami area)
+    if (formData.serviceArea === 'miami' && formData.deliveryMethod === 'delivery' && !formData.zipCode.trim()) {
       newErrors.zipCode = 'ZIP code is required for delivery'
     }
 
@@ -374,9 +414,236 @@ export default function CateringMenuQuoteForm() {
             </div>
           </div>
 
-          {/* Delivery Method */}
+          {/* Service Area Selection */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-            <h3 className="text-white font-bold text-xl mb-6">Delivery Method</h3>
+            <h3 className="text-white font-bold text-xl mb-4">Service Area</h3>
+            <p className="text-gray-400 mb-6">Select your event location to see available delivery options and pricing.</p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+              <label className={`
+                flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all
+                ${serviceArea === 'miami'
+                  ? 'border-brand-gold bg-brand-gold/10'
+                  : 'border-white/20 hover:border-brand-gold/50'
+                }
+              `}>
+                <input
+                  type="radio"
+                  name="serviceArea"
+                  value="miami"
+                  checked={serviceArea === 'miami'}
+                  onChange={() => handleServiceAreaChange('miami')}
+                  className="sr-only"
+                />
+                <div className={`
+                  w-4 h-4 rounded-full border-2 mr-3 flex items-center justify-center
+                  ${serviceArea === 'miami' ? 'border-brand-gold' : 'border-white/40'}
+                `}>
+                  {serviceArea === 'miami' && (
+                    <div className="w-2 h-2 bg-brand-gold rounded-full"></div>
+                  )}
+                </div>
+                <span className="text-white font-medium">Miami/Broward, Florida</span>
+              </label>
+
+              <label className={`
+                flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all
+                ${serviceArea === 'jamaica'
+                  ? 'border-brand-gold bg-brand-gold/10'
+                  : 'border-white/20 hover:border-brand-gold/50'
+                }
+              `}>
+                <input
+                  type="radio"
+                  name="serviceArea"
+                  value="jamaica"
+                  checked={serviceArea === 'jamaica'}
+                  onChange={() => handleServiceAreaChange('jamaica')}
+                  className="sr-only"
+                />
+                <div className={`
+                  w-4 h-4 rounded-full border-2 mr-3 flex items-center justify-center
+                  ${serviceArea === 'jamaica' ? 'border-brand-gold' : 'border-white/40'}
+                `}>
+                  {serviceArea === 'jamaica' && (
+                    <div className="w-2 h-2 bg-brand-gold rounded-full"></div>
+                  )}
+                </div>
+                <span className="text-white font-medium">Jamaica</span>
+              </label>
+
+              <label className={`
+                flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all
+                ${serviceArea === 'atlanta'
+                  ? 'border-brand-gold bg-brand-gold/10'
+                  : 'border-white/20 hover:border-brand-gold/50'
+                }
+              `}>
+                <input
+                  type="radio"
+                  name="serviceArea"
+                  value="atlanta"
+                  checked={serviceArea === 'atlanta'}
+                  onChange={() => handleServiceAreaChange('atlanta')}
+                  className="sr-only"
+                />
+                <div className={`
+                  w-4 h-4 rounded-full border-2 mr-3 flex items-center justify-center
+                  ${serviceArea === 'atlanta' ? 'border-brand-gold' : 'border-white/40'}
+                `}>
+                  {serviceArea === 'atlanta' && (
+                    <div className="w-2 h-2 bg-brand-gold rounded-full"></div>
+                  )}
+                </div>
+                <span className="text-white font-medium">Atlanta, Georgia</span>
+              </label>
+
+              <label className={`
+                flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all
+                ${serviceArea === 'other'
+                  ? 'border-brand-gold bg-brand-gold/10'
+                  : 'border-white/20 hover:border-brand-gold/50'
+                }
+              `}>
+                <input
+                  type="radio"
+                  name="serviceArea"
+                  value="other"
+                  checked={serviceArea === 'other'}
+                  onChange={() => handleServiceAreaChange('other')}
+                  className="sr-only"
+                />
+                <div className={`
+                  w-4 h-4 rounded-full border-2 mr-3 flex items-center justify-center
+                  ${serviceArea === 'other' ? 'border-brand-gold' : 'border-white/40'}
+                `}>
+                  {serviceArea === 'other' && (
+                    <div className="w-2 h-2 bg-brand-gold rounded-full"></div>
+                  )}
+                </div>
+                <span className="text-white font-medium">Other Location</span>
+              </label>
+            </div>
+
+            {/* Service Area Info Messages */}
+            {serviceArea === 'miami' && (
+              <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+                <h4 className="text-green-400 font-medium mb-3">Miami/Broward Delivery Zones</h4>
+                <div className="space-y-2 text-sm text-green-300">
+                  <div className="flex justify-between">
+                    <span><strong>Pickup:</strong></span>
+                    <span className="text-green-400 font-semibold">FREE</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Within 10 miles:</span>
+                    <span className="text-green-400 font-semibold">FREE on orders $250+</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>11-20 miles:</span>
+                    <span className="text-brand-gold font-semibold">$25</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>21-35 miles:</span>
+                    <span className="text-brand-gold font-semibold">$45</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Beyond 35 miles:</span>
+                    <span className="text-gray-400">Contact us for pricing</span>
+                  </div>
+                </div>
+                <p className="text-xs text-green-300 mt-3">7-day advance notice required. Fees per order, not per tray.</p>
+              </div>
+            )}
+
+            {serviceArea === 'jamaica' && (
+              <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+                <div className="flex items-center mb-3">
+                  <span className="text-xl mr-2">🇯🇲</span>
+                  <h4 className="text-blue-400 font-medium">Jamaica Delivery</h4>
+                </div>
+                <p className="text-blue-300 text-sm mb-4">
+                  Please provide your event address so we can confirm availability and send custom pricing for Jamaica delivery.
+                </p>
+                <div>
+                  <label htmlFor="jamaica-address" className="block text-sm text-blue-300 mb-2">
+                    Event Address & Details <span className="text-brand-gold">*</span>
+                  </label>
+                  <textarea
+                    id="jamaica-address"
+                    name="jamaicaAddress"
+                    rows={3}
+                    value={formData.jamaicaAddress}
+                    onChange={(e) => setFormData(prev => ({ ...prev, jamaicaAddress: e.target.value }))}
+                    placeholder="Please include the full address, venue name (if applicable), and any special access instructions for your event location in Jamaica."
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent resize-none"
+                  />
+                  {errors.jamaicaAddress && <p className="text-red-400 text-sm mt-1">{errors.jamaicaAddress}</p>}
+                </div>
+                <p className="text-xs text-blue-300 mt-3">We'll reach out within 24 hours with availability and pricing for your Jamaica location.</p>
+              </div>
+            )}
+
+            {serviceArea === 'atlanta' && (
+              <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
+                <div className="flex items-center mb-3">
+                  <span className="text-xl mr-2">🏢</span>
+                  <h4 className="text-purple-400 font-medium">Atlanta Area Delivery</h4>
+                </div>
+                <p className="text-purple-300 text-sm mb-4">
+                  Please provide your event address so we can confirm availability and send custom pricing for Atlanta area delivery.
+                </p>
+                <div>
+                  <label htmlFor="atlanta-address" className="block text-sm text-purple-300 mb-2">
+                    Event Address & Details <span className="text-brand-gold">*</span>
+                  </label>
+                  <textarea
+                    id="atlanta-address"
+                    name="atlantaAddress"
+                    rows={3}
+                    value={formData.atlantaAddress}
+                    onChange={(e) => setFormData(prev => ({ ...prev, atlantaAddress: e.target.value }))}
+                    placeholder="Please include the full address, venue name (if applicable), and any special access instructions for your event location in Atlanta, Georgia."
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent resize-none"
+                  />
+                  {errors.atlantaAddress && <p className="text-red-400 text-sm mt-1">{errors.atlantaAddress}</p>}
+                </div>
+                <p className="text-xs text-purple-300 mt-3">We'll reach out within 24 hours with availability and pricing for your Atlanta location.</p>
+              </div>
+            )}
+
+            {serviceArea === 'other' && (
+              <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4">
+                <div className="flex items-center mb-3">
+                  <span className="text-xl mr-2">❓</span>
+                  <h4 className="text-orange-400 font-medium">Other Location</h4>
+                </div>
+                <p className="text-orange-300 text-sm mb-4">
+                  Contact us to check if we can service your area. We're always exploring new locations!
+                </p>
+                <div>
+                  <label htmlFor="other-location" className="block text-sm text-orange-300 mb-2">
+                    Location Details <span className="text-brand-gold">*</span>
+                  </label>
+                  <textarea
+                    id="other-location"
+                    name="otherLocationDetails"
+                    rows={3}
+                    value={formData.otherLocationDetails}
+                    onChange={(e) => setFormData(prev => ({ ...prev, otherLocationDetails: e.target.value }))}
+                    placeholder="Please tell us about your event location - city, state, venue details, and any other information that would help us determine if we can serve your area."
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent resize-none"
+                  />
+                  {errors.otherLocationDetails && <p className="text-red-400 text-sm mt-1">{errors.otherLocationDetails}</p>}
+                </div>
+                <p className="text-xs text-orange-300 mt-3">We'll review your request and get back to you as soon as possible.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Delivery Method - Only show for Miami area */}
+          {serviceArea === 'miami' && (
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+              <h3 className="text-white font-bold text-xl mb-6">Delivery Method</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div
                 className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
@@ -452,7 +719,8 @@ export default function CateringMenuQuoteForm() {
                 )}
               </div>
             )}
-          </div>
+            </div>
+          )}
 
           {/* Tray Selection */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
