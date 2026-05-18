@@ -15,13 +15,26 @@ export async function POST(request: NextRequest) {
     const normalizedCode = code.trim().toUpperCase()
 
     const supabase = getSupabase()
-    const { data: promo, error } = await supabase
+
+    // Fetch ALL promo codes and filter in app to handle whitespace issues
+    const { data: allPromos, error } = await supabase
       .from('promo_codes')
       .select('*')
-      .eq('code', normalizedCode)
-      .single()
 
-    if (error || !promo) {
+    if (error) {
+      console.error('Supabase error:', error)
+      return NextResponse.json({
+        valid: false,
+        message: 'Invalid promo code.',
+      })
+    }
+
+    // Filter using trim+uppercase comparison to handle whitespace in database
+    const promo = (allPromos || []).find(
+      p => p.code && p.code.trim().toUpperCase() === normalizedCode
+    )
+
+    if (!promo) {
       return NextResponse.json({
         valid: false,
         message: 'Invalid promo code.',

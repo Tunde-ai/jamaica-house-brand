@@ -63,7 +63,7 @@ export default function DeliveryInfo() {
 
             <div className="px-6 py-4 bg-white/5">
               <p className="text-gray-400 text-sm">
-                * Delivery zones calculated from Fort Lauderdale, FL (33169)
+                Select your event location above to see delivery options and pricing
               </p>
             </div>
           </div>
