@@ -431,6 +431,10 @@ export async function POST(request: NextRequest) {
           shippingCost: emailShippingCost,
           orderTotal: emailOrderTotal,
           orderDate: new Date().toISOString(),
+          promoCode: session.metadata?.promoCode || undefined,
+          promoDiscount: session.metadata?.promoDiscount
+            ? parseFloat(session.metadata.promoDiscount)
+            : undefined,
           shippingAddressLine1: ccShipping?.address?.line1 || undefined,
           shippingAddressLine2: ccShipping?.address?.line2 || undefined,
           shippingCity: ccShipping?.address?.city || undefined,
