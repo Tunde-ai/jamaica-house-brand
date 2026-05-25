@@ -510,28 +510,29 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Send fulfillment email
-      const appPassword = process.env.GMAIL_APP_PASSWORD
-      if (appPassword) {
-        const transporter = nodemailer.createTransport({
-          service: 'gmail',
-          auth: {
-            user: 'olatunde@jamaicahousebrand.com',
-            pass: appPassword,
-          },
-        })
+      // Prepare all data for parallel execution
+      const usedPromoCode = paymentIntent.metadata.promoCode
+      const piNameParts = customerName.split(' ')
+      const piItems = items.map((item) => ({
+        name: item.name,
+        qty: item.quantity,
+        price: Number((item.price / 100).toFixed(2)),
+      }))
+      const piShippingCost = parseInt(paymentIntent.metadata.shipping_cost || '0') / 100
+      const piOrderTotal = paymentIntent.amount / 100
 
-        const itemRows = items.length > 0
-          ? items.map((item) => `
+      // Build fulfillment email HTML
+      const itemRows = items.length > 0
+        ? items.map((item) => `
             <tr>
               <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.name}</td>
               <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
               <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">$${(item.price / 100).toFixed(2)}</td>
               <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">$${(item.price * item.quantity / 100).toFixed(2)}</td>
             </tr>`).join('')
-          : '<tr><td colspan="4" style="padding: 10px;">No items available</td></tr>'
+        : '<tr><td colspan="4" style="padding: 10px;">No items available</td></tr>'
 
-        const html = `
+      const fulfillmentHtml = `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
             <div style="background: #1a1a2e; padding: 24px; text-align: center;">
               <h1 style="color: #d4a437; margin: 0; font-size: 24px;">${label}</h1>
@@ -570,92 +571,77 @@ export async function POST(request: NextRequest) {
             </div>
           </div>`
 
-        try {
+      // Build Slack blocks
+      const itemsList = items.length > 0
+        ? items.map((item) => `\u2022 ${item.quantity}x ${item.name}`).join('\n')
+        : 'Items not available'
+      const slackBlocks = [
+        {
+          type: 'header',
+          text: { type: 'plain_text', text: isUpsell ? '\u2B06\uFE0F Upsell Added!' : '\uD83D\uDED2 New Order Received!' },
+        },
+        {
+          type: 'section',
+          fields: [
+            { type: 'mrkdwn', text: `*Total:*\n${total}` },
+            ...(isUpsell ? [] : [{ type: 'mrkdwn', text: `*Shipping:*\n${shippingCost}` }]),
+            { type: 'mrkdwn', text: `*Customer:*\n${resolvedEmail || 'N/A'}` },
+            { type: 'mrkdwn', text: `*Name:*\n${customerName}` },
+          ],
+        },
+        ...(!isUpsell && shippingAddress ? [{
+          type: 'section',
+          text: { type: 'mrkdwn', text: `*Address:*\n${shippingAddress}` },
+        }] : []),
+        {
+          type: 'section',
+          text: { type: 'mrkdwn', text: `*Items:*\n${itemsList}` },
+        },
+      ]
+
+      // Run ALL notifications in parallel — must complete before Vercel kills the function
+      await Promise.allSettled([
+        // 1. Fulfillment email to owner
+        (async () => {
+          const appPassword = process.env.GMAIL_APP_PASSWORD
+          if (!appPassword) return
+          const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: { user: 'olatunde@jamaicahousebrand.com', pass: appPassword },
+          })
           await transporter.sendMail({
             from: '"Jamaica House Brand Orders" <olatunde@jamaicahousebrand.com>',
             to: 'olatunde@jamaicahousebrand.com',
             subject: `${label} — ${customerName} — ${total}`,
-            html,
+            html: fulfillmentHtml,
           })
-        } catch (emailErr) {
-          console.error('PaymentIntent fulfillment email failed:', emailErr)
-        }
-      }
-
-      // Send Slack notification
-      const webhookUrl = process.env.SLACK_WEBHOOK_URL
-      if (webhookUrl) {
-        const itemsList = items.length > 0
-          ? items.map((item) => `\u2022 ${item.quantity}x ${item.name}`).join('\n')
-          : 'Items not available'
-
-        try {
-          await fetch(webhookUrl, {
+        })(),
+        // 2. Slack notification
+        (async () => {
+          const slackUrl = process.env.SLACK_WEBHOOK_URL
+          if (!slackUrl) return
+          await fetch(slackUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              blocks: [
-                {
-                  type: 'header',
-                  text: { type: 'plain_text', text: isUpsell ? '\u2B06\uFE0F Upsell Added!' : '\uD83D\uDED2 New Order Received!' },
-                },
-                {
-                  type: 'section',
-                  fields: [
-                    { type: 'mrkdwn', text: `*Total:*\n${total}` },
-                    ...(isUpsell ? [] : [{ type: 'mrkdwn', text: `*Shipping:*\n${shippingCost}` }]),
-                    { type: 'mrkdwn', text: `*Customer:*\n${resolvedEmail || 'N/A'}` },
-                    { type: 'mrkdwn', text: `*Name:*\n${customerName}` },
-                  ],
-                },
-                ...(!isUpsell && shippingAddress ? [{
-                  type: 'section',
-                  text: { type: 'mrkdwn', text: `*Address:*\n${shippingAddress}` },
-                }] : []),
-                {
-                  type: 'section',
-                  text: { type: 'mrkdwn', text: `*Items:*\n${itemsList}` },
-                },
-              ],
-            }),
+            body: JSON.stringify({ blocks: slackBlocks }),
           })
-        } catch (slackErr) {
-          console.error('PaymentIntent Slack notification failed:', slackErr)
-        }
-      }
-
-      // Increment promo code usage if one was used
-      const usedPromoCode = paymentIntent.metadata.promoCode
-      if (usedPromoCode) {
-        try {
+        })(),
+        // 3. Promo code usage increment
+        (async () => {
+          if (!usedPromoCode) return
           const { data: promo } = await getSupabase()
             .from('promo_codes')
             .select('usage_count')
             .eq('code', usedPromoCode)
             .single()
-
           if (promo) {
             await getSupabase()
               .from('promo_codes')
               .update({ usage_count: promo.usage_count + 1 })
               .eq('code', usedPromoCode)
           }
-        } catch (promoErr) {
-          console.error('Failed to increment promo usage:', promoErr)
-        }
-      }
-
-      // Post to Command Center, send customer email, and sync Mailchimp
-      const piNameParts = customerName.split(' ')
-      const piItems = items.map((item) => ({
-        name: item.name,
-        qty: item.quantity,
-        price: Number((item.price / 100).toFixed(2)),
-      }))
-      const piShippingCost = parseInt(paymentIntent.metadata.shipping_cost || '0') / 100
-      const piOrderTotal = paymentIntent.amount / 100
-
-      await Promise.allSettled([
+        })(),
+        // 4. Command Center webhook + inventory fulfillment
         postToCommandCenter({
           orderId: paymentIntent.id,
           customerEmail: resolvedEmail || '',
@@ -669,13 +655,13 @@ export async function POST(request: NextRequest) {
           promoDiscount: paymentIntent.metadata.promoDiscount
             ? parseInt(paymentIntent.metadata.promoDiscount) / 100
             : undefined,
-          // Parse shipping address from metadata (stored by checkout form)
           shippingAddressLine1: paymentIntent.shipping?.address?.line1 || paymentIntent.metadata.shipping_address?.split(',')[0]?.trim() || undefined,
           shippingCity: paymentIntent.shipping?.address?.city || undefined,
           shippingState: paymentIntent.shipping?.address?.state || undefined,
           shippingZip: paymentIntent.shipping?.address?.postal_code || undefined,
           shippingCountry: paymentIntent.shipping?.address?.country || 'US',
         }),
+        // 5. Customer confirmation email
         resolvedEmail ? sendOrderConfirmationEmail({
           customerFirstName: piNameParts[0] || 'Customer',
           customerEmail: resolvedEmail,
@@ -688,6 +674,7 @@ export async function POST(request: NextRequest) {
           shippingCost: piShippingCost,
           orderTotal: piOrderTotal,
         }) : Promise.resolve(),
+        // 6. Mailchimp sync
         mailchimpSync({
           customerEmail: resolvedEmail || '',
           firstName: piNameParts[0] || '',
@@ -699,7 +686,7 @@ export async function POST(request: NextRequest) {
           })),
         }),
       ]).then((results) => {
-        const labels = ['Command Center webhook + inventory fulfillment', 'Customer confirmation email', 'Mailchimp sync']
+        const labels = ['Fulfillment email', 'Slack notification', 'Promo increment', 'Command Center webhook', 'Customer confirmation email', 'Mailchimp sync']
         results.forEach((result, i) => {
           if (result.status === 'rejected') {
             console.error(`PI ${labels[i]} failed:`, result.reason)
