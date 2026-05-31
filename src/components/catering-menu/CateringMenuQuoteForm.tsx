@@ -266,6 +266,10 @@ export default function CateringMenuQuoteForm() {
           selectedItems: {},
           notes: '',
           actionType: 'pay_deposit',
+          serviceArea: 'miami',
+          jamaicaAddress: '',
+          atlantaAddress: '',
+          otherLocationDetails: '',
         })
       } else {
         throw new Error('Failed to submit quote request')
