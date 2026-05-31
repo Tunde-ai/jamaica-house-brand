@@ -96,7 +96,7 @@ export const atlantaStreetSeriesMenu: StreetSeriesCategory[] = [
 
 // Atlanta Service Area Configuration
 export const atlantaServiceArea: AtlantaServiceArea = {
-  zipCode: '30309', // Partner's ZIP code - update this
+  zipCode: '30316', // Partner's ZIP code
   radius: 30,
   deliveryFee: 15,
   minimumOrder: 50,
@@ -104,7 +104,7 @@ export const atlantaServiceArea: AtlantaServiceArea = {
     name: 'Atlanta Partner', // Update with actual name
     phone: '+1-XXX-XXX-XXXX', // Update with actual phone
     email: 'atlanta@jamaicahousebrand.com', // Update with actual email
-    address: 'Atlanta, GA 30309', // Update with actual address
+    address: 'Atlanta, GA 30316', // Update with actual address
   },
 }
 
@@ -123,9 +123,9 @@ export const atlantaPickupLocations = [
   {
     id: 'main-location',
     name: 'Atlanta Main Location',
-    address: 'TBD - Partner Address', // Update with actual address
+    address: 'Atlanta, GA 30316', // Update with actual address when available
     hours: 'Mon-Fri: 11am-8pm, Sat-Sun: 12pm-9pm',
-    phone: '+1-XXX-XXX-XXXX',
+    phone: '+1-XXX-XXX-XXXX', // Update with partner's phone
   },
   // Add more pickup locations as needed
 ]
