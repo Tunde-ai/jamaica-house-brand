@@ -39,7 +39,7 @@ function NoApiKeyFallback() {
             What Our Customers Say
           </h2>
         </div>
-        <p className="text-gray-400 mb-8">148 five-star reviews on Google</p>
+        <p className="text-gray-400 mb-8">Over 200 five-star reviews on Google</p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a
             href={`https://search.google.com/local/reviews?placeid=${GOOGLE_PLACE_ID}`}
@@ -48,7 +48,7 @@ function NoApiKeyFallback() {
             className="inline-flex items-center gap-2 bg-white/10 border border-brand-gold/20 text-white px-6 py-3 rounded-lg hover:bg-white/15 transition-colors font-medium"
           >
             <GoogleIcon />
-            Read Our 148 Reviews on Google
+            Read Our Reviews on Google
             <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>

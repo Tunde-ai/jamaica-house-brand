@@ -51,7 +51,7 @@ export async function fetchGoogleReviews(): Promise<PlaceDetails | null> {
     return {
       name: place.name || 'Jamaica House Brand',
       rating: place.rating || 5,
-      totalReviews: place.user_ratings_total || 148,
+      totalReviews: place.user_ratings_total || 200,
       url: place.url || `https://www.google.com/maps/place/?q=place_id:${PLACE_ID}`,
       reviews: (place.reviews || []).map((r: Record<string, unknown>) => ({
         authorName: r.author_name as string,
