@@ -3,6 +3,7 @@ import CateringHero from '@/components/catering/CateringHero'
 import CateringMenu from '@/components/catering/CateringMenu'
 import PricingTable from '@/components/catering/PricingTable'
 import CateringQuoteForm from '@/components/catering/CateringQuoteForm'
+import CateringLocationSelector from '@/components/catering/CateringLocationSelector'
 
 export const metadata: Metadata = {
   title: 'Catering Services',
@@ -19,9 +20,12 @@ export default function CateringServicesPage() {
   return (
     <main className="bg-brand-dark">
       <CateringHero />
-      <CateringMenu />
-      <PricingTable />
-      <CateringQuoteForm />
+      <CateringLocationSelector />
+      <div id="traditional-catering">
+        <CateringMenu />
+        <PricingTable />
+        <CateringQuoteForm />
+      </div>
     </main>
   )
 }

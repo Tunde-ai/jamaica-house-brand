@@ -43,7 +43,7 @@ export const locationConfigs: Record<ServiceLocation, LocationConfig> = {
     deliveryFee: atlantaServiceArea.deliveryFee,
     minimumOrder: atlantaServiceArea.minimumOrder,
     menuType: 'street-series',
-    menuPath: '/atlanta-street-series',
+    menuPath: '/catering-services/atlanta-street-series',
     isActive: true,
     partnerInfo: atlantaServiceArea.partnerInfo,
   },

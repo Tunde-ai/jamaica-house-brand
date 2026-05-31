@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
       },
       customer_email: orderData.email,
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/atlanta-street-series`,
+      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/catering-services/atlanta-street-series`,
       automatic_tax: {
         enabled: true,
       },

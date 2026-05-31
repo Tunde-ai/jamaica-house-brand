@@ -11,8 +11,9 @@ export default function LocationServiceBanner() {
 
   // Determine current location based on path
   const getCurrentLocation = () => {
-    if (pathname.includes('atlanta')) return 'atlanta'
-    if (pathname.includes('catering')) return 'south-florida'
+    if (pathname.includes('atlanta-street-series')) return 'atlanta'
+    if (pathname.includes('catering-menu')) return 'south-florida'
+    if (pathname.includes('catering-services')) return 'south-florida'
     return null
   }
 

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
   },
   alternates: {
-    canonical: 'https://jamaicahousebrand.com/atlanta-street-series',
+    canonical: 'https://jamaicahousebrand.com/catering-services/atlanta-street-series',
   },
 }
 
