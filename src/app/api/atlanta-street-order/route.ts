@@ -3,9 +3,9 @@ import { Resend } from 'resend'
 import Stripe from 'stripe'
 import { atlantaServiceArea } from '@/data/atlanta-street-series'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia',
+  apiVersion: '2026-01-28.clover',
 })
 
 interface OrderItem {
@@ -103,13 +103,17 @@ export async function POST(request: NextRequest) {
 
     // Send notification email to Atlanta partner (don't wait for payment completion for this initial notification)
     try {
-      await sendPartnerNotification({
-        orderData,
-        cart,
-        pricing,
-        sessionId: session.id,
-        paymentStatus: 'pending'
-      })
+      if (resend) {
+        await sendPartnerNotification({
+          orderData,
+          cart,
+          pricing,
+          sessionId: session.id,
+          paymentStatus: 'pending'
+        })
+      } else {
+        console.log('Resend API key not configured - email notification skipped')
+      }
     } catch (emailError) {
       console.error('Failed to send partner notification:', emailError)
       // Don't fail the order creation if email fails
@@ -236,6 +240,10 @@ async function sendPartnerNotification({
       </div>
     </div>
   `
+
+  if (!resend) {
+    throw new Error('Email service not configured')
+  }
 
   await resend.emails.send({
     from: 'Jamaica House Brand <orders@jamaicahousebrand.com>',
