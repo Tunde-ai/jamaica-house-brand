@@ -5,6 +5,7 @@ import TrayMenuPricing from '@/components/catering-menu/TrayMenuPricing'
 import GroupSizeCalculator from '@/components/catering-menu/GroupSizeCalculator'
 import DeliveryInfo from '@/components/catering-menu/DeliveryInfo'
 import CateringMenuQuoteForm from '@/components/catering-menu/CateringMenuQuoteForm'
+import LocationServiceBanner from '@/components/catering/LocationServiceBanner'
 
 export const metadata: Metadata = {
   title: 'Catering Menu - Order by the Tray',
@@ -28,6 +29,7 @@ export default async function CateringMenuPage({ searchParams }: PageProps) {
   const params = await searchParams
   return (
     <main className="bg-brand-dark">
+      <LocationServiceBanner />
       <CateringMenuHero />
 
       {/* Quote Confirmation Banner */}
