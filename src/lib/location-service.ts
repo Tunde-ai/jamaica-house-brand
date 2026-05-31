@@ -9,7 +9,7 @@ export interface LocationConfig {
   zipCode: string
   radius: number
   deliveryFee: number
-  minimumOrder: number
+  minimumOrder: number | { pickup: number; delivery: number }
   menuType: 'traditional' | 'tray' | 'street-series'
   menuPath: string
   isActive: boolean
@@ -116,9 +116,21 @@ export async function getAvailableLocations(zipCode: string): Promise<LocationCo
 }
 
 // Validate minimum order for location
-export function validateMinimumOrder(orderTotal: number, location: ServiceLocation): boolean {
+export function validateMinimumOrder(orderTotal: number, location: ServiceLocation, deliveryMethod: 'pickup' | 'delivery' = 'pickup'): boolean {
   const config = locationConfigs[location]
-  return orderTotal >= config.minimumOrder
+
+  if (location === 'atlanta') {
+    const minimumOrder = typeof config.minimumOrder === 'object'
+      ? config.minimumOrder[deliveryMethod]
+      : config.minimumOrder
+    return orderTotal >= minimumOrder
+  }
+
+  // For other locations that still use simple number
+  const minimumOrder = typeof config.minimumOrder === 'object'
+    ? config.minimumOrder.delivery
+    : config.minimumOrder
+  return orderTotal >= minimumOrder
 }
 
 // Get partner notification info

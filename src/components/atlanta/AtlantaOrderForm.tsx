@@ -16,6 +16,7 @@ interface OrderFormProps {
   cart: OrderItem[]
   total: number
   onClose: () => void
+  initialDeliveryMethod?: 'pickup' | 'delivery'
 }
 
 interface FormData {
@@ -30,14 +31,14 @@ interface FormData {
   notes: string
 }
 
-export default function AtlantaOrderForm({ cart, total, onClose }: OrderFormProps) {
+export default function AtlantaOrderForm({ cart, total, onClose, initialDeliveryMethod = 'pickup' }: OrderFormProps) {
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
     phone: '',
     orderDate: '',
     orderTime: '',
-    deliveryMethod: 'pickup',
+    deliveryMethod: initialDeliveryMethod,
     zipCode: '',
     address: '',
     notes: '',

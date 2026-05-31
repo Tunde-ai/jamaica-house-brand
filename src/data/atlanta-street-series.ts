@@ -3,7 +3,8 @@ export interface StreetSeriesItem {
   name: string
   description: string
   price: number
-  sides: string[]
+  requiredSides?: number // How many sides to choose (0 = no sides, 1+ = must choose)
+  maxSides?: number // Maximum sides allowed
   image?: string
   spiceLevel?: 'mild' | 'medium' | 'hot'
   popular?: boolean
@@ -19,7 +20,10 @@ export interface AtlantaServiceArea {
   zipCode: string
   radius: number // miles
   deliveryFee: number
-  minimumOrder: number
+  minimumOrder: {
+    pickup: number
+    delivery: number
+  }
   partnerInfo: {
     name: string
     phone: string
@@ -37,36 +41,43 @@ export const atlantaStreetSeriesMenu: StreetSeriesCategory[] = [
       {
         id: 'jerk-chicken',
         name: 'Jerk Chicken',
-        description: 'Authentic jerk chicken served with mac & cheese',
+        description: 'Authentic jerk chicken plate - choose your sides',
         price: 15,
-        sides: ['Mac & Cheese'],
+        requiredSides: 1,
+        maxSides: 2,
         spiceLevel: 'medium',
         popular: true,
+        image: '/images/recipes/authentic-jerk-chicken.jpg',
       },
       {
         id: 'pork-ribs',
         name: 'Pork Ribs',
-        description: 'Tender pork ribs - meal plate',
+        description: 'Tender pork ribs - choose your sides',
         price: 18,
-        sides: ['Choice of 2 sides'],
+        requiredSides: 1,
+        maxSides: 2,
         spiceLevel: 'mild',
+        image: '/images/recipes/jerk-chicken-wings.jpg',
       },
       {
         id: 'jerk-sausage',
         name: 'Jerk Sausage',
-        description: 'Spiced jerk sausage - pork plate',
+        description: 'Spiced jerk sausage plate - choose your sides',
         price: 17,
-        sides: ['Choice of 2 sides'],
+        requiredSides: 1,
+        maxSides: 2,
         spiceLevel: 'hot',
       },
       {
         id: 'bbq-short-ribs',
         name: 'BBQ Short Ribs',
-        description: 'BBQ short ribs with Jamaican hot sauce',
+        description: 'BBQ short ribs with Jamaican hot sauce - choose your sides',
         price: 22,
-        sides: ['Jamaican Hot Plate'],
+        requiredSides: 1,
+        maxSides: 2,
         spiceLevel: 'hot',
         popular: true,
+        image: '/images/recipes/jerk-salmon-rice-peas.jpg',
       },
     ],
   },
@@ -77,18 +88,22 @@ export const atlantaStreetSeriesMenu: StreetSeriesCategory[] = [
       {
         id: 'ribeye-steak',
         name: 'Ribeye Steak',
-        description: 'Grilled ribeye with choice of sides',
+        description: 'Grilled ribeye with your choice of sides',
         price: 28,
-        sides: ['Mac & Cheese', 'Green Mac'],
+        requiredSides: 2,
+        maxSides: 3,
         spiceLevel: 'mild',
+        image: '/images/recipes/pikliz-burger.jpg',
       },
       {
         id: 'ny-strip',
         name: 'NY Strip Steak',
         description: 'New York strip with signature seasoning',
         price: 26,
-        sides: ['Mac & Cheese', 'Green Mac'],
+        requiredSides: 2,
+        maxSides: 3,
         spiceLevel: 'mild',
+        image: '/images/recipes/escovitch-fish.jpg',
       },
     ],
   },
@@ -99,7 +114,10 @@ export const atlantaServiceArea: AtlantaServiceArea = {
   zipCode: '30316', // Partner's ZIP code
   radius: 30,
   deliveryFee: 15,
-  minimumOrder: 50,
+  minimumOrder: {
+    pickup: 15, // Much lower minimum for pickup - just one plate
+    delivery: 30, // Reasonable minimum for delivery to cover costs
+  },
   partnerInfo: {
     name: 'Atlanta Partner', // Update with actual name
     phone: '+1-XXX-XXX-XXXX', // Update with actual phone
