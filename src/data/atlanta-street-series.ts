@@ -47,7 +47,7 @@ export const atlantaStreetSeriesMenu: StreetSeriesCategory[] = [
         maxSides: 2,
         spiceLevel: 'medium',
         popular: true,
-        image: '/images/atlanta-menu-items/jerk-chicken.jpg',
+        image: '/images/atlanta-menu-items/jerk-chicken.png',
       },
       {
         id: 'pork-ribs',
@@ -57,7 +57,7 @@ export const atlantaStreetSeriesMenu: StreetSeriesCategory[] = [
         requiredSides: 1,
         maxSides: 2,
         spiceLevel: 'mild',
-        image: '/images/atlanta-menu-items/pork-ribs.jpg',
+        image: '/images/atlanta-menu-items/pork-ribs.png',
       },
       {
         id: 'jerk-sausage',
@@ -67,7 +67,7 @@ export const atlantaStreetSeriesMenu: StreetSeriesCategory[] = [
         requiredSides: 1,
         maxSides: 2,
         spiceLevel: 'hot',
-        image: '/images/atlanta-menu-items/jerk-sausage.jpg',
+        image: '/images/atlanta-menu-items/jerk-sausage.png',
       },
       {
         id: 'beef-short-ribs',
@@ -78,7 +78,7 @@ export const atlantaStreetSeriesMenu: StreetSeriesCategory[] = [
         maxSides: 2,
         spiceLevel: 'hot',
         popular: true,
-        image: '/images/atlanta-menu-items/beef-short-ribs.jpg',
+        image: '/images/atlanta-menu-items/beef-short-ribs.png',
       },
     ],
   },
@@ -94,7 +94,7 @@ export const atlantaStreetSeriesMenu: StreetSeriesCategory[] = [
         requiredSides: 2,
         maxSides: 3,
         spiceLevel: 'mild',
-        image: '/images/atlanta-menu-items/ribeye.jpg',
+        image: '/images/atlanta-menu-items/ribeye.png',
       },
       {
         id: 'ny-strip',
@@ -104,7 +104,7 @@ export const atlantaStreetSeriesMenu: StreetSeriesCategory[] = [
         requiredSides: 2,
         maxSides: 3,
         spiceLevel: 'mild',
-        image: '/images/atlanta-menu-items/ny-strip.jpg',
+        image: '/images/atlanta-menu-items/ny-strip.png',
       },
     ],
   },

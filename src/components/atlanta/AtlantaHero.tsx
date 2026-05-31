@@ -9,7 +9,7 @@ export default function AtlantaHero() {
         <div
           className="w-full h-full bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: 'url(/images/jerk-chicken-plate.jpg)', // Add actual image
+            backgroundImage: 'url(/images/atlanta-street-series-banner.png)',
             backgroundPosition: 'center center',
           }}
         />
@@ -69,7 +69,7 @@ export default function AtlantaHero() {
             <div className="text-white">Delivery Fee</div>
           </div>
           <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4 border border-brand-gold/20">
-            <div className="text-2xl font-bold text-brand-gold">$50</div>
+            <div className="text-2xl font-bold text-brand-gold">$15+</div>
             <div className="text-white">Minimum Order</div>
           </div>
         </div>
