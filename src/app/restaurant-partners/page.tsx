@@ -47,8 +47,9 @@ export default function RestaurantPartnersPage() {
             <p className="text-brand-gold font-semibold text-sm uppercase tracking-wider mb-2">Back of House</p>
             <h2 className="text-3xl font-bold mb-1">Kitchen</h2>
             <p className="text-4xl font-extrabold text-brand-gold mb-6">
-              1 Gallon = $50 <span className="text-base font-normal text-white/60">(intro)</span>
+              1 Gallon = $65 <span className="text-base font-normal text-white/60">(intro)</span>
             </p>
+            <p className="text-sm text-brand-gold font-semibold mb-4">✓ Includes Free Shipping</p>
             <ul className="space-y-3 text-white/90">
               <li className="flex items-start gap-2">
                 <span className="text-brand-gold mt-0.5">→</span>
@@ -70,8 +71,9 @@ export default function RestaurantPartnersPage() {
             <p className="font-semibold text-sm uppercase tracking-wider mb-2 text-brand-dark/70">Front of House</p>
             <h2 className="text-3xl font-bold mb-1">Table</h2>
             <p className="text-4xl font-extrabold mb-6">
-              Case 12×5oz = $60
+              Case 12×5oz = $75
             </p>
+            <p className="text-sm font-semibold mb-4 text-brand-dark/70">✓ Includes Free Shipping</p>
             <ul className="space-y-3 text-brand-dark/90">
               <li className="flex items-start gap-2">
                 <span className="mt-0.5">→</span>
