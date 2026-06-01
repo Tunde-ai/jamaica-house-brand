@@ -94,9 +94,9 @@ async function sendEmails(body: OrderPayload) {
     },
   })
 
-  const gallonTotal = (body.qtyGallon || 0) * 50
-  const caseTotal = (body.qtyCase || 0) * 60
-  const escovitchTotal = (body.qtyEscovitch || 0) * 72
+  const gallonTotal = (body.qtyGallon || 0) * 65
+  const caseTotal = (body.qtyCase || 0) * 75
+  const escovitchTotal = (body.qtyEscovitch || 0) * 75
   const orderTotal = gallonTotal + caseTotal + escovitchTotal
   const firstName = body.contactName.trim().split(' ')[0]
 
@@ -122,9 +122,9 @@ Delivery: ${body.requestedDate || 'Not specified'}
 ORDER DETAILS
 ─────────────────────────────────────────
 Product                              Qty    Total
-${body.qtyGallon > 0 ? `Jerk Sauce · 1 Gallon ($50 ea)       ${body.qtyGallon}      $${gallonTotal.toFixed(2)}` : ''}
-${body.qtyCase > 0 ? `Jerk Sauce · 5oz Case ($60 ea)        ${body.qtyCase}      $${caseTotal.toFixed(2)}` : ''}
-${body.qtyEscovitch > 0 ? `Escovitch / Pikliz · 12oz Case ($72 ea)  ${body.qtyEscovitch}      $${escovitchTotal.toFixed(2)}` : ''}
+${body.qtyGallon > 0 ? `Jerk Sauce · 1 Gallon ($65 ea)       ${body.qtyGallon}      $${gallonTotal.toFixed(2)}` : ''}
+${body.qtyCase > 0 ? `Jerk Sauce · 5oz Case ($75 ea)        ${body.qtyCase}      $${caseTotal.toFixed(2)}` : ''}
+${body.qtyEscovitch > 0 ? `Escovitch / Pikliz · 12oz Case ($75 ea)  ${body.qtyEscovitch}      $${escovitchTotal.toFixed(2)}` : ''}
 ─────────────────────────────────────────
 ORDER TOTAL:                                 $${orderTotal.toFixed(2)}
 
@@ -147,15 +147,29 @@ Thanks so much for reaching out about a wholesale partnership with Jamaica House
 
 YOUR ORDER REQUEST
 ──────────────────
-${body.qtyGallon > 0 ? `Jerk Sauce · 1 Gallon ($50 ea)  ×${body.qtyGallon}  $${gallonTotal.toFixed(2)}` : ''}
-${body.qtyCase > 0 ? `Jerk Sauce · 5oz Case ($60 ea)  ×${body.qtyCase}  $${caseTotal.toFixed(2)}` : ''}
-${body.qtyEscovitch > 0 ? `Escovitch / Pikliz · 12oz Case ($72 ea)  ×${body.qtyEscovitch}  $${escovitchTotal.toFixed(2)}` : ''}
+${body.qtyGallon > 0 ? `Jerk Sauce · 1 Gallon ($65 ea)  ×${body.qtyGallon}  $${gallonTotal.toFixed(2)}` : ''}
+${body.qtyCase > 0 ? `Jerk Sauce · 5oz Case ($75 ea)  ×${body.qtyCase}  $${caseTotal.toFixed(2)}` : ''}
+${body.qtyEscovitch > 0 ? `Escovitch / Pikliz · 12oz Case ($75 ea)  ×${body.qtyEscovitch}  $${escovitchTotal.toFixed(2)}` : ''}
 
 Estimated Total: $${orderTotal.toFixed(2)}
 
 WHAT HAPPENS NEXT
 ─────────────────
 I'll personally call or email you within 24 hours to confirm pricing, answer any questions, and lock in your delivery date. If you need anything sooner, feel free to text or call me directly at 786-709-1027.
+
+${body.paymentMethod === 'Zelle' ? `
+ZELLE PAYMENT INSTRUCTIONS
+─────────────────────────
+For Zelle payments, please send to:
+📧 Email: olatunde@jamaicahousebrand.com
+📱 Phone: 786-709-1027
+
+In the Zelle memo, include:
+• Your business name: ${body.businessName}
+• Order total: $${orderTotal.toFixed(2)}
+
+We'll confirm receipt and schedule your delivery once payment is received.
+` : ''}
 
 Looking forward to bringing the island to your kitchen.
 
@@ -206,7 +220,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email is required.' }, { status: 400 })
     }
 
-    const orderTotal = ((body.qtyGallon || 0) * 50) + ((body.qtyCase || 0) * 60) + ((body.qtyEscovitch || 0) * 72)
+    const orderTotal = ((body.qtyGallon || 0) * 65) + ((body.qtyCase || 0) * 75) + ((body.qtyEscovitch || 0) * 75)
     if (orderTotal === 0) {
       return NextResponse.json({ error: 'Please add at least one product.' }, { status: 400 })
     }
