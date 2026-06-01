@@ -22,7 +22,7 @@ export default function RestaurantOrderForm() {
   const [qtyGallon, setQtyGallon] = useState(0)
   const [qtyCase, setQtyCase] = useState(0)
   const [qtyEscovitch, setQtyEscovitch] = useState(0)
-  const [paymentMethod, setPaymentMethod] = useState('Cash')
+  const [paymentMethod, setPaymentMethod] = useState('Credit Card')
   const [notes, setNotes] = useState('')
   const [taxCertFile, setTaxCertFile] = useState<File | null>(null)
 
@@ -337,9 +337,12 @@ export default function RestaurantOrderForm() {
 
       {/* Payment method */}
       <div>
-        <label className={labelClass}>Payment Method</label>
+        <label className={labelClass}>Preferred Payment Method</label>
+        <p className="text-gray-500 text-xs mb-3">
+          Credit card is preferred for fastest processing. We'll send a secure payment link after order confirmation.
+        </p>
         <div className="flex flex-wrap gap-3">
-          {['Cash', 'Zelle', 'Check', 'Credit Card'].map((method) => (
+          {['Credit Card', 'Check', 'Cash'].map((method) => (
             <button
               key={method}
               type="button"

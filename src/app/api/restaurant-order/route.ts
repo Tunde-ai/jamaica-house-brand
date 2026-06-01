@@ -157,18 +157,10 @@ WHAT HAPPENS NEXT
 ─────────────────
 I'll personally call or email you within 24 hours to confirm pricing, answer any questions, and lock in your delivery date. If you need anything sooner, feel free to text or call me directly at 786-709-1027.
 
-${body.paymentMethod === 'Zelle' ? `
-ZELLE PAYMENT INSTRUCTIONS
-─────────────────────────
-For Zelle payments, please send to:
-📧 Email: olatunde@jamaicahousebrand.com
-📱 Phone: 786-709-1027
-
-In the Zelle memo, include:
-• Your business name: ${body.businessName}
-• Order total: $${orderTotal.toFixed(2)}
-
-We'll confirm receipt and schedule your delivery once payment is received.
+${body.paymentMethod === 'Credit Card' ? `
+PAYMENT PROCESSING
+─────────────────
+We'll send you a secure payment link via email to process your credit card payment. No need to provide card details over the phone - everything is handled securely online.
 ` : ''}
 
 Looking forward to bringing the island to your kitchen.
