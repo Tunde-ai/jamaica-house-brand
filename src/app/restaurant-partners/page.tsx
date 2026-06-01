@@ -119,7 +119,7 @@ export default function RestaurantPartnersPage() {
             <p className="text-brand-gold font-semibold text-sm uppercase tracking-wider mb-2">Caribbean Probiotic</p>
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">Escovitch Picklez</h2>
             <p className="text-4xl font-extrabold text-brand-gold mb-2">
-              Case 12×12oz = $87 <span className="text-base font-normal text-white/80">includes shipping</span>
+              Case 12×12oz = $75 <span className="text-base font-normal text-white/80">includes shipping</span>
             </p>
             <p className="text-white/90 max-w-2xl mx-auto">
               Traditional Caribbean fermented vegetables — the perfect probiotic condiment for gut health and authentic flavor.

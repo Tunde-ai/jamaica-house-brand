@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 const GALLON_PRICE = 65
 const CASE_PRICE = 75
-const ESCOVITCH_PRICE = 87
+const ESCOVITCH_PRICE = 75
 
 type FormStatus = 'idle' | 'submitting' | 'success' | 'error'
 
@@ -291,7 +291,7 @@ export default function RestaurantOrderForm() {
               <p className="text-white text-sm font-medium">Escovitch / Pikliz</p>
               <p className="text-gray-500 text-xs">Case of 12 × 12oz bottles</p>
             </div>
-            <p className="text-brand-gold text-sm sm:text-right font-semibold">$87.00/case</p>
+            <p className="text-brand-gold text-sm sm:text-right font-semibold">$75.00/case</p>
             <div className="flex items-center sm:justify-center gap-2">
               <button
                 type="button"
