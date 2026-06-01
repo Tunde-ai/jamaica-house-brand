@@ -112,6 +112,93 @@ export default function RestaurantPartnersPage() {
         </div>
       </section>
 
+      {/* Escovitch Picklez Section */}
+      <section className="max-w-6xl mx-auto px-4 py-12 sm:py-16">
+        <div className="rounded-2xl bg-gradient-to-r from-brand-green to-brand-green/80 p-8 sm:p-12 text-white">
+          <div className="text-center mb-8">
+            <p className="text-brand-gold font-semibold text-sm uppercase tracking-wider mb-2">Caribbean Probiotic</p>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Escovitch Picklez</h2>
+            <p className="text-4xl font-extrabold text-brand-gold mb-2">
+              Case 12×12oz = $87 <span className="text-base font-normal text-white/80">includes shipping</span>
+            </p>
+            <p className="text-white/90 max-w-2xl mx-auto">
+              Traditional Caribbean fermented vegetables — the perfect probiotic condiment for gut health and authentic flavor.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Ingredients & Benefits */}
+            <div>
+              <h3 className="text-xl font-bold text-brand-gold mb-4">What&apos;s Inside</h3>
+              <ul className="space-y-3 text-white/90">
+                <li className="flex items-start gap-2">
+                  <span className="text-brand-gold mt-0.5">🥕</span>
+                  <strong>Carrots:</strong> Natural sweetness and beta-carotene
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-brand-gold mt-0.5">🥬</span>
+                  <strong>Cabbage:</strong> Crunchy texture and vitamin C
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-brand-gold mt-0.5">🌶️</span>
+                  <strong>Scotch Bonnet Peppers:</strong> Authentic Caribbean heat
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-brand-gold mt-0.5">🍋</span>
+                  <strong>Vinegar-Fermented:</strong> Natural preservation & probiotics
+                </li>
+              </ul>
+            </div>
+
+            {/* Restaurant Benefits */}
+            <div>
+              <h3 className="text-xl font-bold text-brand-gold mb-4">Restaurant Benefits</h3>
+              <ul className="space-y-3 text-white/90">
+                <li className="flex items-start gap-2">
+                  <span className="text-brand-gold mt-0.5">🦠</span>
+                  <strong>Excellent Probiotic:</strong> Live cultures for gut health
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-brand-gold mt-0.5">🥘</span>
+                  <strong>Cuts Rich Dishes:</strong> Acidity balances heavy foods
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-brand-gold mt-0.5">📦</span>
+                  <strong>Shelf-Stable:</strong> Long-lasting refrigerated storage
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-brand-gold mt-0.5">🌟</span>
+                  <strong>Authentic Caribbean:</strong> Traditional Escovitch recipe
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Usage Ideas */}
+          <div className="mt-8 p-6 bg-black/20 rounded-lg">
+            <h4 className="text-lg font-bold text-brand-gold mb-3">Perfect With:</h4>
+            <div className="flex flex-wrap gap-2">
+              {[
+                'Fried Fish',
+                'Jerk Chicken',
+                'Rice & Peas',
+                'Curry Dishes',
+                'Grilled Meats',
+                'Tacos & Wraps',
+                'Caribbean Platters'
+              ].map((dish) => (
+                <span
+                  key={dish}
+                  className="px-3 py-1.5 rounded-full bg-brand-gold/20 text-brand-gold text-sm font-medium"
+                >
+                  {dish}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Order Form */}
       <section className="max-w-4xl mx-auto px-4 pb-16 sm:pb-24">
         <div className="rounded-2xl border border-brand-gold/20 bg-brand-dark p-6 sm:p-10">
