@@ -235,7 +235,8 @@ export async function POST(request: NextRequest) {
       const ccUrl = process.env.COMMAND_CENTER_WEBHOOK_URL?.replace('/incoming-order', '/incoming-lead')
       const ccKey = process.env.COMMAND_CENTER_WEBHOOK_API_KEY
       if (ccUrl && ccKey) {
-        await fetch(ccUrl, {
+        console.log('[restaurant-order] Attempting Command Center sync...')
+        const response = await fetch(ccUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -256,6 +257,14 @@ export async function POST(request: NextRequest) {
             taxCertFileName: body.taxCertFileName,
           }),
         })
+
+        if (!response.ok) {
+          console.error('[restaurant-order] Command Center responded with:', response.status, await response.text())
+        } else {
+          console.log('[restaurant-order] Command Center sync successful')
+        }
+      } else {
+        console.log('[restaurant-order] Command Center webhook not configured')
       }
     } catch (ccError) {
       console.error('[restaurant-order] Command Center lead sync failed:', ccError)
