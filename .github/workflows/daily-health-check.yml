@@ -3,6 +3,10 @@
 
 name: Daily Health Check
 
+permissions:
+  issues: write
+    contents: read
+
 on:
   schedule:
     # Run at 9:00 AM EST (2:00 PM UTC) every day
@@ -36,7 +40,7 @@ jobs:
 
       - name: Notify on failure
         if: failure()
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             github.rest.issues.create({
