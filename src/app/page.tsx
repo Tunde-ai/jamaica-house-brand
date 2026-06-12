@@ -44,7 +44,7 @@ const homepageFAQs = [
   },
   {
     question: 'What is Escovitch Pikliz?',
-    answer: 'Our Escovitch Pikliz is a spicy Jamaican pickled vegetable relish made with habanero peppers, carrots, onions, and vinegar. It\'s the perfect accompaniment to jerk chicken, grilled meats, and seafood.',
+    answer: 'Our Escovitch Pikliz is a spicy Jamaican pickled vegetable relish made with cabbage, carrots, scotch bonnet peppers, and vinegar. It\'s the perfect accompaniment to jerk chicken, grilled meats, and seafood.',
   },
   {
     question: 'Can I visit your restaurants?',

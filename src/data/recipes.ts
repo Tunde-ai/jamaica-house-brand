@@ -29,7 +29,7 @@ export const recipes: Recipe[] = [
       { step: 3, text: 'Grill chicken for 6-8 minutes per side, or until internal temperature reaches 165°F and skin is charred.' },
       { step: 4, text: 'Remove from grill and let rest for 5 minutes before serving.' },
     ],
-    featuredProducts: ['jerk-sauce-5oz'],
+    featuredProducts: ['jerk-sauce-5oz', 'escovitch-pikliz-12oz'],
     tags: ['chicken', 'jerk', 'grilled', 'jamaican', 'main-dish'],
   },
   {
@@ -62,7 +62,7 @@ export const recipes: Recipe[] = [
       { step: 3, text: 'Heat a large skillet over medium-high heat. Cook shrimp for 2-3 minutes per side until pink and cooked through.' },
       { step: 4, text: 'Warm tortillas and fill with jerk shrimp. Top with mango salsa and serve with lime wedges.' },
     ],
-    featuredProducts: ['jerk-sauce-2oz'],
+    featuredProducts: ['jerk-sauce-2oz', 'escovitch-pikliz-12oz'],
     tags: ['shrimp', 'tacos', 'jerk', 'fusion', 'quick', 'easy'],
   },
   {
@@ -97,7 +97,7 @@ export const recipes: Recipe[] = [
       { step: 4, text: 'Brush salmon with more jerk sauce during the last minute of cooking.' },
       { step: 5, text: 'Serve salmon over rice and peas.' },
     ],
-    featuredProducts: ['jerk-sauce-5oz'],
+    featuredProducts: ['jerk-sauce-5oz', 'escovitch-pikliz-12oz'],
     tags: ['salmon', 'rice-and-peas', 'jerk', 'healthy', 'jamaican'],
   },
   {
@@ -160,7 +160,7 @@ export const recipes: Recipe[] = [
       { step: 3, text: 'Arrange wings on baking sheet and bake for 40 minutes, flipping halfway through, until crispy.' },
       { step: 4, text: 'Toss hot wings with Jamaica House Brand Jerk Sauce and serve immediately.' },
     ],
-    featuredProducts: ['jerk-sauce-10oz'],
+    featuredProducts: ['jerk-sauce-10oz', 'escovitch-pikliz-12oz'],
     tags: ['wings', 'chicken', 'jerk', 'appetizer', 'party', 'baked'],
   },
   {

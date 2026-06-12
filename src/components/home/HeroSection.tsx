@@ -3,7 +3,7 @@ import Image from 'next/image'
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-[80vh] flex items-center overflow-hidden">
+    <section className="relative min-h-[80vh] flex items-center overflow-hidden isolate bg-black z-10">
       {/* Background lifestyle photo */}
       <Image
         src="/images/story/hero.jpg"
@@ -11,13 +11,13 @@ export default function HeroSection() {
         fill
         priority
         sizes="100vw"
-        className="object-cover"
+        className="object-cover z-0"
       />
       {/* Dark gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/30" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/30 z-[1]" />
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <div className="relative z-[2] max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left — Text */}
           <div>
@@ -59,23 +59,6 @@ export default function HeroSection() {
               </Link>
             </div>
 
-            {/* Floating Catering CTA */}
-            <div className="absolute bottom-8 right-8 hidden lg:block">
-              <Link
-                href="/catering-menu"
-                className="bg-brand-gold text-brand-dark font-bold px-6 py-3 rounded-full hover:bg-brand-gold-light transition-all duration-300 shadow-2xl hover:scale-105 flex items-center gap-2 group"
-              >
-                <span>Order by the Tray</span>
-                <svg
-                  className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </Link>
-            </div>
           </div>
 
           {/* Right — Product group shot (desktop only) */}

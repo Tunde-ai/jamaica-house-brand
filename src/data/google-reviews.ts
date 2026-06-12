@@ -60,7 +60,7 @@ export const googleReviews: GoogleReview[] = [
 export const googleBusinessInfo = {
   placeId: 'ChIJmca2LsTZCUgRHUn8HZt5nUw',
   averageRating: 4.9,
-  totalReviews: 24,
+  totalReviews: 200,
   businessName: 'Jamaica House Brand',
   locations: [
     { name: 'Miami (The Original)', address: '19555 NW 2nd Ave, Miami, FL 33169' },

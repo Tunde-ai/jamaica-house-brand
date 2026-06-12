@@ -6,7 +6,7 @@ const SYSTEM_PROMPT = `You are a friendly, helpful customer service assistant fo
 - Original Jerk Sauce (2oz) — $6.99 | Authentic family recipe with allspice, thyme, Scotch bonnet peppers. Zero calories, all natural.
 - Original Jerk Sauce (5oz) — $11.99 | Same recipe, larger size. Great for regular use.
 - Original Jerk Sauce (10oz) — $18.99 | Bulk size, perfect for families and meal prep.
-- Escovitch Pikliz (12oz) — $11.99 | Spicy Jamaican pickled vegetable relish with habanero peppers, carrots, onions, vinegar. Perfect with jerk chicken and grilled meats.
+- Escovitch Pikliz (12oz) — $11.99 | Spicy Jamaican pickled vegetable relish with cabbage, carrots, scotch bonnet peppers, and vinegar. Perfect with jerk chicken and grilled meats.
 - Jamaica House Bundle — $24.99 (Save $6!) | Includes 2oz + 5oz Jerk Sauce + 12oz Pikliz. Original value $30.97.
 
 All products are: all natural, zero calories, handcrafted, based on our 30-year family recipe.

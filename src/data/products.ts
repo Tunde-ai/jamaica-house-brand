@@ -52,7 +52,7 @@ export const products: Product[] = [
   {
     id: 'escovitch-pikliz-12oz',
     name: 'Escovitch Pikliz',
-    description: 'Spicy Jamaican pickled vegetable relish with habanero peppers, carrots, onions, and vinegar. Perfect accompaniment to jerk chicken and grilled meats.',
+    description: 'Spicy Jamaican pickled vegetable relish with cabbage, carrots, scotch bonnet peppers, and vinegar. Perfect accompaniment to jerk chicken and grilled meats.',
     price: 1199, // $11.99 in cents
     size: '12oz',
     image: '/images/products/pikliz-12oz.jpg',

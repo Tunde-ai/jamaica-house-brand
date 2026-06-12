@@ -329,6 +329,179 @@ async function sendCateringDepositNotification(
   console.log('[stripe-webhook] Catering deposit notification sent')
 }
 
+async function handleWholesaleOrder(session: Stripe.Checkout.Session) {
+  console.log('[stripe-webhook] Processing wholesale order:', session.id)
+
+  const meta = session.metadata || {}
+  const total = session.amount_total ? `$${(session.amount_total / 100).toFixed(2)}` : 'N/A'
+  const businessName = meta.business_name || 'Unknown Business'
+  const contactName = meta.contact_name || 'Unknown'
+  const phone = meta.phone || ''
+  const email = session.customer_details?.email || ''
+  const deliveryMethod = meta.delivery_method || 'local'
+  const deliveryAddress = meta.delivery_address || ''
+  const requestedDate = meta.requested_date || ''
+  const notes = meta.notes || ''
+  const qtyGallon = parseInt(meta.qty_gallon || '0')
+  const qtyCase = parseInt(meta.qty_case || '0')
+  const qtyEscovitch = parseInt(meta.qty_escovitch || '0')
+
+  const lineItems: string[] = []
+  if (qtyGallon > 0) lineItems.push(`${qtyGallon}× Gallon`)
+  if (qtyCase > 0) lineItems.push(`${qtyCase}× 5oz Case`)
+  if (qtyEscovitch > 0) lineItems.push(`${qtyEscovitch}× Pikliz Case`)
+
+  const deliveryLabel = deliveryMethod === 'local' ? 'Local Delivery (Free)'
+    : deliveryMethod === 'pickup' ? `Pickup — ${deliveryAddress}`
+    : `Shipping to ${deliveryAddress}`
+
+  // 1. Slack notification
+  const slackUrl = process.env.SLACK_WEBHOOK_URL
+  if (slackUrl) {
+    try {
+      await fetch(slackUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          blocks: [
+            {
+              type: 'header',
+              text: { type: 'plain_text', text: `🌶️ WHOLESALE ORDER PAID — ${total}` },
+            },
+            {
+              type: 'section',
+              fields: [
+                { type: 'mrkdwn', text: `*Business:*\n${businessName}` },
+                { type: 'mrkdwn', text: `*Contact:*\n${contactName}` },
+                { type: 'mrkdwn', text: `*Phone:*\n<tel:${phone}|${phone}>` },
+                { type: 'mrkdwn', text: `*Email:*\n<mailto:${email}|${email}>` },
+              ],
+            },
+            {
+              type: 'section',
+              text: {
+                type: 'mrkdwn',
+                text: `*Order:* ${lineItems.join(' · ')}\n*Delivery:* ${deliveryLabel}\n*Requested Date:* ${requestedDate || 'Not specified'}\n*Total Paid:* ${total}`,
+              },
+            },
+            ...(notes ? [{
+              type: 'section' as const,
+              text: { type: 'mrkdwn' as const, text: `*Notes:* ${notes}` },
+            }] : []),
+            {
+              type: 'context',
+              elements: [{
+                type: 'mrkdwn',
+                text: `✅ Payment confirmed via Stripe · <https://command-center.jamaicahousebrand.com/dashboard/restaurant-leads|View in Command Center>`,
+              }],
+            },
+          ],
+        }),
+      })
+    } catch (err) {
+      console.error('[wholesale-webhook] Slack failed:', err)
+    }
+  }
+
+  // 2. Fulfillment email
+  const appPassword = process.env.GMAIL_APP_PASSWORD
+  if (appPassword) {
+    try {
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: { user: 'olatunde@jamaicahousebrand.com', pass: appPassword },
+      })
+
+      const firstName = contactName.split(' ')[0]
+
+      await Promise.allSettled([
+        // Internal notification
+        transporter.sendMail({
+          from: '"Jamaica House Brand" <olatunde@jamaicahousebrand.com>',
+          to: 'olatunde@jamaicahousebrand.com',
+          subject: `🌶️ WHOLESALE ORDER PAID — ${businessName} — ${total}`,
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+              <div style="background:#2D5016;padding:20px;text-align:center;border-radius:8px 8px 0 0;">
+                <h1 style="color:#D4A843;margin:0;font-size:22px;">Wholesale Order — PAID</h1>
+              </div>
+              <div style="padding:20px;background:#f9f9f9;border-radius:0 0 8px 8px;">
+                <table style="width:100%;font-size:14px;">
+                  <tr><td style="padding:6px 0;font-weight:bold;width:130px;">Business:</td><td>${businessName}</td></tr>
+                  <tr><td style="padding:6px 0;font-weight:bold;">Contact:</td><td>${contactName}</td></tr>
+                  <tr><td style="padding:6px 0;font-weight:bold;">Phone:</td><td><a href="tel:${phone}">${phone}</a></td></tr>
+                  <tr><td style="padding:6px 0;font-weight:bold;">Email:</td><td><a href="mailto:${email}">${email}</a></td></tr>
+                  <tr><td style="padding:6px 0;font-weight:bold;">Delivery:</td><td>${deliveryLabel}</td></tr>
+                  <tr><td style="padding:6px 0;font-weight:bold;">Requested Date:</td><td>${requestedDate || 'Not specified'}</td></tr>
+                </table>
+                <hr style="margin:16px 0;">
+                <table style="width:100%;font-size:14px;">
+                  ${qtyGallon > 0 ? `<tr><td>Jerk Sauce · 1 Gallon</td><td style="text-align:right;">×${qtyGallon}</td><td style="text-align:right;">$${(qtyGallon * 50).toFixed(2)}</td></tr>` : ''}
+                  ${qtyCase > 0 ? `<tr><td>Jerk Sauce · 5oz Case</td><td style="text-align:right;">×${qtyCase}</td><td style="text-align:right;">$${(qtyCase * 72).toFixed(2)}</td></tr>` : ''}
+                  ${qtyEscovitch > 0 ? `<tr><td>Escovitch Pikliz Case</td><td style="text-align:right;">×${qtyEscovitch}</td><td style="text-align:right;">$${(qtyEscovitch * 72).toFixed(2)}</td></tr>` : ''}
+                </table>
+                <div style="background:#2D5016;color:#fff;padding:12px;border-radius:6px;margin-top:16px;text-align:center;font-size:18px;font-weight:bold;">
+                  Total Paid: ${total}
+                </div>
+                ${notes ? `<p style="margin-top:12px;font-size:13px;color:#666;"><strong>Notes:</strong> ${notes}</p>` : ''}
+              </div>
+            </div>`,
+        }),
+        // Customer confirmation
+        transporter.sendMail({
+          from: '"Jamaica House Brand" <olatunde@jamaicahousebrand.com>',
+          to: email,
+          subject: `Order confirmed, ${firstName}! 🌶️`,
+          text: `Hi ${firstName},\n\nYour wholesale order for ${businessName} is confirmed and paid! Here's what's next:\n\n${deliveryMethod === 'pickup' ? `Your order will be ready for pickup at ${deliveryAddress}. We'll call you when it's ready.` : deliveryMethod === 'local' ? `We'll deliver to ${deliveryAddress}. We'll confirm your delivery window.` : `We'll ship to ${deliveryAddress} and send you tracking info.`}\n\nOrder: ${lineItems.join(', ')}\nTotal Paid: ${total}\n\nQuestions? Call 786-709-1027.\n\n— Tunde\nJamaica House Brand`,
+        }),
+      ])
+    } catch (err) {
+      console.error('[wholesale-webhook] Email failed:', err)
+    }
+  }
+
+  // 3. Sync to Command Center as lead
+  try {
+    const ccUrl = process.env.COMMAND_CENTER_WEBHOOK_URL?.replace('/incoming-order', '/incoming-lead')
+    const ccKey = process.env.COMMAND_CENTER_WEBHOOK_API_KEY
+    if (ccUrl && ccKey) {
+      await fetch(ccUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${ccKey}` },
+        body: JSON.stringify({
+          businessName,
+          contactName,
+          phone,
+          email,
+          deliveryAddress,
+          deliveryMethod,
+          requestedDate,
+          qtyGallon,
+          qtyCase,
+          qtyEscovitch,
+          priceGallon: 50,
+          priceCase: 72,
+          priceEscovitch: 72,
+          orderTotal: (session.amount_total || 0) / 100,
+          paymentMethod: 'Stripe',
+          paymentStatus: 'paid',
+          paidAmount: (session.amount_total || 0) / 100,
+          paidDate: new Date().toISOString(),
+          paymentRef: session.payment_intent || session.id,
+          notes: notes || null,
+          status: 'CLOSED_WON',
+          source: 'stripe-wholesale',
+          taxCertFileName: null,
+        }),
+      })
+    }
+  } catch (err) {
+    console.error('[wholesale-webhook] CC sync failed:', err)
+  }
+
+  console.log('[stripe-webhook] Wholesale order processed:', businessName, total)
+}
+
 export async function POST(request: NextRequest) {
   const body = await request.text() // CRITICAL: Use raw body text for signature verification
   const signature = request.headers.get('stripe-signature')
@@ -372,9 +545,15 @@ export async function POST(request: NextRequest) {
         paymentType: session.metadata?.paymentType
       })
 
-      // Handle catering payments first
+      // Handle catering payments
       if (session.metadata?.paymentType === 'catering_deposit') {
         await handleCateringPayment(session)
+        return NextResponse.json({ received: true })
+      }
+
+      // Handle wholesale restaurant orders
+      if (session.metadata?.order_type === 'wholesale') {
+        await handleWholesaleOrder(session)
         return NextResponse.json({ received: true })
       }
 
