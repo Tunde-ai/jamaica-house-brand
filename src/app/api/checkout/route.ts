@@ -93,6 +93,18 @@ export async function POST(request: NextRequest) {
       mode: 'payment',
       success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/shop`,
+      // Collect email first so we have it for abandoned cart recovery
+      customer_email: undefined,
+      // Enable abandoned cart recovery — Stripe generates a recovery URL
+      // that we include in our follow-up email when checkout.session.expired fires
+      after_expiration: {
+        recovery: {
+          enabled: true,
+          allow_promotion_codes: true,
+        },
+      },
+      // Expire after 30 minutes of inactivity (default is 24h which is too long)
+      expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
       metadata: {
         source: 'jamaica-house-brand-web',
       },

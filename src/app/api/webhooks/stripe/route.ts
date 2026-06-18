@@ -875,6 +875,203 @@ export async function POST(request: NextRequest) {
 
       break
     }
+    case 'payment_intent.payment_failed': {
+      const failedPI = event.data.object as Stripe.PaymentIntent
+      const failAmount = `$${(failedPI.amount / 100).toFixed(2)}`
+      const failEmail = failedPI.metadata?.customer_email || failedPI.receipt_email || 'Unknown'
+      const failName = failedPI.metadata?.customer_name || 'Unknown'
+      const failReason = failedPI.last_payment_error?.message || 'Unknown reason'
+
+      console.error('[stripe-webhook] Payment failed:', {
+        id: failedPI.id,
+        amount: failAmount,
+        email: failEmail,
+        reason: failReason,
+      })
+
+      // Slack alert for failed payment
+      const slackUrl = process.env.SLACK_WEBHOOK_URL
+      if (slackUrl) {
+        try {
+          await fetch(slackUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              blocks: [
+                {
+                  type: 'header',
+                  text: { type: 'plain_text', text: '❌ Payment Failed' },
+                },
+                {
+                  type: 'section',
+                  fields: [
+                    { type: 'mrkdwn', text: `*Amount:*\n${failAmount}` },
+                    { type: 'mrkdwn', text: `*Customer:*\n${failEmail}` },
+                    { type: 'mrkdwn', text: `*Name:*\n${failName}` },
+                    { type: 'mrkdwn', text: `*Reason:*\n${failReason}` },
+                  ],
+                },
+                {
+                  type: 'context',
+                  elements: [{
+                    type: 'mrkdwn',
+                    text: `Payment Intent: ${failedPI.id}`,
+                  }],
+                },
+              ],
+            }),
+          })
+        } catch (err) {
+          console.error('[stripe-webhook] Slack failed payment notification error:', err)
+        }
+      }
+
+      break
+    }
+
+    case 'checkout.session.expired': {
+      const expiredSession = event.data.object as Stripe.Checkout.Session
+      const expEmail = expiredSession.customer_details?.email || 'Unknown'
+      const expAmount = expiredSession.amount_total
+        ? `$${(expiredSession.amount_total / 100).toFixed(2)}`
+        : 'N/A'
+
+      console.log('[stripe-webhook] Checkout session expired (abandoned cart):', {
+        id: expiredSession.id,
+        email: expEmail,
+        amount: expAmount,
+      })
+
+      // Slack alert for abandoned cart
+      const slackUrlExp = process.env.SLACK_WEBHOOK_URL
+      if (slackUrlExp) {
+        try {
+          const recoveryUrl = expiredSession.after_expiration?.recovery?.url
+          await fetch(slackUrlExp, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              blocks: [
+                {
+                  type: 'header',
+                  text: { type: 'plain_text', text: '🛒 Abandoned Cart' },
+                },
+                {
+                  type: 'section',
+                  fields: [
+                    { type: 'mrkdwn', text: `*Cart Value:*\n${expAmount}` },
+                    { type: 'mrkdwn', text: `*Customer:*\n${expEmail}` },
+                  ],
+                },
+                ...(recoveryUrl ? [{
+                  type: 'section' as const,
+                  text: { type: 'mrkdwn' as const, text: `*Recovery Link:*\n<${recoveryUrl}|Send to customer>` },
+                }] : []),
+                {
+                  type: 'context',
+                  elements: [{
+                    type: 'mrkdwn',
+                    text: `Session: ${expiredSession.id} · Stripe sends a recovery email automatically if customer provided their email.`,
+                  }],
+                },
+              ],
+            }),
+          })
+        } catch (err) {
+          console.error('[stripe-webhook] Slack abandoned cart notification error:', err)
+        }
+      }
+
+      // Send abandoned cart recovery email via Resend if we have the customer email
+      if (expEmail && expEmail !== 'Unknown' && process.env.RESEND_API_KEY) {
+        try {
+          const { Resend } = await import('resend')
+          const resendClient = new Resend(process.env.RESEND_API_KEY)
+          const recoveryUrl = expiredSession.after_expiration?.recovery?.url
+
+          await resendClient.emails.send({
+            from: 'Jamaica House Brand <orders@jamaicahousebrand.com>',
+            to: expEmail,
+            subject: 'You left something behind! 🌶️',
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+                <div style="background: #1a1a2e; padding: 24px; text-align: center;">
+                  <h1 style="color: #d4a437; margin: 0; font-size: 24px;">Still thinking it over?</h1>
+                </div>
+                <div style="padding: 24px; background: #fff;">
+                  <p style="font-size: 16px; line-height: 1.6;">
+                    Hey! We noticed you didn't finish your order. No worries — your cart is waiting for you.
+                  </p>
+                  <p style="font-size: 16px; line-height: 1.6;">
+                    Our authentic Jamaican jerk sauce is handmade in small batches and sells out fast. Don't miss out!
+                  </p>
+                  ${recoveryUrl ? `
+                  <div style="text-align: center; margin: 30px 0;">
+                    <a href="${recoveryUrl}" style="background: #d4a437; color: #1a1a2e; padding: 14px 32px; text-decoration: none; font-weight: bold; font-size: 16px; border-radius: 6px; display: inline-block;">Complete Your Order</a>
+                  </div>
+                  ` : `
+                  <div style="text-align: center; margin: 30px 0;">
+                    <a href="https://jamaicahousebrand.com/shop" style="background: #d4a437; color: #1a1a2e; padding: 14px 32px; text-decoration: none; font-weight: bold; font-size: 16px; border-radius: 6px; display: inline-block;">Visit Our Shop</a>
+                  </div>
+                  `}
+                  <p style="font-size: 14px; color: #666;">
+                    Questions? Reply to this email or call us at 786-709-1027.
+                  </p>
+                </div>
+                <div style="background: #1a1a2e; padding: 16px; text-align: center;">
+                  <p style="color: #888; font-size: 12px; margin: 0;">Jamaica House Brand — Bold Caribbean Flavor in Every Drop</p>
+                </div>
+              </div>
+            `,
+          })
+          console.log('[stripe-webhook] Abandoned cart email sent to:', expEmail)
+        } catch (err) {
+          console.error('[stripe-webhook] Abandoned cart email failed:', err)
+        }
+      }
+
+      break
+    }
+
+    case 'checkout.session.async_payment_failed': {
+      const asyncFailSession = event.data.object as Stripe.Checkout.Session
+      const asyncEmail = asyncFailSession.customer_details?.email || 'Unknown'
+      const asyncAmount = asyncFailSession.amount_total
+        ? `$${(asyncFailSession.amount_total / 100).toFixed(2)}`
+        : 'N/A'
+
+      console.error('[stripe-webhook] Async payment failed:', asyncFailSession.id)
+
+      const slackUrlAsync = process.env.SLACK_WEBHOOK_URL
+      if (slackUrlAsync) {
+        try {
+          await fetch(slackUrlAsync, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              blocks: [
+                {
+                  type: 'header',
+                  text: { type: 'plain_text', text: '⚠️ Async Payment Failed' },
+                },
+                {
+                  type: 'section',
+                  fields: [
+                    { type: 'mrkdwn', text: `*Amount:*\n${asyncAmount}` },
+                    { type: 'mrkdwn', text: `*Customer:*\n${asyncEmail}` },
+                  ],
+                },
+              ],
+            }),
+          })
+        } catch (err) {
+          console.error('[stripe-webhook] Slack async payment notification error:', err)
+        }
+      }
+
+      break
+    }
+
     default:
       // Log unhandled event types (informational, not an error)
       console.log(`Unhandled event type: ${event.type}`)

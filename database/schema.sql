@@ -277,17 +277,26 @@ CREATE TRIGGER update_email_workflows_updated_at
   EXECUTE FUNCTION update_updated_at_column();
 
 -- =============================================
--- ROW LEVEL SECURITY (Optional - for multi-tenant)
+-- ROW LEVEL SECURITY
 -- =============================================
--- Uncomment if you need row-level security
+-- RLS enabled on all tables. The service_role key (used by API routes)
+-- bypasses RLS. The anon key (public) is default-deny on all tables
+-- except promo_codes which allows read-only access to active codes.
 
--- ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE discounts ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE email_workflows ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE lead_activities ENABLE ROW LEVEL SECURITY;
+ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE discounts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE email_workflows ENABLE ROW LEVEL SECURITY;
+ALTER TABLE lead_activities ENABLE ROW LEVEL SECURITY;
+ALTER TABLE promo_codes ENABLE ROW LEVEL SECURITY;
+
+-- Allow anon users to read active promo codes (needed for checkout validation)
+CREATE POLICY "Allow anon to read active promo codes"
+  ON promo_codes
+  FOR SELECT
+  USING (is_active = true);
 
 -- =============================================
 -- SAMPLE DATA (Optional - for testing)
