@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import RestaurantOrderForm from './RestaurantOrderForm'
 
 export const metadata: Metadata = {
-  title: 'Restaurant Partners | Jamaica House Brand',
+  title: 'Wholesale Partners | Jamaica House Brand',
   description:
     'Wholesale pricing for restaurants. Authentic Jamaican Jerk Sauce — 1-gallon BOH format or 5oz table bottles. 30+ years of Caribbean heritage.',
 }
