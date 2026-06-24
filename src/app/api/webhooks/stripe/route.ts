@@ -834,10 +834,11 @@ export async function POST(request: NextRequest) {
           promoDiscount: paymentIntent.metadata.promoDiscount
             ? parseInt(paymentIntent.metadata.promoDiscount) / 100
             : undefined,
-          shippingAddressLine1: paymentIntent.shipping?.address?.line1 || paymentIntent.metadata.shipping_address?.split(',')[0]?.trim() || undefined,
-          shippingCity: paymentIntent.shipping?.address?.city || undefined,
-          shippingState: paymentIntent.shipping?.address?.state || undefined,
-          shippingZip: paymentIntent.shipping?.address?.postal_code || undefined,
+          shippingAddressLine1: paymentIntent.shipping?.address?.line1 || paymentIntent.metadata.shipping_line1 || paymentIntent.metadata.shipping_address?.split(',')[0]?.trim() || undefined,
+          shippingAddressLine2: paymentIntent.shipping?.address?.line2 || paymentIntent.metadata.shipping_line2 || undefined,
+          shippingCity: paymentIntent.shipping?.address?.city || paymentIntent.metadata.shipping_city || undefined,
+          shippingState: paymentIntent.shipping?.address?.state || paymentIntent.metadata.shipping_state || undefined,
+          shippingZip: paymentIntent.shipping?.address?.postal_code || paymentIntent.metadata.shipping_zip || undefined,
           shippingCountry: paymentIntent.shipping?.address?.country || 'US',
         }),
         // 5. Customer confirmation email
