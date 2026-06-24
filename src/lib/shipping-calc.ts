@@ -203,6 +203,13 @@ export function getCheckoutShippingCostCents(
 ): number {
   const shippingItems = cartItemsToShippingItems(items)
   if (shippingItems.length === 0) return 0
+
+  // Free samples must always pay shipping — never $0
+  const hasOnlyFreeSamples = items.every(i => i.id.replace(/-upsell-\d+$/, '').startsWith('free-sample'))
+  if (hasOnlyFreeSamples) {
+    return 699 // $6.99 flat rate for free samples
+  }
+
   const dollars = getCheckoutShippingCost(shippingItems)
   return Math.round(dollars * 100)
 }
