@@ -17,7 +17,7 @@ export default function RestaurantPartnersPage() {
             Wholesale Partner Program
           </p>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4">
-            Bring the Island to Your Kitchen
+            Bring the Caribbean to Your Kitchen
           </h1>
           <p className="text-white/80 text-lg max-w-2xl mx-auto">
             30+ years of Caribbean heritage in every bottle. Wholesale pricing for restaurants, caterers, and food service.
