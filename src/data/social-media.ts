@@ -8,7 +8,7 @@ export interface SocialPost {
 
 // Social media profile URLs
 export const socialProfiles = {
-  instagram: 'https://instagram.com/jamaicahousebrand',
+  instagram: 'https://www.instagram.com/jamaicahousebrand',
   tiktok: 'https://www.tiktok.com/@jamaicahousebrand',
   youtube: 'https://www.youtube.com/@JAMAICAHOUSEBRAND',
   facebook: 'https://www.facebook.com/p/Jamaica-House-Brand-61576084168596/',

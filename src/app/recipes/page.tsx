@@ -35,7 +35,7 @@ export default function RecipesPage() {
         <p className="text-gray-400 text-lg">
           Want more recipes?{' '}
           <a
-            href="https://instagram.com/jamaicahousebrand"
+            href="https://www.instagram.com/jamaicahousebrand"
             target="_blank"
             rel="noopener noreferrer"
             className="text-brand-gold hover:text-white transition-colors underline"

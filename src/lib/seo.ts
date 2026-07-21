@@ -60,7 +60,7 @@ export function generateOrganizationJsonLd() {
       contactType: 'customer service',
     },
     sameAs: [
-      'https://instagram.com/jamaicahousebrand',
+      'https://www.instagram.com/jamaicahousebrand',
       'https://www.facebook.com/p/Jamaica-House-Brand-61576084168596/',
       'https://www.tiktok.com/@jamaicahousebrand',
       'https://www.youtube.com/@JAMAICAHOUSEBRAND',
