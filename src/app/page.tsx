@@ -2,6 +2,9 @@ import { Metadata } from 'next'
 import HeroSection from '@/components/home/HeroSection'
 import HomeProductGrid from '@/components/home/HomeProductGrid'
 import BrandStory from '@/components/home/BrandStory'
+import FindUsPreview from '@/components/home/FindUsPreview'
+import AuthenticityStatement from '@/components/home/AuthenticityStatement'
+import OrderDirect from '@/components/home/OrderDirect'
 import GoogleReviews from '@/components/home/GoogleReviews'
 import SocialFeedPreview from '@/components/social/SocialFeedPreview'
 import { generateFAQJsonLd, sanitizeJsonLd } from '@/lib/seo'
@@ -64,6 +67,9 @@ export default function Home() {
       <HeroSection />
       <HomeProductGrid />
       <BrandStory />
+      <FindUsPreview />
+      <AuthenticityStatement />
+      <OrderDirect />
       <GoogleReviews />
       <SocialFeedPreview />
     </>
