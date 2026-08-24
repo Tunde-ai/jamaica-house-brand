@@ -36,17 +36,17 @@ export default function HeroSection() {
         {/* Marinate / Grill / Dip */}
         <div className="flex items-center justify-center gap-4 sm:gap-8 mb-8 flex-wrap">
           <div className="flex flex-col items-center gap-1">
-            <span className="text-white font-bold text-sm sm:text-base uppercase tracking-[0.1em]" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>Marinate</span>
+            <span className="text-brand-gold font-bold text-base sm:text-lg uppercase tracking-[0.1em]" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>Marinate</span>
             <span className="text-white/70 text-xs max-w-[140px] leading-snug">Deep, bold island flavor for chicken, pork & seafood</span>
           </div>
           <div className="w-0.5 h-10 bg-brand-gold hidden sm:block" aria-hidden="true" />
           <div className="flex flex-col items-center gap-1">
-            <span className="text-white font-bold text-sm sm:text-base uppercase tracking-[0.1em]" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>Grill</span>
+            <span className="text-brand-gold font-bold text-base sm:text-lg uppercase tracking-[0.1em]" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>Grill</span>
             <span className="text-white/70 text-xs max-w-[140px] leading-snug">Brush on for caramelized, smoky jerk perfection</span>
           </div>
           <div className="w-0.5 h-10 bg-brand-gold hidden sm:block" aria-hidden="true" />
           <div className="flex flex-col items-center gap-1">
-            <span className="text-white font-bold text-sm sm:text-base uppercase tracking-[0.1em]" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>Dip</span>
+            <span className="text-brand-gold font-bold text-base sm:text-lg uppercase tracking-[0.1em]" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>Dip</span>
             <span className="text-white/70 text-xs max-w-[140px] leading-snug">Serve as a table sauce with wings, fries & more</span>
           </div>
         </div>
