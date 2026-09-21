@@ -295,7 +295,7 @@ export default function CateringMenuQuoteForm() {
             </p>
             <div className="space-y-2 text-sm text-gray-400">
               <p>📧 Confirmation sent to your email</p>
-              <p>📞 Questions? Call us at (786) 709-1027</p>
+              <p>📞 Questions? Call us at (754) 261-4918</p>
             </div>
             <button
               onClick={() => setIsSubmitted(false)}

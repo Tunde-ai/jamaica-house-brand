@@ -312,7 +312,7 @@ export default function OrderConfirmationEmail({
             📞 Questions? We're Here to Help!
           </h3>
           <p style={{ margin: '0', color: '#333', fontSize: '14px' }}>
-            <strong>Call/Text:</strong> <a href="tel:+17867091027" style={{ color: '#d4a843' }}>(786) 709-1027</a><br/>
+            <strong>Call/Text:</strong> <a href="tel:+17542614918" style={{ color: '#d4a843' }}>(754) 261-4918</a><br/>
             <strong>Email:</strong> <a href="mailto:olatunde@jamaicahousebrand.com" style={{ color: '#d4a843' }}>olatunde@jamaicahousebrand.com</a><br/>
             <strong>Hours:</strong> Mon-Fri 9AM-6PM EST
           </p>

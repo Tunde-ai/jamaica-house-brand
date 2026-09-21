@@ -155,7 +155,7 @@ Estimated Total: $${orderTotal.toFixed(2)}
 
 WHAT HAPPENS NEXT
 ─────────────────
-I'll personally call or email you within 24 hours to confirm pricing, answer any questions, and lock in your delivery date. If you need anything sooner, feel free to text or call me directly at 786-709-1027.
+I'll personally call or email you within 24 hours to confirm pricing, answer any questions, and lock in your delivery date. If you need anything sooner, feel free to text or call me directly at (754) 261-4918.
 
 ${body.paymentMethod === 'Credit Card' ? `
 PAYMENT PROCESSING
@@ -167,7 +167,7 @@ Looking forward to bringing the island to your kitchen.
 
 — Tunde
 Jamaica House Brand
-786-709-1027
+(754) 261-4918
 jamaicahousebrand.com
 From Our Family to Yours 🇯🇲
 `.trim()

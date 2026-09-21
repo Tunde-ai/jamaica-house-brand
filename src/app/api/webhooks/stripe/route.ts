@@ -452,7 +452,7 @@ async function handleWholesaleOrder(session: Stripe.Checkout.Session) {
           from: '"Jamaica House Brand" <olatunde@jamaicahousebrand.com>',
           to: email,
           subject: `Order confirmed, ${firstName}! 🌶️`,
-          text: `Hi ${firstName},\n\nYour wholesale order for ${businessName} is confirmed and paid! Here's what's next:\n\n${deliveryMethod === 'pickup' ? `Your order will be ready for pickup at ${deliveryAddress}. We'll call you when it's ready.` : deliveryMethod === 'local' ? `We'll deliver to ${deliveryAddress}. We'll confirm your delivery window.` : `We'll ship to ${deliveryAddress} and send you tracking info.`}\n\nOrder: ${lineItems.join(', ')}\nTotal Paid: ${total}\n\nQuestions? Call 786-709-1027.\n\n— Tunde\nJamaica House Brand`,
+          text: `Hi ${firstName},\n\nYour wholesale order for ${businessName} is confirmed and paid! Here's what's next:\n\n${deliveryMethod === 'pickup' ? `Your order will be ready for pickup at ${deliveryAddress}. We'll call you when it's ready.` : deliveryMethod === 'local' ? `We'll deliver to ${deliveryAddress}. We'll confirm your delivery window.` : `We'll ship to ${deliveryAddress} and send you tracking info.`}\n\nOrder: ${lineItems.join(', ')}\nTotal Paid: ${total}\n\nQuestions? Call (754) 261-4918.\n\n— Tunde\nJamaica House Brand`,
         }),
       ])
     } catch (err) {
@@ -1016,7 +1016,7 @@ export async function POST(request: NextRequest) {
                   </div>
                   `}
                   <p style="font-size: 14px; color: #666;">
-                    Questions? Reply to this email or call us at 786-709-1027.
+                    Questions? Reply to this email or call us at (754) 261-4918.
                   </p>
                 </div>
                 <div style="background: #1a1a2e; padding: 16px; text-align: center;">

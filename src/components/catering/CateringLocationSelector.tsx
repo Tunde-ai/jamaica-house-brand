@@ -200,10 +200,10 @@ export default function CateringLocationSelector() {
             Our team is here to help you choose the perfect catering solution for your event.
           </p>
           <a
-            href="tel:(786) 709-1027"
+            href="tel:+17542614918"
             className="inline-flex items-center gap-2 bg-white/10 border border-brand-gold/30 text-brand-gold px-6 py-3 rounded-lg hover:bg-brand-gold/20 transition-colors font-medium"
           >
-            📞 Call us at (786) 709-1027
+            📞 Call us at (754) 261-4918
           </a>
         </div>
       </div>

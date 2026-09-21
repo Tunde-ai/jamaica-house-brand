@@ -43,7 +43,7 @@ export default async function CateringMenuPage({ searchParams }: PageProps) {
             </p>
             <div className="text-sm text-gray-400">
               <p>📲 Check your inbox for confirmation</p>
-              <p>📞 Questions? Call us at (786) 709-1027</p>
+              <p>📞 Questions? Call us at (754) 261-4918</p>
             </div>
           </div>
         </div>
@@ -59,7 +59,7 @@ export default async function CateringMenuPage({ searchParams }: PageProps) {
               No worries! You can still request a quote or try payment again.
             </p>
             <div className="text-sm text-gray-400">
-              <p>💬 Need help? Call us at (786) 709-1027</p>
+              <p>💬 Need help? Call us at (754) 261-4918</p>
             </div>
           </div>
         </div>

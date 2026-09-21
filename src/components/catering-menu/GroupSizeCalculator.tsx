@@ -122,10 +122,10 @@ export default function GroupSizeCalculator() {
                   </p>
                 </div>
                 <button
-                  onClick={() => window.open('tel:+17867091027', '_self')}
+                  onClick={() => window.open('tel:+17542614918', '_self')}
                   className="bg-brand-gold text-brand-dark font-bold px-8 py-3 rounded-lg hover:bg-brand-gold-light transition-colors"
                 >
-                  Call Us: (786) 709-1027
+                  Call Us: (754) 261-4918
                 </button>
               </div>
             ) : (

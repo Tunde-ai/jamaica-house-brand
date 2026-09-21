@@ -14,7 +14,7 @@ const QUICK_REPLIES = [
   { label: 'Talk to Someone', action: 'whatsapp' as const },
 ]
 
-const WHATSAPP_URL = 'https://wa.me/17867091027'
+const WHATSAPP_URL = 'https://wa.me/17542614918'
 
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false)
@@ -54,12 +54,12 @@ export default function ChatWidget() {
       })
 
       const data = await res.json()
-      const reply = data.reply || "I'm having trouble right now. Please reach out on WhatsApp at +1 (786) 709-1027!"
+      const reply = data.reply || "I'm having trouble right now. Please reach out on WhatsApp at +1 (754) 261-4918!"
       setMessages((prev) => [...prev, { role: 'assistant', content: reply }])
     } catch {
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: "I'm having trouble connecting right now. Please reach out on WhatsApp at +1 (786) 709-1027 for immediate help!" },
+        { role: 'assistant', content: "I'm having trouble connecting right now. Please reach out on WhatsApp at +1 (754) 261-4918 for immediate help!" },
       ])
     } finally {
       setIsLoading(false)

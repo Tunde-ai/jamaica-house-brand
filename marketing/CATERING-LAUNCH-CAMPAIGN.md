@@ -141,7 +141,7 @@ From jerk chicken to curry goat, rice & peas to festival - we've got your authen
 Ready to experience the future of catering? 
 👉 jamaicahousebrand.com/catering-menu
 
-Questions? Call us: (786) 709-1027
+Questions? Call us: (754) 261-4918
 ```
 
 ---

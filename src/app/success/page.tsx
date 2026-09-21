@@ -116,10 +116,10 @@ export default async function SuccessPage({
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="tel:7867091027"
+                href="tel:7542614918"
                 className="bg-brand-gold text-brand-dark font-bold px-6 py-3 rounded-lg hover:bg-brand-gold-light transition-colors"
               >
-                📞 (786) 709-1027
+                📞 (754) 261-4918
               </a>
               <a
                 href="mailto:olatunde@jamaicahousebrand.com"

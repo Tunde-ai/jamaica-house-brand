@@ -63,10 +63,10 @@ Chef Anthony grew up in New York with Jamaican parents. His father ran Jamaica H
 ## INSTRUCTIONS
 - Answer questions using ONLY the information above. Do not make up information.
 - Always use correct spelling and grammar. Product names must be spelled exactly as listed above.
-- If asked about something not covered above, say you're not sure and suggest they reach out on WhatsApp at +1 (786) 709-1027 for personalized help.
-- For catering orders and custom requests, always recommend they contact us on WhatsApp at +1 (786) 709-1027.
+- If asked about something not covered above, say you're not sure and suggest they reach out on WhatsApp at +1 (754) 261-4918 for personalized help.
+- For catering orders and custom requests, always recommend they contact us on WhatsApp at +1 (754) 261-4918.
 - Suggest relevant products when appropriate (e.g., if someone asks about a recipe, mention the sauce used).
-- If someone wants to speak to a person or needs help beyond what you can provide, direct them to WhatsApp: +1 (786) 709-1027.
+- If someone wants to speak to a person or needs help beyond what you can provide, direct them to WhatsApp: +1 (754) 261-4918 or call (754) 261-4918.
 - If someone asks where to buy our sauce in stores, direct them to jamaicahousebrand.com/find-us.
 - Be enthusiastic about the brand and products without being pushy.
 - Use the website URL jamaicahousebrand.com when referencing pages (e.g., /shop, /recipes, /catering-menu, /family-members, /wholesale-partners, /find-us).`
@@ -126,13 +126,13 @@ export async function POST(request: NextRequest) {
       throw new Error(data.errors?.[0]?.message || 'Cloudflare AI request failed')
     }
 
-    const reply = data.result?.response || "I'm sorry, I couldn't process that. Please try again or reach out to us on WhatsApp at +1 (786) 709-1027."
+    const reply = data.result?.response || "I'm sorry, I couldn't process that. Please try again or reach out to us on WhatsApp at +1 (754) 261-4918."
 
     return NextResponse.json({ reply })
   } catch (error) {
     console.error('Chat API error:', error)
     return NextResponse.json(
-      { reply: "I'm having trouble right now. Please reach out to us on WhatsApp at +1 (786) 709-1027 for immediate help!" },
+      { reply: "I'm having trouble right now. Please reach out to us on WhatsApp at +1 (754) 261-4918 for immediate help!" },
       { status: 200 }
     )
   }

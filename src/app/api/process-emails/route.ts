@@ -13,7 +13,7 @@ const EMAIL_TEMPLATES = {
         <p>We've received your catering request for ${order.guest_count} guests on ${new Date(order.event_date).toLocaleDateString()}.</p>
         <p>Your order number is: <strong>${order.order_number}</strong></p>
         <p>We'll be in touch within 24 hours with your detailed quote.</p>
-        <p>Questions? Call us at (786) 709-1027</p>
+        <p>Questions? Call us at (754) 261-4918</p>
       </div>
     `
   },
@@ -33,7 +33,7 @@ const EMAIL_TEMPLATES = {
             🚀 Pay Deposit & Reserve Date - $${order.deposit_amount.toFixed(2)}
           </a>
         </div>
-        <p>Questions? Reply to this email or call (786) 709-1027</p>
+        <p>Questions? Reply to this email or call (754) 261-4918</p>
       </div>
     `
   },
@@ -61,7 +61,7 @@ const EMAIL_TEMPLATES = {
             🔒 Reserve Date Now - $${order.deposit_amount.toFixed(2)}
           </a>
         </div>
-        <p>Questions? Call us at (786) 709-1027 - we're here to help!</p>
+        <p>Questions? Call us at (754) 261-4918 - we're here to help!</p>
       </div>
     `
   },
@@ -85,7 +85,7 @@ const EMAIL_TEMPLATES = {
             🔥 SECURE NOW - $${order.deposit_amount.toFixed(2)}
           </a>
         </div>
-        <p>Last chance! Call us at (786) 709-1027 if you need to discuss anything.</p>
+        <p>Last chance! Call us at (754) 261-4918 if you need to discuss anything.</p>
       </div>
     `
   }

@@ -116,7 +116,7 @@ export default function RestaurantOrderForm() {
           Thanks <span className="text-brand-gold font-semibold">{contactName.split(' ')[0]}</span> — we&apos;ll contact you within 1 business day to confirm your order. Check your email for a summary.
         </p>
         <p className="text-gray-500 text-sm">
-          Questions? Call us at <a href="tel:7867091027" className="text-brand-gold hover:underline">786-709-1027</a>
+          Questions? Call us at <a href="tel:7542614918" className="text-brand-gold hover:underline">(754) 261-4918</a>
         </p>
       </div>
     )

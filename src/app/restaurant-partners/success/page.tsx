@@ -39,7 +39,7 @@ export default function RestaurantOrderSuccessPage() {
         </div>
 
         <p className="text-gray-500 text-sm mb-6">
-          Questions? Call <a href="tel:7867091027" className="text-brand-gold hover:underline">786-709-1027</a>
+          Questions? Call <a href="tel:7542614918" className="text-brand-gold hover:underline">(754) 261-4918</a>
         </p>
 
         <Link
