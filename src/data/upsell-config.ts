@@ -13,7 +13,7 @@ export interface UpsellOffer {
  */
 export function getUpsellOffer(cartItemIds: string[]): UpsellOffer {
   const hasSauce = cartItemIds.some((id) =>
-    id.startsWith('jerk-sauce') || id === 'free-sample-2oz'
+    id.startsWith('jerk-sauce')
   )
   const hasPikliz = cartItemIds.some((id) => id.includes('pikliz'))
   const hasBundle = cartItemIds.some((id) => id.includes('bundle'))
@@ -61,20 +61,20 @@ export function getUpsellOffer(cartItemIds: string[]): UpsellOffer {
   return {
     productId: 'jamaica-house-bundle',
     name: 'Jamaica House Bundle',
-    size: '2oz + 5oz + 12oz',
+    size: '5oz + 12oz',
     image: '/images/products/product-group.jpg',
-    originalPrice: 2499,
-    offerPrice: 2099,
-    savingsText: 'Save $4.00',
+    originalPrice: 1999,
+    offerPrice: 1699,
+    savingsText: 'Save $3.00',
   }
 }
 
 export const downsellOffer: UpsellOffer = {
-  productId: 'jerk-sauce-2oz',
+  productId: 'jerk-sauce-5oz',
   name: 'Original Jerk Sauce',
-  size: '2oz',
-  image: '/images/products/jerk-sauce-2oz.jpg',
-  originalPrice: 699,
-  offerPrice: 599,
-  savingsText: 'Save $1.00',
+  size: '5oz',
+  image: '/images/products/jerk-sauce-5oz.jpg',
+  originalPrice: 1199,
+  offerPrice: 999,
+  savingsText: 'Save $2.00',
 }

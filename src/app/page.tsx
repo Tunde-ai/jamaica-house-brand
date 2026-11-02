@@ -39,7 +39,7 @@ const homepageFAQs = [
   },
   {
     question: 'What sizes does the jerk sauce come in?',
-    answer: 'Our Original Jerk Sauce is available in 2oz (travel/sample size), 5oz (everyday use), and 10oz (family size) bottles. We also offer 1-gallon containers for restaurant partners.',
+    answer: 'Our Original Jerk Sauce is available in 5oz (everyday use) and 10oz (family size) bottles. We also offer 1-gallon containers for restaurant partners.',
   },
   {
     question: 'Do you offer free shipping?',

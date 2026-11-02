@@ -4,7 +4,7 @@ import ProductCard from '@/components/ui/ProductCard'
 
 export const metadata: Metadata = {
   title: 'Shop Authentic Jamaican Sauces',
-  description: 'Browse our collection of handcrafted Jamaican sauces. Original Jerk Sauce in 2oz, 5oz, and 10oz sizes, plus our Escovitch Pikliz.',
+  description: 'Browse our collection of handcrafted Jamaican sauces. Original Jerk Sauce in 5oz and 10oz sizes, plus our Escovitch Pikliz.',
   openGraph: {
     title: 'Shop Jamaica House Brand Sauces',
     description: 'Handcrafted Jamaican sauces from a 30-year family recipe.',

@@ -5,7 +5,6 @@ import Navigation from "@/components/navigation/Navigation";
 import FreeShippingBar from "@/components/layout/FreeShippingBar";
 import Footer from "@/components/layout/Footer";
 import CartDrawer from "@/components/CartDrawer";
-import SamplePopup from "@/components/SamplePopup";
 import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 import GoogleAds from "@/components/analytics/GoogleAds";
 import MetaPixel from "@/components/analytics/MetaPixel";
@@ -76,7 +75,6 @@ export default function RootLayout({
           <Footer />
         </div>
         <CartDrawer />
-        <SamplePopup />
         <ChatWidget />
         <Suspense fallback={null}>
           <MetaPixel />
