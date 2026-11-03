@@ -14,7 +14,7 @@
     },
     {
       "path": "/api/cron/abandoned-cart-recovery",
-      "schedule": "0 */2 * * *"
+      "schedule": "0 12 * * *"
     }
   ]
 }
