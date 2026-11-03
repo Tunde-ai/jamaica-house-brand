@@ -55,11 +55,11 @@ export const menuCategories: MenuCategory[] = [
 ]
 
 export const pricingTiers: PricingTier[] = [
-  { guestRange: '20–50', pricePerPerson: 25, includes: '2 proteins, 3 sides, 1 beverage' },
-  { guestRange: '51–100', pricePerPerson: 22, includes: '2 proteins, 3 sides, 2 beverages' },
-  { guestRange: '101–200', pricePerPerson: 20, includes: '3 proteins, 4 sides, 2 beverages' },
-  { guestRange: '201–500', pricePerPerson: 18, includes: '3 proteins, 4 sides, 2 beverages' },
-  { guestRange: '500+', pricePerPerson: 15, includes: 'Custom menu — call for details' },
+  { guestRange: '20–50', pricePerPerson: 22, includes: '2 proteins, 3 sides, 1 beverage' },
+  { guestRange: '51–100', pricePerPerson: 20, includes: '2 proteins, 3 sides, 2 beverages' },
+  { guestRange: '101–200', pricePerPerson: 18, includes: '3 proteins, 4 sides, 2 beverages' },
+  { guestRange: '201–500', pricePerPerson: 16, includes: '3 proteins, 4 sides, 2 beverages' },
+  { guestRange: '500+', pricePerPerson: 14, includes: 'Custom menu — call for details' },
 ]
 
 export const guestCountOptions = [
