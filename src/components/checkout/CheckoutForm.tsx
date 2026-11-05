@@ -78,7 +78,16 @@ export default function CheckoutForm({ onPaymentSuccess, shippingOption, onShipp
       : isFreeShipping || shippingOption === 'free'
         ? 0
         : standardShippingCost
-  const total = subtotal + shippingCost
+  let promoDiscountAmount = 0
+  if (appliedPromo && subtotal > 0) {
+    if (appliedPromo.discount_type === 'percentage') {
+      promoDiscountAmount = Math.round((subtotal * appliedPromo.discount_value) / 100)
+    } else {
+      promoDiscountAmount = Math.round(appliedPromo.discount_value * 100)
+    }
+    if (promoDiscountAmount > subtotal) promoDiscountAmount = subtotal
+  }
+  const total = subtotal - promoDiscountAmount + shippingCost
 
   function updateField(field: keyof ShippingData, value: string) {
     setShipping((prev) => ({ ...prev, [field]: value }))
