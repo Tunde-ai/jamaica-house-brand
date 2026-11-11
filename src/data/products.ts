@@ -50,6 +50,25 @@ export const products: Product[] = [
     ],
   },
   {
+    id: 'jerk-sauce-10oz-2pack',
+    name: 'Double Up Deal — Original Jerk Sauce',
+    description: 'Two 10oz bottles of our authentic Jamaican jerk sauce for one unbeatable price. 20oz of flavor crafted from the family recipe that built three restaurants. Stock up while supplies last!',
+    price: 2499, // $24.99 in cents
+    compareAtPrice: 3998, // $39.98 (19.99 × 2)
+    size: '2 × 10oz (20oz Total)',
+    image: '/images/products/jerk-sauce-10oz.jpg',
+    slug: 'jerk-sauce-10oz-2pack',
+    category: 'bundle',
+    inStock: true,
+    rating: 4.9,
+    callouts: ['Limited Time', 'Save $15', 'Best Value'],
+    images: [
+      '/images/products/jerk-sauce-10oz.jpg',
+      '/images/products/jerk-sauce-10oz-2.jpg',
+    ],
+    bundleItems: ['jerk-sauce-10oz', 'jerk-sauce-10oz'],
+  },
+  {
     id: 'jamaica-house-bundle',
     name: 'Jamaica House Bundle',
     description: 'The perfect starter pack — get our 5oz Original Jerk Sauce plus our signature Escovitch Pikliz at a bundled discount. Everything you need to bring authentic Jamaican flavor to your kitchen.',
