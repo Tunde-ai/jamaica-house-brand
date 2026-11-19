@@ -9,6 +9,7 @@ import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 import GoogleAds from "@/components/analytics/GoogleAds";
 import MetaPixel from "@/components/analytics/MetaPixel";
 import ChatWidget from "@/components/ChatWidget";
+import FlashSalePopup from "@/components/FlashSalePopup";
 import { generateOrganizationJsonLd, generateWebSiteJsonLd, sanitizeJsonLd } from "@/lib/seo";
 import "./globals.css";
 
@@ -75,6 +76,7 @@ export default function RootLayout({
           <Footer />
         </div>
         <CartDrawer />
+        <FlashSalePopup />
         <ChatWidget />
         <Suspense fallback={null}>
           <MetaPixel />
