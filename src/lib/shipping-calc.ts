@@ -45,7 +45,7 @@ export interface ShippingResult {
 }
 
 const PRODUCTS: Record<string, Product> = {
-  '2oz':  { label: '2 oz Woozy Bottle',  weight_oz: 4.5,  free_shipping: true },
+  '2oz':  { label: '2 oz Woozy Bottle',  weight_oz: 4.5,  free_shipping: false },
   '5oz':  { label: '5 oz Woozy Bottle',  weight_oz: 9.0,  free_shipping: false },
   '10oz': { label: '10 oz Woozy Bottle', weight_oz: 16.0, free_shipping: false },
   '12oz': { label: '12 oz Bottle',       weight_oz: 18.0, free_shipping: false },
@@ -66,11 +66,13 @@ const CARRIER_RATES: Record<string, CarrierRate> = {
   'large_wholesale': { min: null,  max: null, note: 'Quote via UPS/FedEx Ground' },
 }
 
+const FLAT_SHIPPING_RATE = 8.99
+
 const CUSTOMER_RATES = {
   free:      { charge: 0, label: 'FREE Shipping' },
-  two_btl:   { min: 4.99, max: 6.99 },
-  three_btl: { min: 7.99, max: 9.99 },
-  large:     { min: 8.99, max: 10.99 },
+  two_btl:   { min: FLAT_SHIPPING_RATE, max: FLAT_SHIPPING_RATE },
+  three_btl: { min: FLAT_SHIPPING_RATE, max: FLAT_SHIPPING_RATE },
+  large:     { min: FLAT_SHIPPING_RATE, max: FLAT_SHIPPING_RATE },
 }
 
 export function calculateShipping(items: ShippingItem[]): ShippingResult {
@@ -117,12 +119,8 @@ export function calculateShipping(items: ShippingItem[]): ShippingResult {
 
   if (only2oz) {
     customerLabel = 'FREE Shipping'
-  } else if (totalBottles <= 2) {
-    customerLabel = `$${CUSTOMER_RATES.two_btl.min.toFixed(2)}–$${CUSTOMER_RATES.two_btl.max.toFixed(2)}`
-  } else if (totalBottles <= 4) {
-    customerLabel = `$${CUSTOMER_RATES.three_btl.min.toFixed(2)}–$${CUSTOMER_RATES.three_btl.max.toFixed(2)}`
   } else {
-    customerLabel = `$${CUSTOMER_RATES.large.min.toFixed(2)}–$${CUSTOMER_RATES.large.max.toFixed(2)}`
+    customerLabel = `$${FLAT_SHIPPING_RATE.toFixed(2)}`
   }
 
   // Packing notes
@@ -205,10 +203,7 @@ export function getCheckoutShippingCostCents(
   if (shippingItems.length === 0) return 0
 
   // Free samples must always pay shipping — never $0
-  const hasOnlyFreeSamples = items.every(i => i.id.replace(/-upsell-\d+$/, '').startsWith('free-sample'))
-  if (hasOnlyFreeSamples) {
-    return 699 // $6.99 flat rate for free samples
-  }
+  // Free sample promotion discontinued — all orders pay standard shipping
 
   const dollars = getCheckoutShippingCost(shippingItems)
   return Math.round(dollars * 100)

@@ -24,10 +24,8 @@ SHIPPING CARRIER: Pirateship USPS Ground Advantage (nationwide)
 Large/wholesale orders: UPS/FedEx Ground, quoted separately
 
 WHAT TO CHARGE CUSTOMERS:
-- 2oz sample bottle only: FREE SHIPPING (we absorb the cost)
-- 2-bottle combos: $4.99-$6.99
-- 3-bottle combos: $7.99-$9.99
-- Larger orders: $8.99-$10.99
+- Standard shipping: $8.99 flat rate
+- Free shipping on orders over $50
 
 RESPONSE FORMAT — always tell the customer:
 1. Recommended box size

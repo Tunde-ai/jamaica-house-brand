@@ -164,7 +164,7 @@ export default function SamplePopup() {
                     Get a FREE 2oz Sample
                   </DialogTitle>
                   <p className="text-brand-gold font-semibold mb-4">
-                    Just Pay $5.99 Shipping
+                    Just Pay $8.99 Shipping
                   </p>
                   <div className="relative w-40 h-40 mx-auto mb-6">
                     <Image
