@@ -194,7 +194,7 @@ ${selectedItemsText}
 }
 
 async function sendSlackNotification(body: CateringMenuQuoteBody, orderId: string) {
-  const webhookUrl = process.env.SLACK_WEBHOOK_URL
+  const webhookUrl = process.env.SLACK_WEBHOOK_URL?.trim()
   if (!webhookUrl) return
 
   const selectedItemsText = formatSelectedItems(body.selectedItems)

@@ -99,7 +99,7 @@ async function sendSaucePackageNotification(body: SaucePackageBody) {
 }
 
 async function sendSlackNotification(body: SaucePackageBody) {
-  const webhookUrl = process.env.SLACK_WEBHOOK_URL
+  const webhookUrl = process.env.SLACK_WEBHOOK_URL?.trim()
   if (!webhookUrl) return
 
   const shippingDestination = `${body.shippingCity}, ${body.shippingStateCountry} ${body.shippingPostalCode}`.trim()

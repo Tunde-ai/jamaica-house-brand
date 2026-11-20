@@ -74,7 +74,7 @@ async function sendSignupNotification(body: MembershipSignupBody) {
 }
 
 async function sendSlackNotification(body: MembershipSignupBody) {
-  const webhookUrl = process.env.SLACK_WEBHOOK_URL
+  const webhookUrl = process.env.SLACK_WEBHOOK_URL?.trim()
   if (!webhookUrl) return
 
   await fetch(webhookUrl, {

@@ -167,8 +167,9 @@ const CART_TO_SHIPPING: Record<string, { sizes: string[]; bottles: number }> = {
   'jerk-sauce-5oz':        { sizes: ['5oz'], bottles: 1 },
   'jerk-sauce-10oz':       { sizes: ['10oz'], bottles: 1 },
   'escovitch-pikliz-12oz': { sizes: ['12oz'], bottles: 1 },
-  'jamaica-house-bundle':  { sizes: ['2oz', '5oz', '12oz'], bottles: 3 },
-  'free-sample-2oz':       { sizes: ['2oz'], bottles: 1 },
+  'jerk-sauce-10oz-2pack': { sizes: ['10oz', '10oz'], bottles: 2 },
+  'flash-sale-20oz':       { sizes: ['10oz', '10oz'], bottles: 2 },
+  'jamaica-house-bundle':  { sizes: ['5oz', '12oz'], bottles: 2 },
 }
 
 export function cartItemsToShippingItems(

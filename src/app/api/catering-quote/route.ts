@@ -179,7 +179,7 @@ async function sendQuoteNotification(body: CateringQuoteBody) {
 }
 
 async function sendSlackNotification(body: CateringQuoteBody) {
-  const webhookUrl = process.env.SLACK_WEBHOOK_URL
+  const webhookUrl = process.env.SLACK_WEBHOOK_URL?.trim()
   if (!webhookUrl) return
 
   const statusEmojis = {

@@ -166,7 +166,7 @@ function formatOrderLine(order: any): string {
 }
 
 async function sendSlackReminder(orders: any[]) {
-  const webhookUrl = process.env.SLACK_WEBHOOK_URL
+  const webhookUrl = process.env.SLACK_WEBHOOK_URL?.trim()
   if (!webhookUrl) return
 
   const orderLines = orders

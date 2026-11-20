@@ -139,7 +139,7 @@ async function sendCriticalAlerts(criticalIssues: string[], timestamp: string, h
   const alertPromises: Promise<void>[] = [];
 
   // 1. URGENT SLACK ALERT
-  const slackWebhookUrl = process.env.SLACK_WEBHOOK_URL;
+  const slackWebhookUrl = process.env.SLACK_WEBHOOK_URL?.trim();
   if (slackWebhookUrl) {
     alertPromises.push(sendSlackAlert(criticalIssues, timestamp, healthData, slackWebhookUrl));
   }
@@ -277,7 +277,7 @@ async function sendEmergencyAlert(error: unknown): Promise<void> {
   const errorMessage = error instanceof Error ? error.message : 'Unknown system error';
 
   // Emergency Slack alert
-  const slackWebhookUrl = process.env.SLACK_WEBHOOK_URL;
+  const slackWebhookUrl = process.env.SLACK_WEBHOOK_URL?.trim();
   if (slackWebhookUrl) {
     try {
       await fetch(slackWebhookUrl, {

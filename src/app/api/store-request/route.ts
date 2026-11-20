@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Send Slack notification
-    const webhookUrl = process.env.SLACK_WEBHOOK_URL
+    const webhookUrl = process.env.SLACK_WEBHOOK_URL?.trim()
     if (webhookUrl) {
       await fetch(webhookUrl, {
         method: 'POST',

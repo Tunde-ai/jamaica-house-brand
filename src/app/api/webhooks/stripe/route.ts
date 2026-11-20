@@ -151,7 +151,7 @@ async function postToCommandCenter(payload: {
 
 
 async function sendSlackNotification(session: Stripe.Checkout.Session) {
-  const webhookUrl = process.env.SLACK_WEBHOOK_URL
+  const webhookUrl = process.env.SLACK_WEBHOOK_URL?.trim()
   if (!webhookUrl) return
 
   const total = session.amount_total ? `$${(session.amount_total / 100).toFixed(2)}` : 'N/A'
@@ -356,7 +356,7 @@ async function handleWholesaleOrder(session: Stripe.Checkout.Session) {
     : `Shipping to ${deliveryAddress}`
 
   // 1. Slack notification
-  const slackUrl = process.env.SLACK_WEBHOOK_URL
+  const slackUrl = process.env.SLACK_WEBHOOK_URL?.trim()
   if (slackUrl) {
     try {
       await fetch(slackUrl, {
@@ -797,7 +797,7 @@ export async function POST(request: NextRequest) {
         })(),
         // 2. Slack notification
         (async () => {
-          const slackUrl = process.env.SLACK_WEBHOOK_URL
+          const slackUrl = process.env.SLACK_WEBHOOK_URL?.trim()
           if (!slackUrl) return
           await fetch(slackUrl, {
             method: 'POST',
@@ -891,7 +891,7 @@ export async function POST(request: NextRequest) {
       })
 
       // Slack alert for failed payment
-      const slackUrl = process.env.SLACK_WEBHOOK_URL
+      const slackUrl = process.env.SLACK_WEBHOOK_URL?.trim()
       if (slackUrl) {
         try {
           await fetch(slackUrl, {
@@ -944,7 +944,7 @@ export async function POST(request: NextRequest) {
       })
 
       // Slack alert for abandoned cart
-      const slackUrlExp = process.env.SLACK_WEBHOOK_URL
+      const slackUrlExp = process.env.SLACK_WEBHOOK_URL?.trim()
       if (slackUrlExp) {
         try {
           const recoveryUrl = expiredSession.after_expiration?.recovery?.url
@@ -1043,7 +1043,7 @@ export async function POST(request: NextRequest) {
 
       console.error('[stripe-webhook] Async payment failed:', asyncFailSession.id)
 
-      const slackUrlAsync = process.env.SLACK_WEBHOOK_URL
+      const slackUrlAsync = process.env.SLACK_WEBHOOK_URL?.trim()
       if (slackUrlAsync) {
         try {
           await fetch(slackUrlAsync, {
