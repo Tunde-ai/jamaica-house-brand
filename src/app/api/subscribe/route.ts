@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
+import { Resend } from 'resend'
+import { render } from '@react-email/render'
 import mailchimp from '@mailchimp/mailchimp_marketing'
 import crypto from 'crypto'
+import { WelcomeEmail } from '@/lib/email-templates/WelcomeEmail'
 
 const apiKey = process.env.MAILCHIMP_API_KEY ?? ''
 const audienceId = process.env.MAILCHIMP_AUDIENCE_ID ?? ''
@@ -59,22 +62,41 @@ export async function POST(request: Request) {
           email_address: email,
           status: 'subscribed',
           merge_fields: mergeFields,
-          tags: ['free-sample'],
+          tags: ['website-signup'],
         })
 
         console.log('[subscribe] Mailchimp success for:', email)
       } catch (mcError) {
-        // Log but don't block — user still gets their sample
+        // Log but don't block
         console.error('[subscribe] Mailchimp error:', mcError)
       }
     } else {
       console.warn('[subscribe] Mailchimp not configured — skipping API call')
     }
 
+    // Send welcome email via Resend
+    if (process.env.RESEND_API_KEY && emailOptIn) {
+      try {
+        const resend = new Resend(process.env.RESEND_API_KEY)
+        const html = await render(WelcomeEmail({ firstName: firstName.trim() }))
+
+        await resend.emails.send({
+          from: 'Jamaica House Brand <hello@jamaicahousebrand.com>',
+          to: email,
+          subject: `Welcome to the family, ${firstName}! 🔥`,
+          html,
+        })
+
+        console.log('[subscribe] Welcome email sent to:', email)
+      } catch (emailError) {
+        // Log but don't block
+        console.error('[subscribe] Welcome email error:', emailError)
+      }
+    }
+
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('[subscribe] Request error:', error)
-    // Still return success so user gets their sample
     return NextResponse.json({ success: true })
   }
 }
