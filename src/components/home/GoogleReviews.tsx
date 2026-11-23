@@ -40,6 +40,22 @@ function NoApiKeyFallback() {
           </h2>
         </div>
         <p className="text-gray-400 mb-8">Over 200 five-star reviews on Google</p>
+        {/* Video Review CTA */}
+        <div className="mt-8 mb-8 bg-gradient-to-r from-brand-gold/10 to-brand-gold/5 border border-brand-gold/20 rounded-xl p-8 text-center">
+          <h3 className="text-xl font-bold text-white mb-2">Share Your Experience</h3>
+          <p className="text-gray-400 text-sm mb-5 max-w-md mx-auto">
+            Tried our sauce? Record a quick video review and show us how you use it!
+          </p>
+          <a
+            href="https://share.voicemason.com/r/jrdcpqn572"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-brand-gold text-brand-dark font-bold px-6 py-3 rounded-lg hover:bg-brand-gold-light transition-colors"
+          >
+            Record a Video Review
+          </a>
+        </div>
+
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a
             href={`https://search.google.com/local/reviews?placeid=${GOOGLE_PLACE_ID}`}
@@ -59,7 +75,7 @@ function NoApiKeyFallback() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-brand-gold/10 border border-brand-gold/30 text-brand-gold px-6 py-3 rounded-lg hover:bg-brand-gold/20 transition-colors font-medium"
           >
-            Leave a Review
+            Leave a Google Review
           </a>
         </div>
       </div>
@@ -159,8 +175,32 @@ export default async function GoogleReviews() {
           ))}
         </div>
 
+        {/* Video Review CTA */}
+        <div className="mt-10 mb-10 bg-gradient-to-r from-brand-gold/10 to-brand-gold/5 border border-brand-gold/20 rounded-xl p-8 text-center">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <svg className="w-6 h-6 text-brand-gold" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6zm12.553 1.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
+            </svg>
+            <h3 className="text-xl font-bold text-white">Share Your Experience</h3>
+          </div>
+          <p className="text-gray-400 text-sm mb-5 max-w-md mx-auto">
+            Tried our sauce? Record a quick video review and show us how you use it. We love hearing from our customers!
+          </p>
+          <a
+            href="https://share.voicemason.com/r/jrdcpqn572"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-brand-gold text-brand-dark font-bold px-6 py-3 rounded-lg hover:bg-brand-gold-light transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
+            </svg>
+            Record a Video Review
+          </a>
+        </div>
+
         {/* Links */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a
             href={place.url}
             target="_blank"
@@ -179,7 +219,7 @@ export default async function GoogleReviews() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-brand-gold/10 border border-brand-gold/30 text-brand-gold px-5 py-2.5 rounded-lg hover:bg-brand-gold/20 transition-colors text-sm font-medium"
           >
-            Leave a Review
+            Leave a Google Review
           </a>
         </div>
       </div>

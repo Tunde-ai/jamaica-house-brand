@@ -245,6 +245,78 @@ export function OrderConfirmationEmail({
       >
         Crafted with love from our family to yours.
       </p>
+
+      {/* Review CTA */}
+      <table
+        role="presentation"
+        style={{
+          width: '100%',
+          borderCollapse: 'collapse',
+          marginTop: '28px',
+          backgroundColor: '#F5F0E8',
+          borderRadius: '8px',
+          overflow: 'hidden',
+        }}
+      >
+        <tbody>
+          <tr>
+            <td style={{ padding: '20px 24px', textAlign: 'center' }}>
+              <p
+                style={{
+                  margin: '0 0 8px',
+                  fontSize: '15px',
+                  fontWeight: 700,
+                  color: '#1A1A1A',
+                }}
+              >
+                Loving our sauce?
+              </p>
+              <p
+                style={{
+                  margin: '0 0 14px',
+                  fontSize: '13px',
+                  color: '#6A6A6A',
+                  lineHeight: 1.5,
+                }}
+              >
+                Record a quick video review and we&#39;ll send you a free bottle as a thank you!
+              </p>
+              <a
+                href="https://share.voicemason.com/r/jrdcpqn572"
+                style={{
+                  display: 'inline-block',
+                  backgroundColor: '#D4A843',
+                  color: '#1A1A1A',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  padding: '10px 24px',
+                  borderRadius: '6px',
+                  textDecoration: 'none',
+                  marginRight: '8px',
+                }}
+              >
+                Record a Video Review
+              </a>
+              <a
+                href="https://g.page/r/jamaicahousebrand/review"
+                style={{
+                  display: 'inline-block',
+                  backgroundColor: '#FFFFFF',
+                  color: '#2D5016',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  padding: '10px 24px',
+                  borderRadius: '6px',
+                  textDecoration: 'none',
+                  border: '1px solid #D4D4D4',
+                }}
+              >
+                Leave a Google Review
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </BaseLayout>
   )
 }
