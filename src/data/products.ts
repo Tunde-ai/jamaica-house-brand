@@ -71,19 +71,19 @@ export const products: Product[] = [
   {
     id: 'jamaica-house-bundle',
     name: 'Jamaica House Bundle',
-    description: 'The perfect starter pack — get our 5oz Original Jerk Sauce plus our signature Escovitch Pikliz at a bundled discount. Everything you need to bring authentic Jamaican flavor to your kitchen.',
+    description: 'The perfect starter pack — includes one 5oz Original Jerk Sauce bottle and one 12oz Escovitch Pikliz jar. Two products, one great price. Everything you need to bring authentic Jamaican flavor to your kitchen.',
     price: 1999, // $19.99 in cents
     compareAtPrice: 2398, // $23.98 (11.99 + 11.99)
-    size: '5oz + 12oz',
-    image: '/images/products/bundle-shop.jpg',
+    size: '5oz Jerk Sauce + 12oz Pikliz',
+    image: '/images/products/jerk-sauce-5oz.jpg',
     slug: 'jamaica-house-bundle',
     category: 'bundle',
     inStock: true,
     rating: 5.0,
-    callouts: ['Best Value', 'Save $4', 'Complete Set'],
+    callouts: ['Best Value', 'Save $4', '2 Products'],
     images: [
-      '/images/products/bundle-shop.jpg',
-      '/images/products/product-group.jpg',
+      '/images/products/jerk-sauce-5oz.jpg',
+      '/images/products/pikliz-12oz.jpg',
     ],
     bundleItems: ['jerk-sauce-5oz', 'escovitch-pikliz-12oz'],
   },
